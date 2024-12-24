@@ -1,0 +1,12 @@
+/* tile uploaded pictures */
+.upload-list-inline .ant-upload-list-item {
+    float: left;
+    /* width: 180px; */
+    width: auto;
+    margin-inline-end: 8px;
+    
+  }
+  
+  .ant-upload-rtl.upload-list-inline .ant-upload-list-item {
+    float: right;
+  }

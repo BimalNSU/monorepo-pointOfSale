@@ -1,0 +1,32 @@
+span .hamBurger{
+    width: 35px;
+    height: 5px;
+    background-color:rgb(24, 144, 255) ;
+    margin: 6px 0;
+  }
+  .ant-menu-item-selected{
+    background-color:rgba(76, 175, 80, 0.1) !important;
+  }
+  .ant-menu-item-selected a{
+    color:#222222 !important;
+  }
+  .ant-menu-item-selected::after{
+    border:transparent !important;
+  }
+  .ant-menu-item a:hover{
+    color:rgb(8, 113, 13) !important;
+  }
+  .ant-menu-item::after{
+    border:none !important;
+  }
+  @media only screen and (max-width: 600px) {
+    .right-menu {
+      display: none;
+    }
+    .menu-button {
+      display:block;
+    }
+    .ant-menu-inline .ant-menu-item-selected::after{
+      transform:scaleY(0);
+    }
+  }

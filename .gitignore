@@ -1,0 +1,7 @@
+# node_modules
+**/node_modules/
+
+# Ignore all 'lib' directories anywhere in the repository
+**/lib/
+service-account.json
+service-account-*.json

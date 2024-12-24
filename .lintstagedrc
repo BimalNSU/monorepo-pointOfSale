@@ -1,0 +1,4 @@
+{
+  "pos/**/*.{js,ts,jsx,tsx}": "eslint --fix --quiet",
+  "*.{js,jsx,ts,tsx,md,json}": "prettier --write"
+}

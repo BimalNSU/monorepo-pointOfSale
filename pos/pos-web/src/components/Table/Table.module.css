@@ -1,0 +1,58 @@
+.brBottom {
+    border-bottom: 1px solid #F2F2F2;
+}
+
+.customTh {
+    background: #fafafa;
+    padding: 15px;
+    font-size: 15px;
+    color: #000000E0;
+    border: 1px solid #f2f2f2 !important;
+}
+
+.hideTableHeader label {
+    display: none !important;
+}
+
+.tableInput {
+    margin-left: 15px;
+    margin-top: 25px;
+}
+
+.tableHead {
+    display: none;
+}
+
+.dangerButton {
+    position: relative;
+    top: 15px;
+}
+
+@media only screen and (max-device-width: 480px) {
+    .tableHead {
+        display: block;
+    }
+
+    .customTh {
+        display: none;
+    }
+
+    .tableInput {
+        margin-left: 0px;
+        margin-top: 0px;
+    }
+
+    .customtd {
+        float: left;
+        width: 100%;
+        border: none !important;
+    }
+
+    .hideTableHeader label {
+        display: block !important;
+    }
+
+    .recordCard {
+        font-size: 7px;
+    }
+}

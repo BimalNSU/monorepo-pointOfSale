@@ -1,0 +1,58 @@
+.profile_img {
+  border-radius: 50%;
+  width: 200px;
+  margin-bottom: 40px;
+  display: inline-block;
+}
+.paddingLeft {
+  padding-left: 15px;
+  font-size: 26px;
+}
+/* table */
+.label_table {
+  font-size: 15px;
+  font-weight: bold;
+  padding-right: 30px;
+}
+.text_table {
+  font-size: 15px;
+}
+.sub_title {
+  font-size: 22px;
+  font-weight: bolder;
+  line-height: 0px;
+  margin-bottom: -3px;
+  padding-top: 10px;
+}
+.rightborder {
+  border-right: 1px solid rgb(167, 167, 167);
+}
+.content {
+  padding-left: 20px;
+}
+.subheading {
+  font-size: 15px;
+  font-weight: bolder;
+  padding-top: 15px;
+  padding-bottom: 25px;
+}
+/* icon */
+.icon {
+  height: 13.5px;
+  width: 20px;
+  margin-right: 10px;
+}
+.icon_text {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.hoverEffect {
+  cursor: pointer;
+  color: rgb(127, 166, 168);
+}
+
+.hoverEffect:hover {
+  color: rgb(0, 98, 255);
+}

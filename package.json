@@ -1,0 +1,46 @@
+{
+  "name": "management-system-monorepo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "pnpm clean:ports && pnpm build:lib && pnpm run -r --stream --parallel dev",
+    "dev:prod": "pnpm clean:ports && pnpm build:lib && pnpm run -r --stream --parallel dev:prod",
+    "build": "pnpm build:lib && pnpm run -r --stream build",
+    "build:lib": "pnpm run -r --stream build:lib",
+    "deploy": "pnpm run -r --stream deploy",
+    "lint": "pnpm run -r --stream lint",
+    "format": "pnpm run -r --stream format",
+    "prepare": "husky install",
+    "commit": "git-cz",
+    "clean:ports": "pnpx kill-port 8080 9099 5001 9199"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "engines": {
+    "node": "18"
+  },
+  "engineStrict": true,
+  "keywords": [],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@commitlint/cz-commitlint": "^17.1.2",
+    "commitizen": "^4.2.5",
+    "eslint": "^9.16.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "workspaces": [
+    "pos/pos-web",
+    "pos/pos-functions/functions",
+    "shared"
+  ]
+}
