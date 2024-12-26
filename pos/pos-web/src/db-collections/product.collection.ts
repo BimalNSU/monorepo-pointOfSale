@@ -1,5 +1,5 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { ProductId, PropertyId, UserId, WithId } from "@/models/common.model";
+import { ProductId, UserId, WithId } from "@/models/common.model";
 import { Product as ProductModel } from "@/models/product.model";
 import { firestoreConverter } from "@/utils/converter";
 import {
@@ -48,13 +48,13 @@ export class Product {
     });
     return docRef;
   }
-  async get(id: PropertyId) {
+  async get(id: ProductId) {
     const docRef = doc(this.collectionRef, id).withConverter(productFirestoreConverter);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return { ...docSnap.data(), id };
     } else {
-      throw new Error(`Invalid propertyId: ${id}`);
+      throw new Error(`Invalid productId #${id}`);
     }
   }
   async getListByIds(ids: ProductId[]) {

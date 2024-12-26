@@ -1,18 +1,15 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { DocumentCounterId, ProductId, PropertyId, UserId, WithId } from "@/models/common.model";
+import { DocumentCounterId } from "@/models/common.model";
 import { DocumentCounter as DocumentCounterModel } from "@/models/documentCounter.model";
-import { Product as ProductModel } from "@/models/product.model";
 import { firestoreConverter } from "@/utils/converter";
 import {
   CollectionReference,
-  FieldValue,
   Firestore,
   WriteBatch,
   collection,
   doc,
   getDoc,
   increment,
-  serverTimestamp,
 } from "firebase/firestore";
 
 const counterFirestoreConverter = firestoreConverter<DocumentCounterModel>();

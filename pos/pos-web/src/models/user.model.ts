@@ -1,11 +1,6 @@
 import {
-  PropertyId,
-  TenantAgreementId,
   Address,
   UserId,
-  UnitId,
-  ParkingId,
-  ShopId,
   MaritalStatus,
   UserFiles,
   Gender,
@@ -47,16 +42,6 @@ export interface User {
   emergencyMobile: string | null;
   emergencyEmail: string | null;
   files: UserFiles;
-
-  tenantAssignmentList: Record<PropertyId, { agreementIds: TenantAgreementId[] }>;
-
-  //for owner
-  assignmentList: Record<
-    PropertyId,
-    { unitIds: UnitId[]; parkingIds: ParkingId[]; shopIds: ShopId[] }
-  >;
-  ownedPropertyIds: PropertyId[];
-  assignedPropertyIds: PropertyId[]; //for manager
 
   createdAt: Date;
   createdBy: UserId;

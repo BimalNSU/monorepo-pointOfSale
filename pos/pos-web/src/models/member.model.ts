@@ -1,13 +1,8 @@
 import {
-  PropertyId,
   Address,
   UserId,
-  ShopId,
-  UnitId,
-  MemberAssignmentId,
   MaritalStatus,
   UserFiles,
-  NidRecordId,
   Gender,
   BloodGroup,
   Religion,
@@ -34,17 +29,6 @@ export type Relation =
   | "other"
   | "none";
 export type MemberRole = Relation | Designation;
-export type MemberAssign = { unitId: UnitId | null; shopId: ShopId | null; role: MemberRole };
-
-export type ShopMemberAssignment = {
-  shopIds: ShopId[];
-  roleShops: Record<ShopId, { role: Designation; memberAssignmentId: MemberAssignmentId }>;
-};
-
-export type ResidentialMemberAssignment = {
-  unitIds: UnitId[];
-  roleUnits: Record<UnitId, { role: Relation; memberAssignmentId: MemberAssignmentId }>;
-};
 export interface Member {
   firstName: string;
   lastName: string | null;
@@ -69,12 +53,6 @@ export interface Member {
   //   isEmailVerified: boolean;
   //   isMobileVerified: boolean;
   profileImage: string | null;
-
-  memberAssignmentList: Record<
-    PropertyId,
-    ShopMemberAssignment | ResidentialMemberAssignment
-  > | null;
-  nidVerificationInfo: { nidRecordId: NidRecordId | null; attempts: number };
 
   createdAt: Date;
   createdBy: UserId;

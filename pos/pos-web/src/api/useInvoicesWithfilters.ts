@@ -28,7 +28,11 @@ export const useInvoicesWithFilters = (dateRange?: { fromDate: Dayjs; toDate: Da
     () =>
       invoices?.map((inv) => {
         const { createdAt, ...rest } = inv;
-        return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: inv.id };
+        return {
+          ...rest,
+          createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
+          key: inv.id,
+        };
       }) ?? [],
     [invoices],
   );
