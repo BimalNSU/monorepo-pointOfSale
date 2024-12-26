@@ -11,7 +11,7 @@ const PopHoverProfile = ({ viewContentMbl }) => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   };
   const content = (
     <Space direction="vertical">

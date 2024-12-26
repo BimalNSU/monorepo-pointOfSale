@@ -46,17 +46,11 @@ const App = () => {
             <Route path=":id" element={<InvoiceDetails />} />
           </Route>
           <Route path="reports" element={<InvoiceReport />} />
-        </Route>
 
-        {/* Handle the case where no route matches */}
-        <Route path="/*" element={<NotFound />} />
+          {/* Handle the case where no route matches */}
+          <Route path="/*" element={<NotFound />} />
+        </Route>
       </Routes>
-      {/* <Routes>
-        <Route path="/products" exact element={Products} />
-      </Routes> */}
-      {/* <PrivateRoute>
-        <AuthManagedMainLayout />
-      </PrivateRoute> */}
     </BrowserRouter>
   );
 };

@@ -39,7 +39,7 @@ function Login() {
         const userData = { ...res.data.userData, currentLoginType };
         // await login(res.data.accessToken,userData );
         await loginWithCustomToken(res.data.accessToken, userData);
-        const { from } = location.state || { from: { pathname: "/" } };
+        const { from } = location.state || { from: { pathname: "/sales" } };
         navigate(from, { replace: true });
       } else {
         error("Incorrect Email or password");
