@@ -22,12 +22,16 @@ import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { error, success } from "@/utils/Utils/Utils";
+import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
+import dayjs from "dayjs";
+import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
 
 const InvoiceAdd = () => {
   const db = useFirestore();
+  const [newInvoice, setNewInvoice] = useState();
   const invoiceService = new InvoiceService(db);
   const { userId } = useCustomAuth();
   const { status, data: products } = useProducts();
@@ -57,7 +61,7 @@ const InvoiceAdd = () => {
           };
         });
         try {
-          await invoiceService.create(
+          const nInvoice = await invoiceService.create(
             { ...rest, id: newInvoiceId, discount: totalDiscount, items: invoiceItems },
             userId,
           );
@@ -67,8 +71,10 @@ const InvoiceAdd = () => {
           setTotalDiscount();
           salesForm.resetFields();
           success("New invoice is created successfully");
+
+          setNewInvoice(nInvoice); //temporary store data for print
         } catch (err) {
-          error("Fail to create new invoice");
+          error("Fail to create an invoice");
         }
       },
     });
@@ -168,8 +174,14 @@ const InvoiceAdd = () => {
     setDataSource(nDataSource);
   };
 
+  const handleAfterPrint = () => {
+    setNewInvoice();
+  };
   return (
     <div>
+      {newInvoice ? (
+        <PrintReceipt directPrint={true} onAfterPrint={handleAfterPrint} invoice={newInvoice} />
+      ) : null}
       <Row justify="center">
         <Title level={4}>
           Sales{" "}
@@ -216,7 +228,7 @@ const InvoiceAdd = () => {
             <Card title="Summary & Payment">
               <Space direction="vertical">
                 <Text>
-                  Total:{" "}
+                  Subtotal:{" "}
                   {dataSource.reduce((pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0), 0)}
                 </Text>
                 <InvoiceTotalDiscount
@@ -226,7 +238,7 @@ const InvoiceAdd = () => {
                   isRequiredTooltip={isRequiredTooltip}
                 />
                 <Text>
-                  Net Total:{" "}
+                  Total:{" "}
                   {dataSource.reduce(
                     (pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0),
                     -(totalDiscount ?? 0),

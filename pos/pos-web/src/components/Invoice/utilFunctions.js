@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import { BILL_TYPE } from "@/constants/billsType";
 import { DATE_FORMAT, DATE_MMM_YYYY } from "@/constants/dateFormat";
 
@@ -163,9 +163,9 @@ const invoiceProcess = (data) => {
     tenantAgreementId,
     ...tempData
   } = data;
-  tempData.month = moment(createdAt.toDate()).format(DATE_MMM_YYYY);
-  tempData.createdAt = moment(createdAt.toDate()).format(DATE_FORMAT);
-  tempData.dueDate = moment(dueDate.toDate()).format(DATE_FORMAT);
+  tempData.month = dayjs(createdAt.toDate()).format(DATE_MMM_YYYY);
+  tempData.createdAt = dayjs(createdAt.toDate()).format(DATE_FORMAT);
+  tempData.dueDate = dayjs(dueDate.toDate()).format(DATE_FORMAT);
   const finalBillsArr = [];
   const discountArr = [];
 

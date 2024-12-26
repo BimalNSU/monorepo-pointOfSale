@@ -22,7 +22,7 @@ import {
   Popover,
   Divider,
 } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import Icon, { DownOutlined, SearchOutlined, FilePdfOutlined } from "@ant-design/icons";
 
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
@@ -67,7 +67,7 @@ const dateTimeFormat = "DD/MM/YYYY, HH:mm:ss";
 const dateFormat = "DD/MM/YYYY";
 // const milisecDiffForYesterday = 86400000;
 // const { confirm } = Modal;
-// const currentDateTime = moment().format(dateTimeFormat); // result return as string format
+// const currentDateTime = dayjs().format(dateTimeFormat); // result return as string format
 
 const NotificationContainers = ({ data, numOfMaxNotification, onClickedHideNotification }) => {
   const { userId, role } = useCustomAuth();
@@ -95,63 +95,60 @@ const NotificationContainers = ({ data, numOfMaxNotification, onClickedHideNotif
     const nTodayNotifications = [];
     const nYesterdayNotification = [];
     const nEarlierNotification = [];
-    // const nowDate = moment().format("DD/MM/YYYY");
-    const nowDateTime = moment().format(dateTimeFormat);
+    // const nowDate = dayjs().format("DD/MM/YYYY");
+    const nowDateTime = dayjs().format(dateTimeFormat);
     // let numOfUnread = 0;
     viewableNotifications.forEach((item) => {
       // if (!item.isRead) {
       //   numOfUnread++;
       // }
       const { createdAt, ...rest } = item;
-      const then = moment(createdAt.toDate()).format(dateTimeFormat);
-      //   const then = moment(createdAt).format(dateTimeFormat); //convert date number to date string format
-      const daysDiff = moment(nowDateTime, dateTimeFormat).diff(
-        moment(then, dateTimeFormat),
-        "days",
-      );
+      const then = dayjs(createdAt.toDate()).format(dateTimeFormat);
+      //   const then = dayjs(createdAt).format(dateTimeFormat); //convert date number to date string format
+      const daysDiff = dayjs(nowDateTime, dateTimeFormat).diff(dayjs(then, dateTimeFormat), "days");
       if (daysDiff === 0) {
-        const minutesDiff = moment(nowDateTime, dateTimeFormat).diff(
-          moment(then, dateTimeFormat),
+        const minutesDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+          dayjs(then, dateTimeFormat),
           "minutes",
         );
         if (minutesDiff < 59) {
           nTodayNotifications.push({ ...rest, createdAt: `${minutesDiff}minutes` });
         } else {
-          const hoursDiff = moment(nowDateTime, dateTimeFormat).diff(
-            moment(then, dateTimeFormat),
+          const hoursDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+            dayjs(then, dateTimeFormat),
             "hours",
           );
           nTodayNotifications.push({ ...rest, createdAt: `${hoursDiff}h` });
         }
       } else if (daysDiff === 1) {
-        const hoursDiff = moment(nowDateTime, dateTimeFormat).diff(
-          moment(then, dateTimeFormat),
+        const hoursDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+          dayjs(then, dateTimeFormat),
           "hours",
         );
         nYesterdayNotification.push({ ...rest, createdAt: `${hoursDiff}h` });
       } else {
         //TODO: 2-6 days, 1-3 week
-        const daysDiff = moment(nowDateTime, dateTimeFormat).diff(
-          moment(then, dateTimeFormat),
+        const daysDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+          dayjs(then, dateTimeFormat),
           "days",
         );
         if (daysDiff < 7) {
           nEarlierNotification.push({ ...rest, createdAt: `${daysDiff}d` });
         } else if (daysDiff < 30) {
-          const weeksDiff = moment(nowDateTime, dateTimeFormat).diff(
-            moment(then, dateTimeFormat),
+          const weeksDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+            dayjs(then, dateTimeFormat),
             "weeks",
           );
           nEarlierNotification.push({ ...rest, createdAt: `${weeksDiff}w` });
         } else if (daysDiff < 365) {
-          const monthsDiff = moment(nowDateTime, dateTimeFormat).diff(
-            moment(then, dateTimeFormat),
+          const monthsDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+            dayjs(then, dateTimeFormat),
             "months",
           );
           nEarlierNotification.push({ ...rest, createdAt: `${monthsDiff}m` });
         } else {
-          const yearsDiff = moment(nowDateTime, dateTimeFormat).diff(
-            moment(then, dateTimeFormat),
+          const yearsDiff = dayjs(nowDateTime, dateTimeFormat).diff(
+            dayjs(then, dateTimeFormat),
             "years",
           );
           nEarlierNotification.push({ ...rest, createdAt: `${yearsDiff}y` });

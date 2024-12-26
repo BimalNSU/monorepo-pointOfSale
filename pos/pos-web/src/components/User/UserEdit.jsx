@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Personal.module.css";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
   Input,
@@ -37,7 +37,7 @@ import * as validator from "../../utils/Validation/Validation";
 import { success, error, checkValueExist, deleteUndefinedNullFromObj } from "@/utils/Utils/Utils";
 // import style from "../../assets/common/style.css";
 
-import moment from "moment";
+import dayjs from "dayjs";
 import { COLLECTIONS } from "@/constants/collections";
 const bloodGroupsData = [];
 
@@ -61,7 +61,7 @@ const { Title } = Typography;
 
 const UserEdit = ({ targetRole, onSuccess, userData }) => {
   const { userId: authUserId, isAdmin, getToken } = useCustomAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const storage = useStorage();
   const firestore = useFirestore();
   const [activeKey, setActiveKey] = useState("1");
@@ -134,7 +134,7 @@ const UserEdit = ({ targetRole, onSuccess, userData }) => {
   //   try {
   //     const accessToken = await getToken();
   //     if (!accessToken) {
-  //       history.push(`${isAdmin ? "/admin" : "/"}login`);
+  //       navigate(`${isAdmin ? "/admin" : "/"}login`);
   //     }
   //     const res = isAdmin
   //       ? await apiProvider.addUserByAdmin(otherInfo, accessToken)
@@ -162,7 +162,7 @@ const UserEdit = ({ targetRole, onSuccess, userData }) => {
           // personalInfo.uid = userData.id;
           const accessToken = await getToken();
           if (!accessToken) {
-            history.push(`${isAdmin ? "/admin" : "/"}login`);
+            navigate(`${isAdmin ? "/admin" : "/"}login`);
           }
           const res = isAdmin
             ? await apiProvider.addUserByAdmin({ ...personalInfo, uid: userData.id }, accessToken)
@@ -214,7 +214,7 @@ const UserEdit = ({ targetRole, onSuccess, userData }) => {
     deleteUndefinedNullFromObj(otherInfo);
     const accessToken = await getToken();
     if (!accessToken) {
-      history.push(`${isAdmin ? "/admin" : "/"}login`);
+      navigate(`${isAdmin ? "/admin" : "/"}login`);
     }
     const verb = "update";
     confirm({
@@ -255,7 +255,7 @@ const UserEdit = ({ targetRole, onSuccess, userData }) => {
     const message = `Updated successfully`;
     success(message);
     // success(`${role} Created ID : ${newUserId}`);
-    // history.push(`/admin/${role}s`);
+    // navigate(`/admin/${role}s`);
     onSuccess(userData.id);
   }
   const onChange = (key) => {

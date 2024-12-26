@@ -16,7 +16,7 @@ import {
 } from "antd";
 import { useFirestore } from "reactfire";
 import { success, error } from "@/utils/Utils/Utils";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import PropertyBillAddEdit from "@/components/propertyBill/PropertyBillAddEdit";
 import usePbillDropdownResidential from "@/api/usePBillDropDown/usePBillDropDownResidential";
@@ -114,7 +114,7 @@ const ResidentialPbillAdd = ({ propertyId }) => {
 
   function disabledDate(current) {
     // can not select month after current month
-    return current && current > moment().endOf("day");
+    return current && current > dayjs().endOf("day");
   }
   const showConfirmBox = async (values) => {
     confirm({
@@ -122,7 +122,7 @@ const ResidentialPbillAdd = ({ propertyId }) => {
       async onOk() {
         const userInputs = {
           bills: values.bills,
-          month: moment(values.month.toDate()).format(DATE_MMM_YYYY),
+          month: dayjs(values.month.toDate()).format(DATE_MMM_YYYY),
           considerationAmount: values.considerationAmount,
         };
         const unitIds = selected.value.units?.map((u) => u.id) || [];

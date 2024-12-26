@@ -1,7 +1,7 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 // import styles from "./UserProfileEdit.module.css";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
   Input,
@@ -36,12 +36,12 @@ const { Title } = Typography;
 const dateFormat = "DD/MM/YYYY";
 const dateTimeFormat = "YYYY/MM/DD, h:mm:ss a";
 const SelfProfileEdit = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { userId, role } = useCustomAuth();
   const { status, data } = useUserProfile(userId);
 
   const onSuccess = () => {
-    history.goBack();
+    navigate(-1);
   };
   if (status === "loading") {
     return (

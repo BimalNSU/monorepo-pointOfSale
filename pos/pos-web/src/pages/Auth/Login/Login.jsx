@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth, useSigninCheck } from "reactfire";
 import {
   getAuth,
@@ -12,7 +12,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { success, error } from "@/utils/Utils/Utils";
 import "./Login.css";
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
-import logo from "../../../images/Property_icon.png";
+import logo from "../../../images/logo.png";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 
 const { Title } = Typography;
@@ -22,7 +22,7 @@ const { Title } = Typography;
 function Login() {
   // const auth = useAuth();
   const [isLoaded, setIsLoaded] = useState(true);
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { loginWithCustomToken, logout } = useCustomAuth();
 
@@ -40,7 +40,7 @@ function Login() {
         // await login(res.data.accessToken,userData );
         await loginWithCustomToken(res.data.accessToken, userData);
         const { from } = location.state || { from: { pathname: "/" } };
-        history.replace(from);
+        navigate(from, { replace: true });
       } else {
         error("Incorrect Email or password");
       }
@@ -55,7 +55,7 @@ function Login() {
         <div className="border p-3 rounded" style={{ backgroundColor: "#f4f4f4" }}>
           <div style={{ padding: "5%" }}>
             <Title level={2} align="center">
-              <img src={logo} width={"50%"} alt="logo" />
+              <img src={logo} alt="logo" />
             </Title>
             <Title level={2}>Sign in with Email, Mobile or User ID</Title>
             <Title level={5}>

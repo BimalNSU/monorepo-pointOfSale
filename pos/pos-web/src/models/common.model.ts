@@ -2,32 +2,15 @@ import { DocumentReference } from "firebase/firestore";
 
 export type UserId = string;
 export type MemberId = string;
-export type MemberAssignmentId = string;
-export type RefId = string;
-export type PropertyId = string;
-export type UnitId = string;
-export type ParkingId = string;
-export type ShopId = string;
-export type TenantAgreementId = string;
-export type BillUserType = "admin" | "manager";
 export type InvoiceId = string;
-export type PbillNameId = string;
-export type PbillConfigId = string;
-export type PropertyBillId = string;
 export type InvoicePaymentId = string;
 export type MessageId = string; // will be deprecated
 export type CommunicationId = string;
-export type PointUsageId = string;
-export type PropertyPointId = string;
-export type NidRecordId = string;
-export type NidCreditUsageId = string;
 export type FetchStatus = "loading" | "success" | "error";
 
 export type WithRef<T> = T & { ref: DocumentReference<T> };
 export type WithId<T> = T & { id: string };
 
-export type AccountHeadId = number;
-export type ChartOfAccountId = number;
 export type CustomerPaymentId = string;
 export type SalesReceiptId = string;
 export type VendorId = number;

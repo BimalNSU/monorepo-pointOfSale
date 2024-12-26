@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Typography, Checkbox, Divider } from "antd";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useFirestore } from "reactfire";
@@ -10,7 +10,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 const { Title } = Typography;
 
 function UserSettings() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const db = useFirestore();
   const { role, allowedRoles, updateStore, userId } = useCustomAuth();
   const userDocRef = doc(db, COLLECTIONS.users, userId);
@@ -36,7 +36,7 @@ function UserSettings() {
 
   return (
     <div style={{ paddingInline: "3rem" }}>
-      <Button shape="circle" onClick={() => history.push("/")} style={{ fontSize: 15 }}>
+      <Button shape="circle" onClick={() => navigate("/")} style={{ fontSize: 15 }}>
         <ArrowLeftOutlined />
       </Button>
       <section id="security">

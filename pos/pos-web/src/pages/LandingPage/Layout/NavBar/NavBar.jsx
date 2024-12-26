@@ -2,7 +2,7 @@ import React, { Component, useState } from "react";
 import LeftMenu from "../LeftMenu";
 import RightMenu from "../RightMenu";
 import { Drawer, Button, Menu, Space } from "antd";
-import logo from "../../../../images/Property_icon.png";
+import logo from "../../../../images/logo.png";
 import { Link } from "react-router-dom";
 import "./style.css";
 
@@ -81,76 +81,3 @@ const NavBar = (props) => {
   );
 };
 export default NavBar;
-
-// import { Button, Col, Drawer, Image, Layout, Menu, Row } from "antd";
-// // import { Link } from "react-router-dom";
-// // import logo from "path/to/logo";
-
-// const { Header,Sider } = Layout;
-// const NavBar = (props) => {
-//   const [visible, setVisible] = useState(false);
-
-//   const showDrawer = () => {
-//     setVisible(true);
-//   };
-
-//   const onClose = () => {
-//     setVisible(false);
-//   };
-
-//   return (
-//     <Header>
-//       <div className="logo">
-//         <Link to="/home">
-//           <img src={logo} width={'120px'} alt="logo" />
-//         </Link>
-//       </div>
-//       <Menu theme="light" mode="horizontal">
-//         <Menu.Item key="home">
-//           <Link to="/home">Home</Link>
-//         </Menu.Item>
-//         <Menu.Item key="about">
-//           <Link to="/about">About</Link>
-//         </Menu.Item>
-//         <Menu.Item key="pricing">
-//           <Link to="/pricing">Pricing</Link>
-//         </Menu.Item>
-//       </Menu>
-//       <div className="right-menu">
-//         <Link to="/signin">Sign In</Link>
-//         <Link to="/signup">Sign Up</Link>
-//       </div>
-//       <Button className="menu-button" onClick={showDrawer}>
-//         <span className="bars"></span>
-//       </Button>
-//       <Drawer
-//         title="Menu"
-//         placement="right"
-//         closable={false}
-//         onClose={onClose}
-//         visible={visible}
-//       >
-
-//         <Menu>
-//           <Menu.Item key="home">
-//             <Link to="/home">Home</Link>
-//           </Menu.Item>
-//           <Menu.Item key="about">
-//             <Link to="/about">About</Link>
-//           </Menu.Item>
-//           <Menu.Item key="pricing">
-//             <Link to="/pricing">Pricing</Link>
-//           </Menu.Item>
-//           <Menu.Item key="signin">
-//             <Link to="/signin">Sign In</Link>
-//           </Menu.Item>
-//           <Menu.Item key="signup">
-//             <Link to="/signup">Sign Up</Link>
-//           </Menu.Item>
-//         </Menu>
-//       </Drawer>
-//     </Header>
-//   );
-// };
-
-// export default NavBar;

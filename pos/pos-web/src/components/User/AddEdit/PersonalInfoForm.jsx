@@ -18,8 +18,8 @@ import * as validator from "../../../utils/Validation/Validation";
 
 import { success, error, deleteUndefinedFromObj, checkValueExist } from "@/utils/Utils/Utils";
 
-import moment from "moment";
-const bloodGroupsData = []
+import dayjs from "dayjs";
+const bloodGroupsData = [];
 
 // import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
 // import { useCustomAuth } from "@/utils/hooks/customAuth";
@@ -44,7 +44,7 @@ const PersonalInfoForm = ({ targetRole, onSubmit, userData, children, isAdmin })
         lastName: userData.lastName,
         mobile: userData.mobile,
         email: userData.email || null,
-        DOB: moment(userData.DOB),
+        DOB: dayjs(userData.DOB),
         bloodGroup: userData.bloodGroup || null,
         gender: userData.gender,
         religion: userData.religion || null,

@@ -1,7 +1,7 @@
 // import { useState, useEffect } from 'react'
 import { collection, doc, addDoc, updateDoc, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData, useAuth, useFirestoreDocData } from "reactfire";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 
 class CustomQuery {
@@ -76,7 +76,7 @@ class CustomQuery {
 
   assignUnitToOwner = async (ownerId, unitId) => {
     const ownerUnitsRef = collection(this.firestore, "ownerUnits");
-    const currentDateTime = moment().format().toString();
+    const currentDateTime = dayjs().format().toString();
     const doc = await addDoc(ownerUnitsRef, {
       ownerId: ownerId,
       unitId: unitId,

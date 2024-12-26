@@ -23,7 +23,7 @@
 //   Divider,
 //   Card,
 // } from "antd";
-// import moment from "moment";
+// import dayjs from "dayjs";
 // import Icon, { DownOutlined, SearchOutlined, FilePdfOutlined } from "@ant-design/icons";
 
 // import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
@@ -69,7 +69,7 @@
 // const dateFormat = "DD/MM/YYYY";
 // // const milisecDiffForYesterday = 86400000;
 // // const { confirm } = Modal;
-// // const currentDateTime = moment().format(dateTimeFormat); // result return as string format
+// // const currentDateTime = dayjs().format(dateTimeFormat); // result return as string format
 
 // const Notificationlist = () => {
 //   const { propertyId } = useCustomProperty();

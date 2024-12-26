@@ -2,7 +2,7 @@ import { useMemberDetails } from "@/api/useMemberDetails";
 import { DATE_FORMAT } from "@/constants/dateFormat";
 import { UserOutlined } from "@ant-design/icons";
 import { Avatar, Card, Col, Image, Row, Space, Spin, Table, Typography } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import logo from "../../../images/Property_icon.png";
@@ -18,7 +18,7 @@ export const MemberVerification = () => {
       const nTableData = [
         { key: 1, name: "Member ID", value: data.id },
         { key: 2, name: "Name", value: `${data.firstName} ${data.lastName || ""}` },
-        { key: 3, name: "Date of Birth", value: moment(data.DOB).format(DATE_FORMAT) },
+        { key: 3, name: "Date of Birth", value: dayjs(data.DOB).format(DATE_FORMAT) },
         { key: 4, name: "NID", value: data.nid || "N/A" },
         { key: 5, name: "Birth Certificate", value: data.birthCertificate || "N/A" },
         { key: 6, name: "Phone", value: data.mobile || "N/A" },

@@ -6,12 +6,12 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Button, Card, Col, DatePicker, Form, Row, Table, Typography } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
 
 const InvoiceReport = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [searchForm] = Form.useForm();
   //   const initalDateRange = { fromDate: dayjs().startOf("day"), toDate: dayjs().endOf("day") };
   const location = useLocation();
@@ -62,8 +62,13 @@ const InvoiceReport = () => {
     } else {
       queryParams.delete("toDate");
     }
-
-    history.replace({ search: queryParams.toString() });
+    navigate(
+      {
+        pathname: window.location.pathname, // Keeps the current path
+        search: queryParams.toString(), // Set the updated query params
+      },
+      { replace: true },
+    ); // This replaces the current entry in the history stack
   };
   const onFinish = (values) => {
     const [fromDate, toDate] = values.dateRange || [];

@@ -11,7 +11,7 @@ import { useMemo } from "react";
 const { Text } = Typography;
 const { confirm } = Modal;
 
-const ProductList = () => {
+const Products = () => {
   const { userId, role } = useCustomAuth();
   const db = useFirestore();
   const productService = new ProductService(db);
@@ -173,4 +173,4 @@ const ProductList = () => {
     </Card>
   );
 };
-export default ProductList;
+export default Products;

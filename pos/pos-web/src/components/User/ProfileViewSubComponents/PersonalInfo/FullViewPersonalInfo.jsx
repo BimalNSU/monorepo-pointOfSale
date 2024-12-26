@@ -1,11 +1,11 @@
 import { Row, Col } from "antd";
 import styles from "../../Personal.module.css";
-import moment from "moment";
+import dayjs from "dayjs";
 import { DOB_dateFormat } from "@/constants/dateFormat";
 import { RELIGION_TYPE } from "@/constants/religion";
 
 const FullViewPersonalInfo = ({ data }) => {
-  const dob = data.DOB ? moment(data.DOB).format(DOB_dateFormat) : null;
+  const dob = data.DOB ? dayjs(data.DOB).format(DOB_dateFormat) : null;
   return (
     <Row gutter={[1, 24]} style={{ marginBottom: 24 }}>
       <Col xs={24} sm={24} md={8}>

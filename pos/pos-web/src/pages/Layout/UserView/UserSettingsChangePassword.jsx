@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Typography, Input, message } from "antd";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
@@ -9,7 +9,7 @@ const { Title } = Typography;
 function UserSettingsChangePassword() {
   const [form] = Form.useForm();
   const user = useCustomAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // handlers
   const onFinish = async (values) => {
@@ -18,13 +18,13 @@ function UserSettingsChangePassword() {
     const res = await apiProvider.changePassword(token, currentPassword, newPassword);
     if (res.status === 200) {
       message.success("Password changed successfully.");
-      history.push("/settings");
+      navigate("/settings");
     }
   };
 
   return (
     <div style={{ paddingInline: "3rem" }}>
-      <Button shape="circle" onClick={() => history.goBack()} style={{ fontSize: 15 }}>
+      <Button shape="circle" onClick={() => navigate(-1)} style={{ fontSize: 15 }}>
         <ArrowLeftOutlined />
       </Button>
       <Title level={4}>Change Password</Title>

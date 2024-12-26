@@ -10,11 +10,9 @@ import { doc, updateDoc, where, query, collection } from "firebase/firestore";
 import { useAuth, useFirestore, useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 import styles from "../../App.module.css";
 import { useEffect, useState } from "react";
-import moment from "moment";
 
 const { Title } = Typography;
 const dateTimeFormat = "YYYY/MM/DD, h:mm:ss a";
-const currentDateTime = moment().format(dateTimeFormat);
 
 const Verify = () => {
   const params = useParams();

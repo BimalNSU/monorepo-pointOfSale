@@ -1,6 +1,6 @@
 import { useInvoice } from "@/api/useInvoice";
 import { Button, Card, Col, Result, Row, Spin, Typography } from "antd";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InvoiceItemTableView from "./invoiceItemTableView";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
@@ -9,8 +9,8 @@ import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
 
 const { Title, Text } = Typography;
 
-const InvoiceView = () => {
-  const history = useHistory();
+const InvoiceDetails = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { status, data: invoice } = useInvoice(id);
   if (status === "loading") {
@@ -27,7 +27,7 @@ const InvoiceView = () => {
         title="Invalid data"
         subTitle="Invalid data fetching error ...!"
         extra={
-          <Button type="primary" onClick={() => history.goBack()}>
+          <Button type="primary" onClick={() => navigate(-1)}>
             Go Back
           </Button>
         }
@@ -59,7 +59,7 @@ const InvoiceView = () => {
           </table>
         </Col>
         <Col>
-          <PrintReceipt data={invoice} />
+          <PrintReceipt invoice={invoice} />
         </Col>
       </Row>
       <Row gutter={[16, 2]}>
@@ -105,4 +105,4 @@ const InvoiceView = () => {
     </div>
   );
 };
-export default InvoiceView;
+export default InvoiceDetails;

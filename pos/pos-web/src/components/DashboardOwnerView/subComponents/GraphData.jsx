@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Column } from "@ant-design/plots";
-import moment from "moment";
+import dayjs from "dayjs";
 
 const months = [
   {
@@ -63,7 +63,7 @@ const GraphData = ({ invoices }) => {
 
     months.forEach((m) => {
       const unpaidInvoicesForMonth = invoices.filter((invoice) => {
-        const issuedAtMoment = moment(invoice.createdAt);
+        const issuedAtMoment = dayjs(invoice.createdAt);
         const monthInNumber = issuedAtMoment.month() + 1;
         return m.value === monthInNumber && invoice.paymentStatus === "unpaid";
       });
@@ -73,7 +73,7 @@ const GraphData = ({ invoices }) => {
       );
 
       const paidInvoicesForMonth = invoices.filter((invoice) => {
-        const issuedAtMoment = moment(invoice.createdAt);
+        const issuedAtMoment = dayjs(invoice.createdAt);
         const monthInNumber = issuedAtMoment.month() + 1;
         return m.value === monthInNumber && invoice.paymentStatus === "paid";
       });

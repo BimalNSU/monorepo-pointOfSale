@@ -1,4 +1,4 @@
-import { Route, BrowserRouter, useHistory, Switch } from "react-router-dom";
+import { Route, BrowserRouter, useNavigate, Routes } from "react-router-dom";
 // firebase
 import { collection, getFirestore } from "firebase/firestore";
 // import { ref, listAll, getStorage } from "@firebase/storage"
@@ -44,7 +44,7 @@ const UserApp = () => {
   //   );
   // }
   return (
-    <Switch>
+    <Routes>
       {/* <StorageProvider sdk={getStorage(app)}> */}
       {/* <Route path={`/${userData.role}/profile`} exact component={Profile} /> */}
       {/* <Route path={`/${userData.role}/profile`} exact component={OwnerProfile} />
@@ -56,7 +56,7 @@ const UserApp = () => {
 
       <Route path="/settings" exact component={UserSettings} />
       <Route path="/settings/change-password" exact component={UserSettingsChangePassword} />
-    </Switch>
+    </Routes>
   );
 };
 export default UserApp;

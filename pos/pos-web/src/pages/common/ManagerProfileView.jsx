@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
-import { useHistory, useParams, Link } from "react-router-dom";
+import dayjs from "dayjs";
+import { useNavigate, useParams, Link } from "react-router-dom";
 // import envelope from "../../../images/envelope.png"
 import {
   Tabs,
@@ -44,7 +44,7 @@ import { ref, uploadBytesResumable, getStorage } from "firebase/storage";
 
 import ProfileView from "@/components/User/ProfileView";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
-const dateFormat = "DD/MM/YYYY";
+
 const { Title } = Typography;
 const role = "manager";
 const ManagerProfileView = () => {

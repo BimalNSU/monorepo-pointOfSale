@@ -16,7 +16,7 @@ import {
 } from "antd";
 import { useFirestore } from "reactfire";
 import { success, error } from "@/utils/Utils/Utils";
-import moment from "moment";
+import dayjs from "dayjs";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import PropertyBillAddEdit from "@/components/propertyBill/PropertyBillAddEdit";
 import usePbillDropdownCommercial from "@/api/usePBillDropDown/usePBillDropDownCommercial";
@@ -118,7 +118,7 @@ const CommercialPbillAdd = ({ propertyId }) => {
   }, [selected]);
 
   function disabledDate(current) {
-    return current && current > moment().endOf("day");
+    return current && current > dayjs().endOf("day");
   }
   const showConfirmBox = async (values) => {
     confirm({
@@ -127,7 +127,7 @@ const CommercialPbillAdd = ({ propertyId }) => {
         try {
           const userInputs = {
             bills: values.bills,
-            month: moment(values.month.toDate()).format(DATE_MMM_YYYY),
+            month: dayjs(values.month.toDate()).format(DATE_MMM_YYYY),
             considerationAmount: values.considerationAmount,
           };
           const shopIds = selected.value.shops?.map((s) => s.id) || [];

@@ -10,9 +10,16 @@
     /* line-height: 1.2; */
   }
   @media print {
+    html, body {
+      height: 100vh; /*Use 100% here to support printing more than a single page */
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
     .receipt {
       display: block;  /* content will show in print mode */
     }
+      
   }
   .receiptHeader {
     text-align: center;

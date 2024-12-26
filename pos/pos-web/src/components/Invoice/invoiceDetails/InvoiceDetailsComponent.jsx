@@ -12,7 +12,7 @@ import {
   Popconfirm,
   Input,
 } from "antd";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { INVOICE_STATUS, PMS_INVOICE_STATUS } from "@/constants/paymentStatus";
 import BackBtn from "../../Button/BackBtn";
 import { convertToBD } from "@/constants/currency";
@@ -25,7 +25,7 @@ import PDFGenerator from "./PDFGenerator";
 const { Title, Text } = Typography;
 
 const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const db = useFirestore();
   const invoiceObj = new RegularInvoice(db);
   const [invoiceTableData, setInvoiceTableData] = useState([]);
@@ -158,9 +158,9 @@ const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
             <BackBtn
               onClick={() => {
                 if (authRole === "owner" || authRole === "tenant") {
-                  history.push("/invoices");
+                  navigate("/invoices");
                 } else {
-                  history.goBack();
+                  navigate(-1); //go back
                 }
               }}
             />

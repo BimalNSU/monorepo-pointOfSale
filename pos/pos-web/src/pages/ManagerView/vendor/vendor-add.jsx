@@ -4,7 +4,7 @@ import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useCustomProperty } from "@/utils/hooks/customProperty";
 import { error, success } from "@/utils/Utils/Utils";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -14,7 +14,7 @@ const targetRole = "vendor";
 const VendorAdd = () => {
   const { role, getToken } = useCustomAuth();
   const { propertyId } = useCustomProperty();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [vendorForm] = Form.useForm();
 
   const handleFinish = (values) => {
@@ -49,7 +49,7 @@ const VendorAdd = () => {
             type="secondary"
             // onClick={() => changeTab("2")}
             shape="circle"
-            onClick={() => history.goBack()}
+            onClick={() => navigate(-1)}
           >
             <ArrowLeftOutlined />
           </Button>

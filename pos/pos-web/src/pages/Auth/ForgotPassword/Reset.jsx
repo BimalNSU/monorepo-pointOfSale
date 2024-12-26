@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "reactfire";
 import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import { Form, Input, Button, Checkbox, Typography, Modal, Space, Row } from "antd";
@@ -10,7 +10,7 @@ import logo from "../../../images/Property_icon.png";
 const { Title } = Typography;
 const Reset = () => {
   const auth = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       await sendPasswordResetEmail(auth, values.email);
@@ -19,7 +19,7 @@ const Reset = () => {
     } catch (err) {
       error(`A problem occured. Please try again! ${err}`);
     }
-    history.push("/");
+    navigate("/");
   };
   return (
     <div className="reset">

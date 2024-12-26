@@ -1,76 +1,15 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Menu,
-  Button,
-  Input,
-  message,
-  Space,
-  Row,
-  Col,
-  Select,
-  Table,
-  Dropdown,
-  Modal,
-  Tag,
-  Spin,
-  Typography,
-  List,
-  Image,
-  Badge,
-  Avatar,
-  Popover,
-  Divider,
-} from "antd";
-import moment from "moment";
-import Icon, { DownOutlined, SearchOutlined, FilePdfOutlined } from "@ant-design/icons";
+import { Button, Space, Row, Col, Select, Typography } from "antd";
 
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import {
-  doc,
-  getFirestore,
-  updateDoc,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  query,
-  where,
-  collection,
-  documentId,
-  orderBy,
-} from "firebase/firestore";
-import { Link, useHistory } from "react-router-dom";
-import {
-  FirebaseAppProvider,
-  FirestoreProvider,
-  useFirestoreDocData,
-  useFirestore,
-  useFirestoreCollectionData,
-  useFirebaseApp,
-  useAuth,
-  useStorage,
-  useStorageDownloadURL,
-} from "reactfire";
+import { doc, updateDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { useFirestore } from "reactfire";
 // import { error } from "../../../../utils/Utils/Utils";
-import { useCustomProperty } from "../../../../utils/hooks/customProperty";
 import { COLLECTIONS } from "../../../../constants/collections";
-import { useMemo } from "react";
-import { ButtonToolbar } from "react-bootstrap";
-import { ref } from "firebase/storage";
-import { useCustomAuth } from "../../../../utils/hooks/customAuth";
-// import notificationSvg from "path/to/message.svg"; // path to your '*.svg' file.
-// import notificationSvg from "../../images/notification.svg";
-// import InfiniteScroll from "react-infinite-scroll-component";
 const { Text, Title } = Typography;
 const { Option } = Select;
-const dateTimeFormat = "YYYY/MM/DD, h:mm:ss a";
-const dateFormat = "DD/MM/YYYY";
-const milisecDiffForYesterday = 86400000;
-// const { confirm } = Modal;
-// const currentDateTime = moment().format(dateTimeFormat); // result return as string format
 
 const NotificationContiner = ({ userId, title, notificationsData, onClickedHideNotification }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const firestore = useFirestore();
 
   const handleNotification = async (notification) => {
@@ -89,7 +28,7 @@ const NotificationContiner = ({ userId, title, notificationsData, onClickedHideN
       onClickedHideNotification();
     }
     const url = getRedirectPath(notification);
-    history.push(url);
+    navigate(url);
   };
   // const handleRedirectURL = () => {
   //   notificationsData.varient;

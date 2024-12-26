@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Personal.module.css";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
   Input,
@@ -36,7 +36,7 @@ import * as validator from "../../utils/Validation/Validation";
 
 import { success, error, deleteUndefinedFromObj, checkValueExist } from "@/utils/Utils/Utils";
 
-import moment from "moment";
+import dayjs from "dayjs";
 import { COLLECTIONS } from "@/constants/collections";
 
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
@@ -55,11 +55,11 @@ const { Option } = Select;
 const { Title } = Typography;
 const dateTimeFormat = "DD/MM/YYYY HH:mm:ss";
 // const domain = window.location.origin;
-// const currentDateTime = moment().format(dateTimeFormat).toString();
+// const currentDateTime = dayjs().format(dateTimeFormat).toString();
 
 const UserAdd = ({ targetRole, onSuccess }) => {
   const { userId: authUserId, role: authRole, isAdmin, getToken } = useCustomAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const storage = useStorage();
   const firestore = useFirestore();
   const [activeKey, setActiveKey] = useState("1");
@@ -80,7 +80,7 @@ const UserAdd = ({ targetRole, onSuccess }) => {
           }
           const accessToken = await getToken();
           if (!accessToken) {
-            history.push(`${isAdmin ? "/admin" : "/"}login`);
+            navigate(`${isAdmin ? "/admin" : "/"}login`);
           }
           const res = isAdmin
             ? await apiProvider.addUserByAdmin({ ...personalInfo }, accessToken)
@@ -129,7 +129,7 @@ const UserAdd = ({ targetRole, onSuccess }) => {
     const verb = "add";
     const accessToken = await getToken();
     if (!accessToken) {
-      history.push(`${isAdmin ? "/admin" : "/"}login`);
+      navigate(`${isAdmin ? "/admin" : "/"}login`);
     }
     confirm({
       title: `Are you sure to ${verb} Detail Info.?`,
@@ -176,7 +176,7 @@ const UserAdd = ({ targetRole, onSuccess }) => {
     const message = `${targetRole} Id: ${newUserId} is created successfully`;
     success(message);
     // success(`${role} Created ID : ${newUserId}`);
-    // history.push(`/admin/${role}s`);
+    // navigate(`/admin/${role}s`);
     onSuccess(newUserId);
   }
 

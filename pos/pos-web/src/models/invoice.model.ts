@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase/firestore";
 import { ProductId, UserId } from "./common.model";
 
 export type InvoiceStatus = number;
@@ -15,9 +16,9 @@ export interface Invoice {
   discount: number | null;
   note: string | null;
   items: InvoiceItem[];
-  createdAt: Date;
+  createdAt: Date | FieldValue;
   createdBy: UserId;
-  updatedAt: Date;
+  updatedAt: Date | FieldValue;
   updatedBy: UserId;
   isDeleted: boolean; // default: false
   deletedAt: Date | null;

@@ -1,17 +1,17 @@
 import { Button, Space, Row, Col, Divider, Popover, Typography, Avatar } from "antd";
 import { LogoutOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 
 const { Text } = Typography;
 
 const PopHoverProfile = ({ viewContentMbl }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { userId, firstName, lastName, logout } = useCustomAuth();
 
   const handleLogout = async () => {
     await logout();
-    history.replace("/");
+    navigate("/", { replace: true });
   };
   const content = (
     <Space direction="vertical">

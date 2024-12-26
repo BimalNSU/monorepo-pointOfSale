@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 import styles from "./SelfProfileView.module.css";
 import envelope from "../../../../../images/envelope.png";
 import {

@@ -2,13 +2,13 @@ import { useVendor } from "@/api/vendor/useVendor";
 import { useCustomProperty } from "@/utils/hooks/customProperty";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Result, Row, Spin, Typography } from "antd";
-import { Link, useParams, useHistory } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 const { Text, Title } = Typography;
 
 const VendorView = () => {
   const { id } = useParams();
   const { propertyId } = useCustomProperty();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { status, data } = useVendor(propertyId, id);
 
   if (status === "loading") {
@@ -25,7 +25,7 @@ const VendorView = () => {
         title="Invalid data"
         subTitle="Invalid data fetching error ...!"
         extra={
-          <Button type="primary" onClick={() => history.goBack()}>
+          <Button type="primary" onClick={() => navigate(-1)}>
             Go Back
           </Button>
         }
@@ -40,7 +40,7 @@ const VendorView = () => {
         type="secondary"
         // onClick={() => changeTab("2")}
         shape="circle"
-        onClick={() => history.goBack()}
+        onClick={() => navigate(-1)}
       >
         <ArrowLeftOutlined />
       </Button>

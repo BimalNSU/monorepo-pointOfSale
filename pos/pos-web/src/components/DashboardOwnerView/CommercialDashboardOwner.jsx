@@ -25,7 +25,7 @@ const CommercialDashboardOwner = ({ propertyId, userId }) => {
         title="Invalid data"
         subTitle="Invalid data fetching error ...!"
         extra={
-          <Button type="primary" onClick={() => history.goBack()}>
+          <Button type="primary" onClick={() => navigate(-1)}>
             Go Back
           </Button>
         }

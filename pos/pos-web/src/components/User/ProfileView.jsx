@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./Personal.module.css";
-import { useHistory, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Tabs,
   Button,
@@ -64,7 +64,7 @@ const columns = [
 ];
 const { TabPane } = Tabs;
 const ProfileView = ({ userId, role, currentPropertyId, isAdmin, authUserId }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [tableData, setTableData] = useState([]);
   const { status, data: uData } = useUserProfile(userId);
 
@@ -167,7 +167,7 @@ const ProfileView = ({ userId, role, currentPropertyId, isAdmin, authUserId }) =
         status="error"
         title="Invalid data fetching request..!"
         extra={
-          <Button type="primary" onClick={() => history.goBack()}>
+          <Button type="primary" onClick={() => navigate(-1)}>
             Go Back
           </Button>
         }
@@ -180,10 +180,10 @@ const ProfileView = ({ userId, role, currentPropertyId, isAdmin, authUserId }) =
   // let date = new Date(timestamp)
   // const dob = `${date.getDate()}/${(date.getMonth() + 1)}/${date.getFullYear()}`
   //   const timestamp = data ? uData?.DOB.seconds : null;
-  //   const dob = moment(timestamp).format(dateFormat).toString();
+  //   const dob = dayjs(timestamp).format(dateFormat).toString();
 
   // const { uploadBirth, uploadNID, uploadTin, uploadVAT, otherFiles, updatedAt, createdAt } = data
-  // const createAt = moment(createdAt).format(dateFormat).toString()
+  // const createAt = dayjs(createdAt).format(dateFormat).toString()
   const generateAddress = () => {
     const postOfficeObject = postOfficeList.find(
       (postOffice) => postOffice.postCode === Number(uData.address.postOffice),
@@ -206,7 +206,7 @@ const ProfileView = ({ userId, role, currentPropertyId, isAdmin, authUserId }) =
   };
   return (
     <div>
-      <Button shape="circle" onClick={() => history.goBack()} style={{ fontSize: 15 }}>
+      <Button shape="circle" onClick={() => navigate(-1)} style={{ fontSize: 15 }}>
         <ArrowLeftOutlined />
       </Button>
       <Row style={{ marginTop: 10 }}>

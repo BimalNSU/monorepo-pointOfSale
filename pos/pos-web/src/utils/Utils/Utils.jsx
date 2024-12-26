@@ -5,7 +5,7 @@
 import { query, getDocs, where } from "firebase/firestore";
 
 import { message, Spin, Modal, Row, Tag } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 export const toPascalCase = (s) => {
   return s.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
@@ -70,7 +70,7 @@ export const success = (data) => {
   // })
 };
 export const dateFormatForFirebase = (date, format) => {
-  return moment(date).format(format).toString();
+  return dayjs(date).format(format).toString();
 };
 
 export const checkValueExist = async (ref, fieldName, fieldValue) => {

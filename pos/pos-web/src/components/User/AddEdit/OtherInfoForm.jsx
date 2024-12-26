@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "../Personal.module.css";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Form,
   Input,

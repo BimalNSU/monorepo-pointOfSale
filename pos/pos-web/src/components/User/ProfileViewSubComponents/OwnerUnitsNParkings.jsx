@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 import styles from "../Personal.module.css";
-import { useHistory, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 // import envelope from "../../../images/envelope.png"
 import {
   Tabs,
@@ -65,7 +65,7 @@ const OwnerUnitsNParkings = ({
   isAdmin,
   currentPropertyId,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const firestore = useFirestore();
   const [unitNParkingData, setUnitNParkingtData] = useState([]);

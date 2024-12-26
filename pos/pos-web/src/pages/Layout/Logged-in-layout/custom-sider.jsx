@@ -10,7 +10,7 @@ import {
 import { Layout, Menu, Drawer } from "antd";
 import { useState } from "react";
 import { AppVersion } from "@/pages/AppVersion";
-import logo from "../../../images/Property_icon.png";
+import logo from "../../../images/logo.png";
 const { Sider } = Layout;
 
 const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
@@ -31,7 +31,7 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
       key: "4",
       label: (
         <span>
-          <Link to="/invoices/add">Sales</Link>
+          <Link to="/sales">Sales</Link>
         </span>
       ),
       icon: <ShoppingCartOutlined />,
@@ -70,11 +70,6 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         },
       ],
     },
-    {
-      key: "5",
-      label: <Link to="/demo-receipt">Demo Receipt</Link>,
-      icon: <FileTextOutlined />,
-    },
   ];
 
   return !isScreenMd ? (
@@ -94,7 +89,8 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
       title={
         <img
           style={{
-            width: "40%",
+            // width: "40%",
+            // height: "4%",
             transition: "opacity 0.3s ease",
             opacity: collapsed ? 0 : 1,
           }}
@@ -163,7 +159,8 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
             opacity: collapsed ? 0 : 1,
           }}
         /> */}
-        <img src={logo} width={"85%"} alt="logo" />
+        <img src={logo} alt="logo" />
+        {/* <p>Organic Design</p> */}
         <AppVersion />
       </div>
 

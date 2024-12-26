@@ -1,5 +1,5 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { InvoiceId, UserId } from "@/models/common.model";
+import { InvoiceId, UserId, WithId } from "@/models/common.model";
 import { Invoice as InvoiceModel } from "@/models/invoice.model";
 import { firestoreConverter } from "@/utils/converter";
 import {
@@ -9,11 +9,11 @@ import {
   WriteBatch,
   collection,
   doc,
+  getDoc,
   serverTimestamp,
-  writeBatch,
 } from "firebase/firestore";
 
-const invoiceConverter = firestoreConverter<InvoiceModel>();
+const invoiceFirestoreConverter = firestoreConverter<InvoiceModel>();
 type omitKeys =
   | "createdAt"
   | "createdBy"
@@ -29,14 +29,15 @@ export class Invoice {
   constructor(db: Firestore) {
     this.collectionRef = collection(db, COLLECTIONS.invoices);
   }
-  add(batch: WriteBatch, data: RData, createdBy: UserId, customId?: InvoiceId) {
+  add(
+    batch: WriteBatch,
+    data: RData,
+    createdBy: UserId,
+    customId?: InvoiceId,
+  ): WithId<InvoiceModel> {
     const now = serverTimestamp();
-    const { ...rest } = data;
-    const docRef = !customId
-      ? doc(this.collectionRef).withConverter(invoiceConverter)
-      : doc(this.collectionRef, customId).withConverter(invoiceConverter);
-    batch.set(docRef, {
-      ...rest,
+    const newData = {
+      ...data,
       // dueDate: Timestamp.fromDate(dueDate),
       createdAt: now,
       createdBy,
@@ -45,14 +46,27 @@ export class Invoice {
       isDeleted: false, // default
       deletedAt: null,
       deletedBy: null,
-    });
-    return docRef;
+    };
+    const docRef = !customId
+      ? doc(this.collectionRef).withConverter(invoiceFirestoreConverter)
+      : doc(this.collectionRef, customId).withConverter(invoiceFirestoreConverter);
+    batch.set(docRef, newData);
+    return { ...newData, id: docRef.id };
+  }
+  async get(id: InvoiceId) {
+    const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);
+    const snapShot = await getDoc(docRef);
+    if (snapShot.exists()) {
+      return { ...snapShot.data(), id };
+    } else {
+      throw new Error(`Invoice ID #${id} is not found`);
+    }
   }
 
   // //batch update
   // edit(batch: WriteBatch, id: InvoiceId, data: InvoiceMutableFields, updatedBy: UserId) {
   //   const now = serverTimestamp();
-  //   const docRef = doc(this.collectionRef, id).withConverter(invoiceConverter);
+  //   const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);
   //   const asMutPbill = data as InvoiceMutPBill;
   //   const asMutPayment = data as InvoiceMutPayment;
   //   if (asMutPbill.pBills) {
@@ -75,7 +89,7 @@ export class Invoice {
   // }
   remove(batch: WriteBatch, id: InvoiceId, deletedBy: UserId) {
     const now = serverTimestamp();
-    const docRef = doc(this.collectionRef, id).withConverter(invoiceConverter);
+    const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);
     batch.set(
       docRef,
       {

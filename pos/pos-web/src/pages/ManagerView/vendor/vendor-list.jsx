@@ -1,13 +1,13 @@
 import { useVendorList } from "@/api/vendor/useVendorList";
 import { useCustomProperty } from "@/utils/hooks/customProperty";
 import { Button, Col, Row, Table, Typography } from "antd";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const { Title, Text } = Typography;
 
 const VendorList = () => {
   const { propertyId } = useCustomProperty();
   const { status, data } = useVendorList(propertyId);
-  const history = useHistory();
+  const navigate = useNavigate();
   const renderValueCell = (text, record) => (
     <Link
       to={{ pathname: `/vendors/${record.id}/view` }}
@@ -85,7 +85,7 @@ const VendorList = () => {
         <Row justify="space-between">
           <Col></Col>
           <Col>
-            <Button onClick={() => history.push("/vendors/create")}>Add Vendor</Button>
+            <Button onClick={() => navigate("/vendors/create")}>Add Vendor</Button>
           </Col>
         </Row>
         <Table size="small" columns={columns} loading={status === "loading"} dataSource={data} />

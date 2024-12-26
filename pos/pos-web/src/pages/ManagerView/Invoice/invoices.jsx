@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useFirestore } from "reactfire";
-import moment from "moment";
+import dayjs from "dayjs";
 
 import {
   Button,
@@ -44,7 +44,7 @@ const { Text } = Typography;
 const { Option } = Select;
 const { confirm } = Modal;
 
-const InvoiceList = () => {
+const Invoices = () => {
   const { userId, role } = useCustomAuth();
   const db = useFirestore();
   const invoiceService = new InvoiceService(db);
@@ -194,8 +194,8 @@ const InvoiceList = () => {
   }
 
   // const handleDeleteCurrentMonthInvoiceData = async (e) => {
-  //   // const currentMonth = moment(currentDateTime).format("MMMM");
-  //   const currentMonth = moment().format("MMMM");
+  //   // const currentMonth = dayjs(currentDateTime).format("MMMM");
+  //   const currentMonth = dayjs().format("MMMM");
   //   e.preventDefault();
   //   const currentMonthsInvoices = processInvoices
   //     .filter((invoice) => invoice.month === currentMonth)
@@ -284,10 +284,10 @@ const InvoiceList = () => {
     // }),
   };
 
-  // const t = moment("2022/05/22", "YYYY/MM/DD").add(5, 'days')
-  // const t = moment(currentYearMonth1, "YYYY/MM/DD").add(10, 'days')
-  // const tt = moment(currentYearMonth1, "YYYY/MM/DD").add(12-1, 'days').format("YYYY/MM/DD")
-  // const t = moment(currentDateTime, "YYYY/MM/DD").diff(moment("2022/01/22", "YYYY/MM/DD").add(5, 'months'))
+  // const t = dayjs("2022/05/22", "YYYY/MM/DD").add(5, 'days')
+  // const t = dayjs(currentYearMonth1, "YYYY/MM/DD").add(10, 'days')
+  // const tt = dayjs(currentYearMonth1, "YYYY/MM/DD").add(12-1, 'days').format("YYYY/MM/DD")
+  // const t = dayjs(currentDateTime, "YYYY/MM/DD").diff(dayjs("2022/01/22", "YYYY/MM/DD").add(5, 'months'))
 
   return (
     <Card
@@ -357,4 +357,4 @@ const InvoiceList = () => {
     </Card>
   );
 };
-export default InvoiceList;
+export default Invoices;

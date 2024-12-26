@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 import styles from "../Personal.module.css";
-import { useHistory, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 // import envelope from "../../../images/envelope.png"
 import {
   Tabs,
@@ -78,7 +78,7 @@ const UnitsNParkingsDetails = (props) => {
   //   const [result, error, state] = usePromise(props.data);
   //   const [unitData, setUnitData] = useState([])
   //   const role = props.role;
-  const history = useHistory();
+  const navigate = useNavigate();
 
   //   const storage = useStorage();
   //   const params = useParams();

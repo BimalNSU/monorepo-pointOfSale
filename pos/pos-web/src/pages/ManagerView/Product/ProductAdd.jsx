@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import ProductAddEdit from "@/components/Product/ProductAddEdit";
 import { Card, Row, Tag } from "antd";
 import ProductService from "@/service/product.service";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 
-const AddProduct = () => {
+const ProductAdd = () => {
   const { userId } = useCustomAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const db = useFirestore();
   const storage = useStorage();
   const { status, documentId: newProductId } = useDocumentFormat("product");
@@ -50,4 +50,4 @@ const AddProduct = () => {
     </Card>
   );
 };
-export default AddProduct;
+export default ProductAdd;

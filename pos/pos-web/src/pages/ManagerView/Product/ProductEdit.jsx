@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
-import { useHistory, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import ProductAddEdit from "@/components/Product/ProductAddEdit";
 import { Button, Card, Result, Row, Spin, Tag } from "antd";
 import { useProduct } from "@/api/useProduct";
 import ProductService from "@/service/product.service";
 
-const EditProduct = () => {
+const ProductEdit = () => {
   const { userId } = useCustomAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const db = useFirestore();
   const storage = useStorage();
   const { id } = useParams();
@@ -39,7 +39,7 @@ const EditProduct = () => {
         status="error"
         title="Data fetch error ...!"
         extra={
-          <Button type="primary" onClick={() => history.goBack()}>
+          <Button type="primary" onClick={() => navigate(-1)}>
             Go Back
           </Button>
         }
@@ -70,4 +70,4 @@ const EditProduct = () => {
     </Card>
   );
 };
-export default EditProduct;
+export default ProductEdit;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "reactfire";
 import {
   getAuth,
@@ -28,7 +28,7 @@ const showConfirmPersonalInfoForm = async (auth) => {
 };
 const PasswordReset = () => {
   const auth = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
       await updatePassword(auth.currentUser, values.password);
@@ -37,7 +37,7 @@ const PasswordReset = () => {
       error(`${err}`);
       await auth.signOut();
     }
-    history.push("/");
+    navigate("/");
   };
   return (
     <div className="reset">

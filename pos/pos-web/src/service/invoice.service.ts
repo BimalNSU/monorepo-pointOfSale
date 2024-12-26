@@ -34,7 +34,7 @@ class InvoiceService extends Invoice {
       -(data.discount ?? 0),
     );
     const batch = writeBatch(this.db);
-    this.add(
+    const nInvoice = this.add(
       batch,
       {
         status: INVOICE_STATUS.VALUES.Paid,
@@ -55,6 +55,7 @@ class InvoiceService extends Invoice {
       (item) => product.edit(batch, item.productId, { qty: increment(-item.qty) }, createdBy), //decreasing qty
     );
     await batch.commit();
+    return await this.get(nInvoice.id);
   }
   // async update(id: InvoiceId, data: InvoiceMutPayment, updatedBy: UserId) {
   //   const batch = writeBatch(this.firestore);

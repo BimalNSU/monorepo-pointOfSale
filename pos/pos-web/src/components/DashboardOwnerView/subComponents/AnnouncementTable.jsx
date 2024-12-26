@@ -1,7 +1,7 @@
 import { DATE_FORMAT } from "@/constants/dateFormat";
 import { Table } from "antd";
 import { useMemo } from "react";
-import moment from "moment";
+import dayjs from "dayjs";
 
 const AnnouncementTable = ({ announcements }) => {
   const columns = [
@@ -20,7 +20,7 @@ const AnnouncementTable = ({ announcements }) => {
       announcements?.map((item) => {
         return {
           key: item.id,
-          date: item.publishedAt ? moment(item.publishedAt).format(DATE_FORMAT) : "N/A",
+          date: item.publishedAt ? dayjs(item.publishedAt).format(DATE_FORMAT) : "N/A",
           description: item.description,
         };
       }) || [][announcements],

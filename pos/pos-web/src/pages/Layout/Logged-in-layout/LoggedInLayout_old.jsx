@@ -1,7 +1,16 @@
-import { useState } from "react";
-import { Layout, Button, Grid, Popover, List } from "antd";
-import { BellOutlined, UserOutlined, MenuFoldOutlined } from "@ant-design/icons";
-import { Outlet } from "react-router-dom";
+import React, { useState } from "react";
+import { Layout, Menu, Button, Grid, Popover, Dropdown, Avatar, List, Space } from "antd";
+import {
+  BellOutlined,
+  UserOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  DashboardOutlined,
+  PropertySafetyOutlined,
+  SendOutlined,
+} from "@ant-design/icons";
+import { Link, Route, Routes } from "react-router-dom";
+import ManagerApp from "../../ManagerView/ManagerApp/ManagerApp";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import CustomSidebar from "./custom-sider";
 // import PopHoverNotifications from "@/components/Notification/PopHoverNotification/PopHoverNotifications";
@@ -10,12 +19,13 @@ import { USER_ROLE } from "@/constants/role";
 // import Notificationlist from "@/components/Notification/NotificationList";
 // import OwnerApp from "../../SalesmanView/OwnerApp/OwnerApp";
 // import TenantApp from "../../TenantView/TenantApp/TenantApp";
+import UserApp from "../UserView/UserApp";
 
 const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
 
 const LoggedInLayout = () => {
-  const { role, firstName, lastName } = useCustomAuth();
+  const { userId, role, firstName, lastName } = useCustomAuth();
   // const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const screens = useBreakpoint();
@@ -176,7 +186,17 @@ const LoggedInLayout = () => {
           <div
           // className="site-layout-background" style={{ paddingBottom: "70px" }}
           >
-            <Outlet />
+            {/* {role === "manager" || role === "owner" || role === "tenant" ? (
+              <Routes>
+                <Route path="/notifications" exact>
+                  <Notificationlist />
+                </Route>
+              </Routes>
+            ) : null} */}
+            <UserApp />
+            {role === USER_ROLE.VALUES.Admin ? <ManagerApp /> : null}
+            {/* {role === USER_ROLE.VALUES.Manager ? <OwnerApp /> : null}
+            {role === USER_ROLE.VALUES.Salesman ? <TenantApp /> : null} */}
           </div>
         </Content>
         <Footer
