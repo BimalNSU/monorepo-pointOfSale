@@ -21,7 +21,7 @@ export class User {
   }
   async get(id: UserId) {
     const docRef = doc(this.db, COLLECTIONS.users, id).withConverter(userConverter);
-    const docSnap = await getDoc<UserModel>(docRef);
+    const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return {
         ...docSnap.data(),
