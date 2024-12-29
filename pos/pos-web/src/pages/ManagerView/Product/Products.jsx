@@ -62,18 +62,18 @@ const Products = () => {
             <br />
             <Text strong>Qty:</Text> {record.qty}
             <br />
-            <br />
-            <Text strong>Purchase Rate:</Text> {convertToBD(record.purchaseRate)}
+            <Text strong>Purchase Rate:</Text>{" "}
+            {record.purchaseRate ? convertToBD(record.purchaseRate) : record.purchaseRate}
             <br />
             <Text strong>Sales Rate:</Text> {convertToBD(record.salesRate)}
           </Link>
-          {[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Manager].includes(authRole) && (
+          {[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Manager].includes(role) && (
             <div>
               <Text strong>Action:</Text>{" "}
               <span>
                 <DeleteOutlined
                   onClick={(e) => {
-                    handleDelete(e, record);
+                    handleDeleteProduct(e, record);
                   }}
                 />
               </span>
@@ -117,10 +117,7 @@ const Products = () => {
       title: "Purchase Rate",
       dataIndex: "purchaseRate",
       align: "right",
-      render: (text, record) => {
-        const amountBDT = convertToBD(text);
-        return renderValueCell(amountBDT, record);
-      },
+      render: (text, record) => (text ? renderValueCell(convertToBD(text), record) : text),
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {

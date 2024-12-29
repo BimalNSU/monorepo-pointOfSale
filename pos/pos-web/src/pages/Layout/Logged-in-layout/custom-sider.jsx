@@ -15,7 +15,6 @@ const { Sider } = Layout;
 
 const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const toggleSidebar = () => setCollapsed(!collapsed);
 
   const leftSiderItems = [
     {
@@ -127,7 +126,8 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         // theme="dark"
         style={{ height: "100" }}
         items={leftSiderItems}
-      ></Menu>
+        onClick={() => toggleDrawer()}
+      />
     </Drawer>
   ) : (
     <Sider
