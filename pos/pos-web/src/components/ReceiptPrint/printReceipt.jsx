@@ -90,7 +90,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
             <strong>Total:</strong> {convertToBD(invoice.totalAmount)}
           </p>
         </div>
-        <div className={styles.separator}></div>
+        <hr />
         <div className={styles.note}>
           <p style={{ fontSize: "10px" }}>Thank you for your purchase!</p>
         </div>
