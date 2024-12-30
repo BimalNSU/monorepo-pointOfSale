@@ -42,7 +42,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
       <div ref={contentRef} className={styles.receipt}>
         <div className={styles.receiptHeader}>
           <h2>Organic Design</h2>
-          <p style={{ marginTop: "3px", fontSize: "7px" }}>
+          <p style={{ marginTop: "3px", fontSize: "10px" }}>
             উত্তরা ময়লার মোড়, সোনারগাঁও জনপদ রোড, ট্রাফিক পুলিশ বক্সের সাথে,সেক্টর -১৩, উত্তরা,
             ঢাকা-১২৩০
           </p>
