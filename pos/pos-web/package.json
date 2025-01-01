@@ -34,6 +34,7 @@
     "dotenv": "^16.4.7",
     "firebase": "^11.1.0",
     "html2canvas": "^1.4.1",
+    "jsbarcode": "^3.11.6",
     "lodash": "^4.17.21",
     "random-string-alphanumeric-generator": "^0.12.2",
     "rc-queue-anim": "^2.0.0",

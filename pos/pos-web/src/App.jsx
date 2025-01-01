@@ -14,6 +14,7 @@ import ProductAdd from "./pages/ManagerView/Product/ProductAdd";
 import InvoiceAdd from "./pages/ManagerView/Invoice/Add/invoiceAdd";
 import NotFound from "./pages/notFound";
 import InvoiceReport from "./pages/ManagerView/Invoice/invoiceReport";
+import TestBarcode from "./pages/ManagerView/testBarcode";
 
 const App = () => {
   return (
@@ -46,6 +47,8 @@ const App = () => {
             <Route path=":id" element={<InvoiceDetails />} />
           </Route>
           <Route path="reports" element={<InvoiceReport />} />
+
+          <Route path="barcode" element={<TestBarcode />} />
 
           {/* Handle the case where no route matches */}
           <Route path="/*" element={<NotFound />} />

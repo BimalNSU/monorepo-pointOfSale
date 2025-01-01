@@ -69,6 +69,11 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         },
       ],
     },
+    {
+      key: "5",
+      label: <Link to="/barcode">"Test Barcode"</Link>,
+      icon: <FileTextOutlined />,
+    },
   ];
 
   return !isScreenMd ? (
