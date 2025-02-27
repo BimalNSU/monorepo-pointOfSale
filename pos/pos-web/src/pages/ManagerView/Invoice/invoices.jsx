@@ -50,7 +50,6 @@ const Invoices = () => {
   const { userId, role } = useCustomAuth();
   const db = useFirestore();
   const invoiceService = new InvoiceService(db);
-  // const { status, data: invoices } = useInvoices();
   const {
     status,
     data: invoices,
