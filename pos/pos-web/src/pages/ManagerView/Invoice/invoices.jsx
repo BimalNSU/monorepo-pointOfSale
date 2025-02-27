@@ -25,6 +25,8 @@ import {
   EyeOutlined,
   DeleteOutlined,
   CheckCircleOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 // import { removeInvoice, removeInvoices } from "@/api/manager/invoiceFunctions";
@@ -36,9 +38,9 @@ import inAppLogo from "@/images/check.png";
 import smsLogo from "@/images/comment.png";
 import mailLogo from "@/images/mail.png";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
-import { useInvoices } from "@/api/useInvoices";
 import InvoiceService from "@/service/invoice.service";
 import { USER_ROLE } from "@/constants/role";
+import { useInvoicesPaginated } from "@/api/useInvoicesPaginated";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -48,7 +50,16 @@ const Invoices = () => {
   const { userId, role } = useCustomAuth();
   const db = useFirestore();
   const invoiceService = new InvoiceService(db);
-  const { status, data: invoices } = useInvoices();
+  // const { status, data: invoices } = useInvoices();
+  const {
+    status,
+    data: invoices,
+    metaData,
+    hasPreviousePage,
+    hasNextPage,
+    handleNextPage,
+    handlePreviousPage,
+  } = useInvoicesPaginated();
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -343,6 +354,27 @@ const Invoices = () => {
         </Col>
       </Row>
       <br />
+      <Row justify="end">
+        <Text>
+          {metaData.pageSize * (metaData.pageNo - 1) + 1}-{metaData.pageSize * metaData.pageNo}
+        </Text>
+        <Space direction="horizontal">
+          <Button
+            icon={<LeftOutlined />}
+            size="small"
+            disabled={!hasPreviousePage}
+            onClick={handlePreviousPage}
+            type="text"
+          />
+          <Button
+            icon={<RightOutlined />}
+            size="small"
+            disabled={!hasNextPage}
+            onClick={handleNextPage}
+            type="text"
+          />
+        </Space>
+      </Row>
       <Table
         size="small"
         loading={status === "loading"}
@@ -352,6 +384,7 @@ const Invoices = () => {
           type: "checkbox",
           ...rowSelection,
         }}
+        pagination={false}
         // onChange={onChange}
       />
     </Card>
