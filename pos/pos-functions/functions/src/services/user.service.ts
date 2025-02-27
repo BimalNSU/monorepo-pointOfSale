@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { COLLECTIONS } from "../constants/collections";
 import { User as UserModel } from "../models/user.model";
 import { User } from "../db-collections/user.collection";
-import bcrypt from "bcrypt";
+import bcrypt from "@node-rs/bcrypt";
 type omitType =
   | "createdBy"
   | "createdAt"

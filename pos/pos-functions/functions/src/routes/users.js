@@ -3,7 +3,7 @@ import express from "express";
 import { config } from "dotenv";
 import recaptchaAuthorization from "../middlewares/recaptcha-authorization.middleware";
 import cors from "cors";
-import bcrypt from "bcrypt";
+import bcrypt from "@node-rs/bcrypt";
 import { UserMiddleware } from "../middlewares/user.middleware";
 
 config();

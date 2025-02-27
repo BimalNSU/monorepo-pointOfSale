@@ -19,13 +19,13 @@
     "script-get-data": "cross-env GOOGLE_APPLICATION_CREDENTIALS=\"./service-account.json\" ts-node ./src/scripts/get-data.ts"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "main": "lib/src/index.js",
   "dependencies": {
     "@google-cloud/functions-framework": "^3.2.0",
+    "@node-rs/bcrypt": "^1.10.7",
     "axios": "^0.27.2",
-    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
