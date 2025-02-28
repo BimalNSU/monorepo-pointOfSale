@@ -49,6 +49,7 @@ const { confirm } = Modal;
 const Invoices = () => {
   const { userId, role } = useCustomAuth();
   const db = useFirestore();
+  const [pageSize, setPageSize] = useState(10);
   const invoiceService = new InvoiceService(db);
   const {
     status,
@@ -58,7 +59,7 @@ const Invoices = () => {
     hasNextPage,
     handleNextPage,
     handlePreviousPage,
-  } = useInvoicesPaginated();
+  } = useInvoicesPaginated(pageSize);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -300,46 +301,8 @@ const Invoices = () => {
   // const t = dayjs(currentDateTime, "YYYY/MM/DD").diff(dayjs("2022/01/22", "YYYY/MM/DD").add(5, 'months'))
 
   return (
-    <Card
-      title="Invoice List"
-      bordered={false}
-      style={{
-        margin: "10px",
-      }}
-    >
-      {/* TODO: comment following lines in production */}
-      {/* {children} */}
-      <Row justify="space-between">
-        <Col>
-          {/* <Row gutter={[10, 1]}>
-            <Col>
-              {pmsMenu.list.length > 0 ? (
-                <Select
-                  mode="multiple"
-                  style={{ width: "150px" }}
-                  placeholder={pmsMenu.dropDownName}
-                  onSelect={onSelectFilterType}
-                  onDeselect={onDelectFilterType}
-                >
-                  {pmsMenu.list.map((selectItem) => (
-                    <Option key={selectItem.dataIndex} value={selectItem.dataIndex}>
-                      {selectItem.title}
-                    </Option>
-                  ))}
-                </Select>
-              ) : null}
-            </Col>
-            <Col>
-              <Input
-                width={100}
-                className="header-search"
-                placeholder="Type here..."
-                prefix={<SearchOutlined />}
-                onChange={onChangeInput}
-              />
-            </Col>
-          </Row> */}
-        </Col>
+    <Card title="Invoice List" bordered={false} size="small">
+      <Row justify="space-between" style={{ marginBottom: "5px" }}>
         <Col>
           {selectedInvoiceIds?.length ? (
             <Button
@@ -351,28 +314,39 @@ const Invoices = () => {
             </Button>
           ) : null}
         </Col>
-      </Row>
-      <br />
-      <Row justify="end">
-        <Text>
-          {metaData.pageSize * (metaData.pageNo - 1) + 1}-{metaData.pageSize * metaData.pageNo}
-        </Text>
-        <Space direction="horizontal">
-          <Button
-            icon={<LeftOutlined />}
-            size="small"
-            disabled={!hasPreviousePage}
-            onClick={handlePreviousPage}
-            type="text"
-          />
-          <Button
-            icon={<RightOutlined />}
-            size="small"
-            disabled={!hasNextPage}
-            onClick={handleNextPage}
-            type="text"
-          />
-        </Space>
+        <Col>
+          <Row justify="end" gutter={[16, 1]}>
+            <Col>
+              <Text>
+                {metaData.pageSize * (metaData.pageNo - 1) + 1}-
+                {metaData.pageSize * metaData.pageNo}
+              </Text>
+            </Col>
+            <Col>
+              <Space direction="horizontal">
+                <Button
+                  icon={<LeftOutlined />}
+                  size="small"
+                  disabled={!hasPreviousePage}
+                  onClick={handlePreviousPage}
+                  type="text"
+                />
+                <Button
+                  icon={<RightOutlined />}
+                  size="small"
+                  disabled={!hasNextPage}
+                  onClick={handleNextPage}
+                  type="text"
+                />
+              </Space>
+              <Select
+                value={pageSize}
+                onChange={(value) => setPageSize(value)}
+                options={[10, 20, 30, 50].map((item) => ({ value: item, label: item }))}
+              />
+            </Col>
+          </Row>
+        </Col>
       </Row>
       <Table
         size="small"
