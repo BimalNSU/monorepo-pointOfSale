@@ -57,7 +57,7 @@ const PopHoverProfile = ({ viewContentMbl }) => {
           {!viewContentMbl ? (
             <Col>
               <Space direction="vertical" size={0}>
-                <Text>{`${firstName} ${lastName}`}</Text>
+                <Text>{`${firstName}${lastName ? ` ${lastName}` : ""}`}</Text>
               </Space>
             </Col>
           ) : null}
