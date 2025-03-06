@@ -1,42 +1,11 @@
-import React, { useMemo, useState } from "react";
+import { useState } from "react";
 import { useFirestore } from "reactfire";
-import dayjs from "dayjs";
 
-import {
-  Button,
-  Select,
-  message,
-  Row,
-  Typography,
-  Col,
-  Table,
-  Input,
-  Space,
-  Modal,
-  Tag,
-  Badge,
-  Image,
-  Card,
-} from "antd";
-import {
-  FilePdfOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  EyeOutlined,
-  DeleteOutlined,
-  CheckCircleOutlined,
-  LeftOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
+import { Button, Select, Row, Typography, Col, Table, Space, Modal, Tag, Card } from "antd";
+import { DeleteOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-// import { removeInvoice, removeInvoices } from "@/api/manager/invoiceFunctions";
-import { DATE_FORMAT, DATE_TIME_FORMAT } from "@/constants/dateFormat";
-import { useDebounce } from "react-use";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";
 import { convertToBD } from "@/constants/currency";
-import inAppLogo from "@/images/check.png";
-import smsLogo from "@/images/comment.png";
-import mailLogo from "@/images/mail.png";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import InvoiceService from "@/service/invoice.service";
 import { USER_ROLE } from "@/constants/role";
@@ -97,38 +66,42 @@ const Invoices = () => {
     {
       dataIndex: "mobileIndex",
       key: "mobileIndex",
-      render: (text, record) => (
-        <div>
-          <Link
-            to={{ pathname: `/invoices/${record.id}` }}
-            style={{
-              color: "black",
-              textDecoration: "none",
-            }}
-          >
-            {record.isDeleted ? <Text type="danger">{text}</Text> : text}
-            <Text strong>#:</Text> {record.id}
-            <br />
+      render: (_, record) => (
+        <Row gutter={[16, 1]} justify="space-between">
+          <Col span={24}>
+            <Link
+              to={{ pathname: `/invoices/${record.id}` }}
+              style={{ color: "black", textDecoration: "none" }}
+            >
+              <>
+                <Text strong>{`# `}</Text>
+                <Text type={record.isDeleted ? "danger" : undefined}>{record.id}</Text>
+              </>
+            </Link>
+          </Col>
+          <Col span={24}>
             <Text strong>Date:</Text> {record.createdAt}
-            <br />
+          </Col>
+          <Col span={12}>
+            <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
+          </Col>
+          <Col span={12}>
             <Text strong>Discount:</Text>{" "}
             {record.discount ? convertToBD(record.discount) : record.discount}
-            <br />
-            <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
-            <br />
+          </Col>
+          <Col span={12}>
             <Text strong>Status: </Text>
             <Tag color={INVOICE_STATUS.KEYS[record.status].color}>
               {INVOICE_STATUS.KEYS[record.status].text}
             </Tag>
-            {/* <br />
-            {(authRole === "manager" || authRole === "owner") && (
-              <div>
-                <Text strong>Bill To:</Text> {record.billTo}
-              </div>
-            )} */}
-          </Link>
+          </Col>
+          {/* {(authRole === "manager" || authRole === "owner") && (
+            <Col span={24}>
+              <Text strong>Bill To:</Text> {record.billTo}
+            </Col>
+          )} */}
           {role === USER_ROLE.VALUES.Admin && (
-            <div>
+            <Col span={12}>
               <Text strong>Action:</Text>
               <span>
                 <DeleteOutlined
@@ -137,9 +110,9 @@ const Invoices = () => {
                   }}
                 />
               </span>
-            </div>
+            </Col>
           )}
-        </div>
+        </Row>
       ),
       responsive: ["xs"],
     },
