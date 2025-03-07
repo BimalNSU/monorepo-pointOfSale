@@ -67,52 +67,59 @@ const Invoices = () => {
       dataIndex: "mobileIndex",
       key: "mobileIndex",
       render: (_, record) => (
-        <Row gutter={[16, 1]} justify="space-between">
-          <Col span={24}>
-            <Link
-              to={{ pathname: `/invoices/${record.id}` }}
-              style={{ color: "black", textDecoration: "none" }}
-            >
-              <>
+        <>
+          <Link
+            to={{ pathname: `/invoices/${record.id}` }}
+            style={{ color: "black", textDecoration: "none" }}
+          >
+            <Row gutter={[16, 1]} justify="space-between">
+              <Col span={24}>
                 <Text strong>{`# `}</Text>
                 <Text type={record.isDeleted ? "danger" : undefined}>{record.id}</Text>
-              </>
-            </Link>
-          </Col>
-          <Col span={24}>
-            <Text strong>Date:</Text> {record.createdAt}
-          </Col>
-          <Col span={12}>
-            <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
-          </Col>
-          <Col span={12}>
-            <Text strong>Discount:</Text>{" "}
-            {record.discount ? convertToBD(record.discount) : record.discount}
-          </Col>
-          <Col span={12}>
-            <Text strong>Status: </Text>
-            <Tag color={INVOICE_STATUS.KEYS[record.status].color}>
-              {INVOICE_STATUS.KEYS[record.status].text}
-            </Tag>
-          </Col>
-          {/* {(authRole === "manager" || authRole === "owner") && (
+              </Col>
+              <Col span={24}>
+                <Text strong>Date:</Text> {record.createdAt}
+              </Col>
+              <Col span={12}>
+                <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
+              </Col>
+              <Col span={12}>
+                <Text strong>Discount:</Text>{" "}
+                {record.discount ? convertToBD(record.discount) : record.discount}
+              </Col>
+            </Row>
+          </Link>
+          <Row gutter={[16, 1]} justify="space-between">
+            <Col span={12}>
+              <Link
+                to={{ pathname: `/invoices/${record.id}` }}
+                style={{ color: "black", textDecoration: "none" }}
+              >
+                <Text strong>Status: </Text>
+                <Tag color={INVOICE_STATUS.KEYS[record.status].color}>
+                  {INVOICE_STATUS.KEYS[record.status].text}
+                </Tag>
+              </Link>
+            </Col>
+            {/* {(authRole === "manager" || authRole === "owner") && (
             <Col span={24}>
               <Text strong>Bill To:</Text> {record.billTo}
             </Col>
           )} */}
-          {role === USER_ROLE.VALUES.Admin && (
-            <Col span={12}>
-              <Text strong>Action:</Text>
-              <span>
-                <DeleteOutlined
-                  onClick={(e) => {
-                    handleDeleteInvoice(e, record);
-                  }}
-                />
-              </span>
-            </Col>
-          )}
-        </Row>
+            {role === USER_ROLE.VALUES.Admin && (
+              <Col span={12}>
+                <Text strong>Action:</Text>
+                <span>
+                  <DeleteOutlined
+                    onClick={(e) => {
+                      handleDeleteInvoice(e, record);
+                    }}
+                  />
+                </span>
+              </Col>
+            )}
+          </Row>
+        </>
       ),
       responsive: ["xs"],
     },
