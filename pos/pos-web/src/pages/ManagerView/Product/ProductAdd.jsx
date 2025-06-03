@@ -46,7 +46,7 @@ const ProductAdd = () => {
           </Tag>
         </Row>
       ) : null}
-      <ProductAddEdit onSubmit={handleSubmit} newProductFormat={{ status, newProductId }} />;
+      <ProductAddEdit onSubmit={handleSubmit} newProductFormat={{ status, newProductId }} />
     </Card>
   );
 };
