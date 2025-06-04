@@ -41,6 +41,6 @@
   "workspaces": [
     "pos/pos-web",
     "pos/pos-functions/functions",
-    "shared"
+    "pos/shared-models"
   ]
 }

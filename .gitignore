@@ -3,5 +3,6 @@
 
 # Ignore all 'lib' directories anywhere in the repository
 **/lib/
+**/dist/
 service-account.json
 service-account-*.json

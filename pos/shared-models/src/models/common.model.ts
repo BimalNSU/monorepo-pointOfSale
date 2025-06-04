@@ -46,8 +46,21 @@ export type MaritalStatus = "unmarried" | "married" | "devorced" | "others";
  * *@enum {1: "male", 2: "female", 3: "other"}
  **/
 export type Gender = 1 | 2 | 3;
-export type BloodGroup = "A+" | "A-" | "B+" | "B-" | "O+" | "O-" | "AB+" | "AB-";
-export type Religion = "islam" | "hindu" | "buddhism" | "christianity" | "others";
+export type BloodGroup =
+  | "A+"
+  | "A-"
+  | "B+"
+  | "B-"
+  | "O+"
+  | "O-"
+  | "AB+"
+  | "AB-";
+export type Religion =
+  | "islam"
+  | "hindu"
+  | "buddhism"
+  | "christianity"
+  | "others";
 
 export type ProductId = string;
 export type CategoryId = number;
