@@ -1,5 +1,5 @@
-import { InvoiceId, UserId, WithId } from "@/models/common.model";
-import { Invoice as InvoiceModel } from "@/models/invoice.model";
+import { InvoiceId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { Invoice as InvoiceModel } from "@pos/shared-models/dist/models/invoice.model";
 import { Firestore, increment, writeBatch } from "firebase/firestore";
 import { Invoice } from "@/db-collections/invoice.collection";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";

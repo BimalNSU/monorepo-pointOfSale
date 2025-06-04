@@ -25,6 +25,7 @@
   "dependencies": {
     "@google-cloud/functions-framework": "^3.2.0",
     "@node-rs/bcrypt": "^1.10.7",
+    "@pos/shared-models": "workspace:^",
     "axios": "^0.27.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

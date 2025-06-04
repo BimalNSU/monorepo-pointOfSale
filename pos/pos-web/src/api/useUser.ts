@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { UserId } from "@/models/common.model";
-import { User } from "@/models/user.model";
+import { UserId } from "@pos/shared-models/dist/models/common.model";
+import { User } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import { doc } from "firebase/firestore";
 import { useFirestore, useFirestoreDocData } from "reactfire";

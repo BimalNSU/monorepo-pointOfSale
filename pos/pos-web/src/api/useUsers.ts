@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { WithId } from "@/models/common.model";
-import { User } from "@/models/user.model";
+import { WithId } from "@pos/shared-models/dist/models/common.model";
+import { User } from "@pos/shared-models/dist/models/user.model";
 import { firestoreConverter } from "@/utils/converter";
 import { collection, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";

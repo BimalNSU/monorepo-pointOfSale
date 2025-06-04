@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { WithId } from "@/models/common.model";
-import { Category } from "@/models/category.model";
+import { WithId } from "@pos/shared-models/dist/models/common.model";
+import { Category } from "@pos/shared-models/dist/models/category.model";
 import { firestoreConverter } from "@/utils/converter";
 import { collection, query, where } from "firebase/firestore";
 import { useMemo } from "react";

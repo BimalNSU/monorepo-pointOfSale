@@ -1,8 +1,8 @@
-import { UserId } from "../models/common.model";
+import { UserId } from "@pos/shared-models/dist/models/common.model";
 import { AppError } from "../AppError";
 import { db } from "../firebase";
 import { COLLECTIONS } from "../constants/collections";
-import { User as UserModel } from "../models/user.model";
+import { User as UserModel } from "@pos/shared-models/dist/models/user.model";
 import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
 type omitType =
@@ -31,11 +31,10 @@ export class UserService {
     };
     const userObj = new User();
     const allUsers = await userObj.findAll();
-    const activeUsers = allUsers.filter((u) => u.isActive);
     const newUserMobile = data.mobile ? data.mobile : "";
     const newUserEmail = data.email ? data.email : "";
     const errorMessage = this.checkExistEmailNMobile(
-      activeUsers,
+      allUsers,
       newUserMobile,
       newUserEmail
     );

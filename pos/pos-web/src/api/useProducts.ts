@@ -1,7 +1,7 @@
 import { COLLECTIONS } from "@/constants/collections";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
-import { WithId } from "@/models/common.model";
-import { Product } from "@/models/product.model";
+import { WithId } from "@pos/shared-models/dist/models/common.model";
+import { Product } from "@pos/shared-models/dist/models/product.model";
 import { firestoreConverter } from "@/utils/converter";
 import dayjs from "dayjs";
 import { collection, query, where } from "firebase/firestore";

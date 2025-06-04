@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { InvoiceId, UserId, WithId } from "@/models/common.model";
-import { Invoice as InvoiceModel } from "@/models/invoice.model";
+import { InvoiceId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { Invoice as InvoiceModel } from "@pos/shared-models/dist/models/invoice.model";
 import { firestoreConverter } from "@/utils/converter";
 import {
   CollectionReference,

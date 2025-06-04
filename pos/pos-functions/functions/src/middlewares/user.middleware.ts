@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { MutableData, UserService } from "../services/user.service";
-import { UserId } from "../models/common.model";
+import { UserId } from "@pos/shared-models/dist/models/common.model";
 import bcrypt from "@node-rs/bcrypt";
 import { auth } from "../firebase";
 

@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { ProductId, WithId } from "@/models/common.model";
-import { Product } from "@/models/product.model";
+import { ProductId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { Product } from "@pos/shared-models/dist/models/product.model";
 import { firestoreConverter } from "@/utils/converter";
 import { doc } from "firebase/firestore";
 import { useFirestore, useFirestoreDocData } from "reactfire";

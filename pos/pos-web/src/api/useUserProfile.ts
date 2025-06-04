@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { FetchStatus, MemberId } from "@/models/common.model";
-import { User } from "@/models/user.model";
+import { FetchStatus, MemberId } from "@pos/shared-models/dist/models/common.model";
+import { User } from "@pos/shared-models/dist/models/user.model";
 import { firestoreConverter } from "@/utils/converter";
 import { doc } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";

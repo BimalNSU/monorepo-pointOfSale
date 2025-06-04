@@ -1,5 +1,5 @@
-import { Product as ProductModel } from "@/models/product.model";
-import { ProductId, UserId, WithId } from "@/models/common.model";
+import { Product as ProductModel } from "@pos/shared-models/dist/models/product.model";
+import { ProductId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
 import { Firestore, writeBatch } from "firebase/firestore";
 import { Product } from "@/db-collections/product.collection";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";

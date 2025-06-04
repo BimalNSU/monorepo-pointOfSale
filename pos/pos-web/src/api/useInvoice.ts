@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { InvoiceId, WithId } from "@/models/common.model";
-import { Invoice } from "@/models/invoice.model";
+import { InvoiceId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { Invoice } from "@pos/shared-models/dist/models/invoice.model";
 import { firestoreConverter } from "@/utils/converter";
 import { doc } from "firebase/firestore";
 import { useFirestore, useFirestoreDocData } from "reactfire";

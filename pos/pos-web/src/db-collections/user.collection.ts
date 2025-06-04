@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/collections";
-import { UserId, WithId } from "@/models/common.model";
-import { User as UserModel } from "@/models/user.model";
+import { UserId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { User as UserModel } from "@pos/shared-models/dist/models/user.model";
 import { firestoreConverter } from "@/utils/converter";
 import {
   Firestore,
