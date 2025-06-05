@@ -27,7 +27,7 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import * as validator from "../../../../../utils/Validation/Validation";
 import ProfileView from "@/components/User/ProfileView";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import UserEdit from "@/components/User/UserEdit";
 import { useUserProfile } from "@/api/useUserProfile";
 

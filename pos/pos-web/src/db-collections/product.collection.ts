@@ -1,4 +1,4 @@
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { ProductId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
 import { Product as ProductModel } from "@pos/shared-models/dist/models/product.model";
 import { firestoreConverter } from "@/utils/converter";

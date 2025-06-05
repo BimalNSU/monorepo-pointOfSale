@@ -1,4 +1,4 @@
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { FetchStatus, MemberId } from "@pos/shared-models/dist/models/common.model";
 import { User } from "@pos/shared-models/dist/models/user.model";
 import { firestoreConverter } from "@/utils/converter";

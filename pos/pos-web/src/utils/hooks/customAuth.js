@@ -15,6 +15,7 @@ export const useCustomAuth = () => {
   const firstName = useAuthStore((state) => state.firstName);
   const lastName = useAuthStore((state) => state.lastName);
   const role = useAuthStore((state) => state.role);
+  const status = useAuthStore((state) => state.status);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const user = useAuthStore((state) => state.user);
@@ -114,6 +115,9 @@ export const useCustomAuth = () => {
       if (role !== newUserData.role) {
         updatableData.role = newUserData.role;
       }
+      if (status !== newUserData.status) {
+        updatableData.status = newUserData.status;
+      }
       updateStore(updatableData);
     }
   };
@@ -123,11 +127,12 @@ export const useCustomAuth = () => {
       const result = await signInWithCustomToken(auth, customToken);
       const nUser = result.user;
       // const accessToken = nUser.accessToken;
-      const { currentLoginType, id, role, firstName, lastName, mobile, email } = userData;
+      const { currentLoginType, id, role, status, firstName, lastName, mobile, email } = userData;
       const updatableData = {
         currentLoginType,
         id,
         role,
+        status,
         firstName,
         lastName,
         email,
@@ -169,6 +174,7 @@ export const useCustomAuth = () => {
     getToken,
     userId,
     role,
+    status,
     firstName,
     lastName,
     currentLoginType,

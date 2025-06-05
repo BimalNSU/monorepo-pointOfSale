@@ -50,7 +50,7 @@ import {
   useFirebaseApp,
 } from "reactfire";
 import { ref, uploadBytesResumable, getStorage } from "firebase/storage";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import UnitsNParkingsDetails from "./UnitsNParkingsDetails";
 
 const { Text } = Typography;

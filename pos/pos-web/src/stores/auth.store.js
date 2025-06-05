@@ -12,6 +12,7 @@ let initialState = {
   // uid: "SOMEIMPOSSIBLEID123",
   id: "",
   role: undefined,
+  status: undefined,
   name: undefined,
   firstName: undefined,
   lastName: undefined,

@@ -1,4 +1,4 @@
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { DocumentCounterId } from "@pos/shared-models/dist/models/common.model";
 import { DocumentCounter } from "@pos/shared-models/dist/models/documentCounter.model";

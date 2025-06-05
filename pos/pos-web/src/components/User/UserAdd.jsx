@@ -37,7 +37,7 @@ import * as validator from "../../utils/Validation/Validation";
 import { success, error, deleteUndefinedFromObj, checkValueExist } from "@/utils/Utils/Utils";
 
 import dayjs from "dayjs";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
@@ -48,6 +48,7 @@ import PersonalInfoForm from "./AddEdit/PersonalInfoForm";
 import OtherInfoForm from "./AddEdit/OtherInfoForm";
 // import { updateUserOtherInfo } from "@/api/admin/userFunctions";
 import { uploadUserProfile } from "@/api/common/commonFunctions";
+import { USER_ROLE } from "@/constants/role";
 const bloodGroupsData = [];
 
 const { confirm } = Modal;
@@ -58,7 +59,7 @@ const dateTimeFormat = "DD/MM/YYYY HH:mm:ss";
 // const currentDateTime = dayjs().format(dateTimeFormat).toString();
 
 const UserAdd = ({ targetRole, onSuccess }) => {
-  const { userId: authUserId, role: authRole, isAdmin, getToken } = useCustomAuth();
+  const { userId: authUserId, role: authRole, getToken } = useCustomAuth();
   const navigate = useNavigate();
   const storage = useStorage();
   const firestore = useFirestore();
@@ -75,16 +76,17 @@ const UserAdd = ({ targetRole, onSuccess }) => {
       title: `Are you sure to ${verb} personal Information?`,
       async onOk() {
         try {
-          if (newUserId && isAdmin) {
+          if (newUserId && authRole === USER_ROLE.VALUES.Admin) {
             personalInfo.uid = newUserId;
           }
           const accessToken = await getToken();
           if (!accessToken) {
-            navigate(`${isAdmin ? "/admin" : "/"}login`);
+            navigate(`${authRole === USER_ROLE.VALUES.Admin ? "/admin" : "/"}login`);
           }
-          const res = isAdmin
-            ? await apiProvider.addUserByAdmin({ ...personalInfo }, accessToken)
-            : await apiProvider.updateFormOne({ ...personalInfo }, accessToken);
+          const res =
+            authRole === USER_ROLE.VALUES.Admin
+              ? await apiProvider.addUserByAdmin({ ...personalInfo }, accessToken)
+              : await apiProvider.updateFormOne({ ...personalInfo }, accessToken);
           if (res.data?.uid) {
             const nUserId = res.data.uid;
             setNewUserId(nUserId);
@@ -129,7 +131,7 @@ const UserAdd = ({ targetRole, onSuccess }) => {
     const verb = "add";
     const accessToken = await getToken();
     if (!accessToken) {
-      navigate(`${isAdmin ? "/admin" : "/"}login`);
+      navigate(`${authRole === USER_ROLE.VALUES.Admin ? "/admin" : "/"}login`);
     }
     confirm({
       title: `Are you sure to ${verb} Detail Info.?`,
@@ -191,7 +193,7 @@ const UserAdd = ({ targetRole, onSuccess }) => {
             onSubmit={handleSubmitPersonalInfo}
             // onSuccess={handleForm1Submit}
             // authUserId={authUserId}
-            isAdmin={isAdmin}
+            authRole={authRole}
           >
             <Button type="primary" htmlType="submit" style={{ backgroundColor: "green" }}>
               {newUserId ? "Update" : "Save"} & Continue

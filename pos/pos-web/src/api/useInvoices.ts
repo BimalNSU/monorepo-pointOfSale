@@ -1,4 +1,4 @@
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 import { WithId } from "@pos/shared-models/dist/models/common.model";
 import { Invoice } from "@pos/shared-models/dist/models/invoice.model";

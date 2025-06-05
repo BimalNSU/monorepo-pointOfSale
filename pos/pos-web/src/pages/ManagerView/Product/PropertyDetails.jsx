@@ -2,7 +2,7 @@ import React from "react";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useFirestore, useFirestoreDocData } from "reactfire";
 import { Spin } from "antd";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { useParams } from "react-router-dom";
 import { doc } from "firebase/firestore";
 import ResidentialPropertyDetails from "@/components/Property/PropertyDetails/ResidentialPropetyDetails";

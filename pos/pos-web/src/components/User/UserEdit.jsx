@@ -38,7 +38,7 @@ import { success, error, checkValueExist, deleteUndefinedNullFromObj } from "@/u
 // import style from "../../assets/common/style.css";
 
 import dayjs from "dayjs";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 const bloodGroupsData = [];
 
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";

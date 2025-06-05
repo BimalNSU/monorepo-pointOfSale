@@ -4,7 +4,7 @@ import { Button, Typography, Checkbox, Divider } from "antd";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useFirestore } from "reactfire";
 import { doc, updateDoc } from "firebase/firestore";
-import { COLLECTIONS } from "@/constants/collections";
+import { COLLECTIONS } from "@pos/shared-models";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 // import { updateUserRoleStatus } from "@/api/admin/userFunctions";
 const { Title } = Typography;
