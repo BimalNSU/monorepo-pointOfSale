@@ -4,7 +4,7 @@ import { USER_ROLE } from "@/constants/role";
 import { Link } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import ProductService from "@/service/product.service";
 import { useFirestore } from "reactfire";
 import { useMemo } from "react";
@@ -12,7 +12,7 @@ const { Text } = Typography;
 const { confirm } = Modal;
 
 const Products = () => {
-  const { userId, role } = useCustomAuth();
+  const { userId, session } = useFirebaseAuth();
   const db = useFirestore();
   const productService = new ProductService(db);
   const { status, data } = useProducts();
@@ -67,7 +67,7 @@ const Products = () => {
             <br />
             <Text strong>Sales Rate:</Text> {convertToBD(record.salesRate)}
           </Link>
-          {[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Manager].includes(role) && (
+          {USER_ROLE.VALUES.Admin === session.role && (
             <div>
               <Text strong>Action:</Text>{" "}
               <span>
@@ -131,7 +131,7 @@ const Products = () => {
       responsive: ["md", "lg", "xl", "xxl"],
     },
   ];
-  if (role === USER_ROLE.VALUES.Admin) {
+  if (session.role === USER_ROLE.VALUES.Admin) {
     columns.push({
       title: "Action",
       align: "center",

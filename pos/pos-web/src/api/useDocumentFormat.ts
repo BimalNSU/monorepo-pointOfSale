@@ -1,7 +1,5 @@
-import { COLLECTIONS } from "@pos/shared-models";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
-import { DocumentCounterId } from "@pos/shared-models/dist/models/common.model";
-import { DocumentCounter } from "@pos/shared-models/dist/models/documentCounter.model";
+import { COLLECTIONS, DocumentCounterId, DocumentCounter } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import dayjs from "dayjs";
 import { doc, setDoc } from "firebase/firestore";

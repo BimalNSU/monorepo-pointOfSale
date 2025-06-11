@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Layout, Button, Grid, Popover, List } from "antd";
 import { BellOutlined, UserOutlined, MenuFoldOutlined } from "@ant-design/icons";
 import { Outlet } from "react-router-dom";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import CustomSidebar from "./custom-sider";
 // import PopHoverNotifications from "@/components/Notification/PopHoverNotification/PopHoverNotifications";
 import PopHoverProfile from "./pop-hover-profile";
-import { USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
+import DisplayShop from "@/components/shop/displayShop";
 // import Notificationlist from "@/components/Notification/NotificationList";
 // import OwnerApp from "../../SalesmanView/OwnerApp/OwnerApp";
 // import TenantApp from "../../TenantView/TenantApp/TenantApp";
@@ -15,7 +16,7 @@ const { Header, Content, Footer } = Layout;
 const { useBreakpoint } = Grid;
 
 const LoggedInLayout = () => {
-  const { role, firstName, lastName } = useCustomAuth();
+  const { firstName, lastName, session } = useFirebaseAuth();
   // const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const screens = useBreakpoint();
@@ -166,7 +167,16 @@ const LoggedInLayout = () => {
                   lastName ? ` ${lastName}` : ""
                 }`}</span>
                 {/* User role */}
-                <span style={{ fontSize: "12px", marginTop: "0" }}>{USER_ROLE.KEYS[role]}</span>
+                <span style={{ fontSize: "12px", marginTop: "0" }}>
+                  {session.role === USER_ROLE.VALUES.Employee && session.shopRole ? (
+                    <>
+                      <DisplayShop shopId={session.shopId} />{" "}
+                      <span>{`| ${SHOP_ROLE.KEYS[session.shopRole].text}`}</span>
+                    </>
+                  ) : (
+                    USER_ROLE.KEYS[session.role]
+                  )}
+                </span>
               </div>
             ) : null}
           </div>

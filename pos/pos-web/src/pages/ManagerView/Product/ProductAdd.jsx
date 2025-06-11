@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import ProductAddEdit from "@/components/Product/ProductAddEdit";
@@ -8,7 +8,7 @@ import ProductService from "@/service/product.service";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 
 const ProductAdd = () => {
-  const { userId } = useCustomAuth();
+  const { userId, session } = useFirebaseAuth();
   const navigate = useNavigate();
   const db = useFirestore();
   const storage = useStorage();
@@ -18,7 +18,10 @@ const ProductAdd = () => {
 
   const handleSubmit = async (values, form) => {
     try {
-      await productService.create({ ...values, id: newProductId }, userId);
+      await productService.create(
+        { ...values, id: newProductId },
+        { userId, role: session.role, shopId: session.shopId, shopRole: session.shopRole },
+      );
       form.resetFields();
       setResponseMessage("success");
     } catch (err) {

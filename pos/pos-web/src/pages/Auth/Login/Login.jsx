@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth, useSigninCheck } from "reactfire";
 import {
@@ -6,6 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
 } from "firebase/auth";
 import { Form, Input, Button, Checkbox, message, Typography, Space, Row } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
@@ -13,33 +14,29 @@ import { success, error } from "@/utils/Utils/Utils";
 import "./Login.css";
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
 import logo from "../../../images/logo.png";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 
 const { Title } = Typography;
 
 // const key = 'updatable'
 
 function Login() {
-  // const auth = useAuth();
+  const auth = useAuth();
   const [isLoaded, setIsLoaded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { loginWithCustomToken, logout } = useCustomAuth();
-
-  useEffect(() => {
-    logout();
-  }, []);
+  const { updateStore } = useFirebaseAuth();
 
   const onFinish = async (values) => {
     setIsLoaded(false);
     const res = await apiProvider.login(values);
     try {
       if (res.status === 200) {
-        const currentLoginType = res.data.currentLoginType;
-        const userData = { ...res.data.userData, currentLoginType };
-        // await login(res.data.accessToken,userData );
-        await loginWithCustomToken(res.data.accessToken, userData);
-        const { from } = location.state || { from: { pathname: "/sales" } };
+        // const userData = { ...res.data.userData, currentLoginType };
+        const { accessToken, sessionId, userData } = res.data;
+        await signInWithCustomToken(auth, accessToken);
+        updateStore({ session: { id: sessionId } });
+        const { from } = location.state || { from: { pathname: "/dashboard" } };
         navigate(from, { replace: true });
       } else {
         error("Incorrect Email or password");

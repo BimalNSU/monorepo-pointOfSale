@@ -32,9 +32,7 @@ const InvoiceReport = () => {
   const { status, data } = useInvoicesWithFilters(filters);
 
   useEffect(() => {
-    searchForm.setFieldsValue({
-      dateRange: [filters.fromDate, filters.toDate],
-    });
+    searchForm.setFieldsValue({ dateRange: [filters.fromDate, filters.toDate] });
   }, [filters]);
 
   const updateUrlParams = (queryFilters) => {

@@ -6,7 +6,7 @@ import { DeleteOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";
 import { convertToBD } from "@/constants/currency";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import InvoiceService from "@/service/invoice.service";
 import { USER_ROLE } from "@/constants/role";
 import { useInvoicesPaginated } from "@/api/useInvoicesPaginated";
@@ -16,7 +16,7 @@ const { Option } = Select;
 const { confirm } = Modal;
 
 const Invoices = () => {
-  const { userId, role } = useCustomAuth();
+  const { userId, session } = useFirebaseAuth();
   const db = useFirestore();
   const [pageSize, setPageSize] = useState(10);
   const invoiceService = new InvoiceService(db);
@@ -106,7 +106,7 @@ const Invoices = () => {
               <Text strong>Bill To:</Text> {record.billTo}
             </Col>
           )} */}
-            {role === USER_ROLE.VALUES.Admin && (
+            {session.role === USER_ROLE.VALUES.Admin && (
               <Col span={12}>
                 <Text strong>Action:</Text>
                 <span>
@@ -162,7 +162,7 @@ const Invoices = () => {
       responsive: ["md", "lg", "xl", "xxl"],
     },
   ];
-  if (role === USER_ROLE.VALUES.Admin) {
+  if (session.role === USER_ROLE.VALUES.Admin) {
     columns.push({
       title: "Action",
       align: "center",

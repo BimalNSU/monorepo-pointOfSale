@@ -1,6 +1,5 @@
+import { COLLECTIONS, Shop as ShopModel, ShopId, UserId, WithId } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
-import { COLLECTIONS } from "@pos/shared-models";
-import { ProductId, UserId, WithId, Product as ProductModel } from "@pos/shared-models";
 import {
   CollectionReference,
   FieldValue,
@@ -12,7 +11,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-const productFirestoreConverter = firestoreConverter<ProductModel>();
+const shopFirestoreConverter = firestoreConverter<ShopModel>();
 type omitKeys =
   | "createdAt"
   | "createdBy"
@@ -21,20 +20,20 @@ type omitKeys =
   | "isDeleted"
   | "deletedAt"
   | "deletedBy";
-type AddData = WithId<Omit<ProductModel, omitKeys>>;
-type EditData = Omit<ProductModel, omitKeys | "qty"> & { qty: number | FieldValue };
+type AddData = WithId<Omit<ShopModel, omitKeys>>;
+type EditData = Omit<ShopModel, omitKeys | "qty"> & { qty: number | FieldValue };
 
-export class Product {
+export class Shop {
   collectionRef: CollectionReference;
   constructor(db: Firestore) {
-    this.collectionRef = collection(db, COLLECTIONS.products);
+    this.collectionRef = collection(db, COLLECTIONS.shops);
   }
   add(batch: WriteBatch, data: AddData, createdBy: UserId) {
     const now = serverTimestamp();
     const { id, ...rest } = data;
     const docRef = !id
-      ? doc(this.collectionRef).withConverter(productFirestoreConverter)
-      : doc(this.collectionRef, id).withConverter(productFirestoreConverter);
+      ? doc(this.collectionRef).withConverter(shopFirestoreConverter)
+      : doc(this.collectionRef, id).withConverter(shopFirestoreConverter);
     batch.set(docRef, {
       ...rest,
       createdAt: now,
@@ -47,30 +46,30 @@ export class Product {
     });
     return docRef;
   }
-  async get(id: ProductId) {
-    const docRef = doc(this.collectionRef, id).withConverter(productFirestoreConverter);
+  async get(id: ShopId) {
+    const docRef = doc(this.collectionRef, id).withConverter(shopFirestoreConverter);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return { ...docSnap.data(), id };
     } else {
-      throw new Error(`Invalid productId #${id}`);
+      throw new Error(`Invalid shop ID #${id}`);
     }
   }
-  async getListByIds(ids: ProductId[]) {
+  async getListByIds(ids: ShopId[]) {
     return ids.length ? await Promise.all(ids?.map(async (id) => await this.get(id))) : [];
   }
-  edit(batch: WriteBatch, id: ProductId, data: Partial<EditData>, updatedBy: UserId) {
+  edit(batch: WriteBatch, id: ShopId, data: Partial<EditData>, updatedBy: UserId) {
     const now = serverTimestamp();
-    const docRef = doc(this.collectionRef, id).withConverter(productFirestoreConverter);
+    const docRef = doc(this.collectionRef, id).withConverter(shopFirestoreConverter);
     batch.update(docRef, {
       ...data,
       updatedBy,
       updatedAt: now,
     });
   }
-  remove(batch: WriteBatch, id: ProductId, deletedBy: UserId) {
+  remove(batch: WriteBatch, id: ShopId, deletedBy: UserId) {
     const now = serverTimestamp();
-    const docRef = doc(this.collectionRef, id).withConverter(productFirestoreConverter);
+    const docRef = doc(this.collectionRef, id).withConverter(shopFirestoreConverter);
     batch.update(docRef, {
       isDeleted: true,
       deletedAt: now,

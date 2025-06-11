@@ -1,17 +1,20 @@
 import { Button, Space, Row, Col, Divider, Popover, Typography, Avatar } from "antd";
 import { LogoutOutlined, SettingOutlined, UserOutlined } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { Link } from "react-router-dom";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
+import SwitchShop from "@/components/switch_shop/switchShop";
 
 const { Text } = Typography;
 
 const PopHoverProfile = ({ viewContentMbl }) => {
-  const navigate = useNavigate();
-  const { userId, firstName, lastName, logout } = useCustomAuth();
+  const { userId, firstName, lastName, logout, shopRoles } = useFirebaseAuth();
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    try {
+      await logout();
+    } catch (e) {
+      console.log(e);
+    }
   };
   const content = (
     <Space direction="vertical">
@@ -19,6 +22,8 @@ const PopHoverProfile = ({ viewContentMbl }) => {
       {/* <p>
           <Link to="/reset/password">Change Password</Link>
         </p> */}
+      <Divider style={{ margin: 1 }} />
+      <SwitchShop shopRoles={shopRoles} />
       <Divider style={{ margin: 1 }} />
       <Space direction="horizontal">
         <UserOutlined />

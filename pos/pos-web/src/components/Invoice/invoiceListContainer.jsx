@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 // import { removeInvoice, removeInvoices } from "@/api/manager/invoiceFunctions";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";
 import { convertToBD } from "@/constants/currency";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import InvoiceService from "@/service/invoice.service";
 import { USER_ROLE } from "@/constants/role";
 
@@ -16,7 +16,7 @@ const { Option } = Select;
 const { confirm } = Modal;
 
 const InvoiceListContainer = ({ status, data: invoices }) => {
-  const { userId, role } = useCustomAuth();
+  const { userId, role } = useFirebaseAuth();
   const db = useFirestore();
   const invoiceService = new InvoiceService(db);
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState();

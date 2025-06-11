@@ -1,8 +1,24 @@
-import { Button, Result } from "antd";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
+import { Button, Result, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+  const { isLoggingOut } = useFirebaseAuth();
   const navigate = useNavigate();
+  if (isLoggingOut) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh", // full viewport height
+        }}
+      >
+        <Spin />
+      </div>
+    );
+  }
   return (
     <Result
       status="404"

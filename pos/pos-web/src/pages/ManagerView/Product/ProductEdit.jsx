@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import ProductAddEdit from "@/components/Product/ProductAddEdit";
@@ -8,7 +8,7 @@ import { useProduct } from "@/api/useProduct";
 import ProductService from "@/service/product.service";
 
 const ProductEdit = () => {
-  const { userId } = useCustomAuth();
+  const { userId } = useFirebaseAuth();
   const navigate = useNavigate();
   const db = useFirestore();
   const storage = useStorage();

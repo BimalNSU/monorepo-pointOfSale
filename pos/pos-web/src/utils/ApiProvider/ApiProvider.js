@@ -49,12 +49,18 @@ const addUserByAdmin = async (data, accessToken) =>
 // const deleteProperty = async (id, token) =>
 //   axiosDelete(`/properties/${id}/`, { authorization: token });
 
+const updateSession = async (id, data, token) =>
+  put(`/sessions/${id}`, data, { authorization: token });
+const removeSession = async (id, token) => axiosDelete(`/sessions/${id}`, { authorization: token });
+
 export const apiProvider = {
   login,
   // register,
   updateUser,
   addUserByAdmin,
   changePassword,
+  updateSession,
+  removeSession,
   // addProperty,
   // updateProperty,
   // deleteProperty,

@@ -6,75 +6,102 @@ import {
   FileTextOutlined,
   ProductOutlined,
   ShoppingCartOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Drawer } from "antd";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppVersion } from "@/pages/AppVersion";
 import logo from "../../../images/logo.png";
+import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 const { Sider } = Layout;
 
 const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
+  const { session } = useFirebaseAuth();
   const [collapsed, setCollapsed] = useState(false);
+  // const { shopId, shopRole } = useCustomShop();
 
-  const leftSiderItems = [
-    {
-      key: "1",
-      label: (
-        <span>
-          <Link to="/">Dashboard</Link>
-        </span>
-      ),
-      icon: <DashboardOutlined />,
-    },
-    {
-      key: "4",
-      label: (
-        <span>
-          <Link to="/sales">Sales</Link>
-        </span>
-      ),
-      icon: <ShoppingCartOutlined />,
-    },
-    {
-      key: "2",
-      label: "Product",
-      icon: <AppstoreOutlined />,
-      children: [
-        {
-          key: "21",
-          label: <Link to="/products/add">Add Product</Link>,
-          icon: <ProductOutlined />,
-        },
-        {
-          key: "22",
-          label: <Link to="/products">Products</Link>,
+  const leftSiderItems = useMemo(() => {
+    const nLeftSiderItems = [
+      {
+        key: "1",
+        label: (
+          <span>
+            <Link to="/dashboard">Dashboard</Link>
+          </span>
+        ),
+        icon: <DashboardOutlined />,
+      },
+    ];
+    if (session.role === USER_ROLE.VALUES.Admin) {
+      nLeftSiderItems.push({
+        key: "2",
+        label: (
+          <span>
+            <Link to="/users">Users</Link>
+          </span>
+        ),
+        icon: <UserOutlined />,
+      });
+    }
+    if (session.shopId) {
+      if ([SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)) {
+        nLeftSiderItems.push({
+          key: "3",
+          label: (
+            <span>
+              <Link to="/sales">Sales</Link>
+            </span>
+          ),
+          icon: <ShoppingCartOutlined />,
+        });
+      }
+      if (session.shopRole === SHOP_ROLE.VALUES.Manager) {
+        nLeftSiderItems.push({
+          key: "4",
+          label: "Product",
           icon: <AppstoreOutlined />,
-        },
-      ],
-    },
-    {
-      key: "3",
-      label: "Invoices",
-      icon: <FileTextOutlined />,
-      children: [
-        {
-          key: "3.1",
-          label: <Link to="/invoices">History</Link>,
-          icon: <ProductOutlined />,
-        },
-        {
-          key: "3.2",
-          label: <Link to="/reports">Report</Link>,
-          icon: <AppstoreOutlined />,
-        },
-      ],
-    },
-    {
-      key: "5",
+          children: [
+            {
+              key: "4.1",
+              label: <Link to="/products/add">Add Product</Link>,
+              icon: <ProductOutlined />,
+            },
+            {
+              key: "4.2",
+              label: <Link to="/products">Products</Link>,
+              icon: <AppstoreOutlined />,
+            },
+          ],
+        });
+      }
+      if ([SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)) {
+        nLeftSiderItems.push({
+          key: "5",
+          label: "Invoices",
+          icon: <FileTextOutlined />,
+          children: [
+            {
+              key: "5.1",
+              label: <Link to="/invoices">History</Link>,
+              icon: <ProductOutlined />,
+            },
+            {
+              key: "5.2",
+              label: <Link to="/reports">Report</Link>,
+              icon: <AppstoreOutlined />,
+            },
+          ],
+        });
+      }
+    }
+    nLeftSiderItems.push({
+      key: "6",
       label: <Link to="/barcode">"Test Barcode"</Link>,
       icon: <FileTextOutlined />,
-    },
-  ];
+    });
+    return nLeftSiderItems;
+  }, [session]);
 
   return !isScreenMd ? (
     <Drawer

@@ -1,6 +1,5 @@
 import { COLLECTIONS } from "@pos/shared-models";
-import { UserId, WithId } from "@pos/shared-models/dist/models/common.model";
-import { User as UserModel } from "@pos/shared-models/dist/models/user.model";
+import { UserId, WithId, User as UserModel } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import {
   Firestore,

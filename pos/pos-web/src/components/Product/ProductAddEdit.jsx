@@ -1,12 +1,12 @@
 import { USER_ROLE } from "@/constants/role";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { Button, Col, Form, Input, InputNumber, Row, Spin, Typography } from "antd";
 import { useEffect } from "react";
 import * as validator from "@/utils/Validation/Validation";
 const { Text } = Typography;
 
 const ProductAddEdit = ({ data, onSubmit, newProductFormat }) => {
-  const { role } = useCustomAuth();
+  const { role } = useFirebaseAuth();
   const [productForm] = Form.useForm();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const ProductAddEdit = ({ data, onSubmit, newProductFormat }) => {
         description: data.description,
         qty: data.qty,
         salesRate: data.salesRate,
-        ...([USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Manager].includes(role) && data.purchaseRate
+        ...(USER_ROLE.VALUES.Admin === role && data.purchaseRate
           ? { purchaseRate: data.purchaseRate }
           : {}),
       });

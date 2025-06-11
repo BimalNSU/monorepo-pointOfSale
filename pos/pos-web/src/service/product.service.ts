@@ -1,9 +1,10 @@
-import { Product as ProductModel } from "@pos/shared-models/dist/models/product.model";
-import { ProductId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
+import { Product as ProductModel, ProductId, ShopId, UserId, WithId } from "@pos/shared-models";
 import { Firestore, writeBatch } from "firebase/firestore";
 import { Product } from "@/db-collections/product.collection";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
+import CustomAuthService from "./customAuth.service";
+import { ShopRole, UserRole } from "@pos/shared-models";
 type omitKeys =
   | "qty"
   | "createdAt"
@@ -15,13 +16,18 @@ type omitKeys =
   | "deletedBy";
 
 type Data = WithId<Omit<ProductModel, omitKeys> & { qty?: number }>;
-
+type PartialAuthData = { userId: UserId; role: UserRole; shopId?: ShopId; shopRole: ShopRole };
 class ProductService {
   db: Firestore;
   constructor(db: Firestore) {
     this.db = db;
   }
-  async create(data: Data, createdBy: UserId) {
+  async create(data: Data, partialAuth: PartialAuthData) {
+    const authService = new CustomAuthService(this.db);
+    const isAuthValid = await authService.validate(partialAuth);
+    if (!isAuthValid) {
+      throw new Error(`Auth session is corrupted`);
+    }
     const productObj = new Product(this.db);
     try {
       const batch = writeBatch(this.db);
@@ -37,7 +43,7 @@ class ProductService {
           salesRate: data.salesRate,
           imagesFiles: null,
         },
-        createdBy,
+        partialAuth.userId,
       );
       new DocumentCounter(this.db).incrementCounter(batch, DOCUMENT_FORMAT.VALUES.Product);
       await batch.commit();
