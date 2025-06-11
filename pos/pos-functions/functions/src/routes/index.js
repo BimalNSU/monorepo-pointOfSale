@@ -20,6 +20,16 @@ router.post(
   UserMiddleware.authorization,
   UserMiddleware.create
 );
+router.put(
+  "/sessions/:id",
+  UserMiddleware.authorization,
+  UserMiddleware.updateSession
+);
+router.delete(
+  "/sessions/:id",
+  UserMiddleware.authorization,
+  UserMiddleware.removeSession
+);
 
 // router.put("/properties/:id/", userAuthorization, async (req, res) => {
 //   const { uid } = res.locals;

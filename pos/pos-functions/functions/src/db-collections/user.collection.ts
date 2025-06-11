@@ -1,11 +1,9 @@
 import { db } from "../firebase";
 import { config } from "dotenv";
-
 import { COLLECTIONS } from "../constants/collections";
-import { UserId } from "@pos/shared-models/dist/models/common.model";
+import { UserId, User as UserModel } from "@pos/shared-models";
 import { CollectionReference } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
-import { User as UserModel } from "@pos/shared-models/dist/models/user.model";
 type omitType =
   | "createdBy"
   | "createdAt"

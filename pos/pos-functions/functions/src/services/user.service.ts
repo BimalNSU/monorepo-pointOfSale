@@ -1,8 +1,7 @@
-import { UserId } from "@pos/shared-models/dist/models/common.model";
+import { User as UserModel, UserId } from "@pos/shared-models";
 import { AppError } from "../AppError";
 import { db } from "../firebase";
 import { COLLECTIONS } from "../constants/collections";
-import { User as UserModel } from "@pos/shared-models/dist/models/user.model";
 import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
 type omitType =
@@ -43,7 +42,7 @@ export class UserService {
     }
     const customUserId = this.generateCustomuserId(allUsers, data.firstName);
     const { password, ...rest } = nData;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password ?? "", 10);
     const nUser = await userObj.create(
       { ...rest, password: hashedPassword },
       customUserId
