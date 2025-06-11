@@ -6,6 +6,8 @@ export * from "./models/invoice.model";
 export * from "./models/purchase_order.model";
 export * from "./models/shop.model";
 export * from "./models/employee-assignments.model";
+export * from "./models/session.model";
+export * from "./models/common.model";
 
 //COLLECTIONS
 export * from "./constants/collections";

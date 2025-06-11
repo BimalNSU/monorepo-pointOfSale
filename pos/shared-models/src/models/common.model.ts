@@ -66,6 +66,7 @@ export type ProductId = string;
 export type CategoryId = number;
 export type DocumentCounterId = string;
 export type ShopId = string;
+export type ActiveSessionId = string;
 export interface BaseModel {
   createdAt: Date;
   createdBy: UserId;
