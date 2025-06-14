@@ -1,30 +1,18 @@
 import { useState } from "react";
-import {
-  Input,
-  Button,
-  Row,
-  Col,
-  Form,
-  Typography,
-  AutoComplete,
-  Card,
-  Space,
-  Spin,
-  Modal,
-} from "antd";
+import { Input, Button, Row, Col, Form, Typography, Card, Space, Spin, Modal } from "antd";
 import * as validator from "@/utils/Validation/Validation";
 import InvoiceItemTable from "./invoice-item-table";
-import { useProducts } from "@/api/useProducts";
 import InvoiceTotalDiscount from "./invoice-totalDiscount";
 import { useFirestore } from "reactfire";
 import InvoiceService from "@/service/invoice.service";
-import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { error, success } from "@/utils/Utils/Utils";
 import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
+import useAuthStore2 from "@/stores/auth2.store";
+import ProductSearchBox from "@/components/Product/productSearchBox";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
@@ -33,13 +21,10 @@ const InvoiceAdd = () => {
   const db = useFirestore();
   const [newInvoice, setNewInvoice] = useState();
   const invoiceService = new InvoiceService(db);
-  const { userId } = useCustomAuth();
-  const { status, data: products } = useProducts();
+  const { userId } = useAuthStore2();
   const { status: fetchDocumentCounter, documentId: newInvoiceId } = useDocumentFormat(
     DOCUMENT_FORMAT.VALUES.Invoice,
   );
-  const [searchItem, setSearchItem] = useState();
-  const [matchedItems, setMatchedItems] = useState();
   const [dataSource, setDataSource] = useState([]);
   const [salesForm] = Form.useForm();
   const [totalDiscount, setTotalDiscount] = useState();
@@ -82,48 +67,6 @@ const InvoiceAdd = () => {
 
   const handleDelete = (key) => {
     setDataSource((prev) => prev.filter((item) => item.key !== key));
-    salesForm.resetFields([["items", key]]); //update only qty in form state
-  };
-
-  const handleAddItem = (itemId) => {
-    if (!matchedItems?.length) return;
-
-    const selectedItem = matchedItems.find((p) => p.id === itemId);
-    let isItemInTable = false;
-
-    //update old item qty in table
-    const nDataSource = dataSource.map((row) => {
-      if (row.key === itemId) {
-        isItemInTable = true;
-        salesForm.setFieldValue(["items", itemId, "qty"], row.qty + 1); //update only qty in form state
-        return { ...row, qty: row.qty + 1 };
-      } else {
-        return row;
-      }
-    });
-
-    if (isItemInTable) {
-      setDataSource(nDataSource);
-    }
-    //add new item in table
-    else {
-      setDataSource((prev) => [
-        ...prev,
-        {
-          // key: String(prev.length + 1),
-          key: itemId,
-          productId: itemId,
-          name: selectedItem.name,
-          description: selectedItem.description,
-          qty: 1,
-          rate: selectedItem.salesRate,
-        },
-      ]);
-    }
-
-    //reset search item & it's result
-    setSearchItem();
-    setMatchedItems();
   };
 
   // Update the row data when a field changes
@@ -142,33 +85,43 @@ const InvoiceAdd = () => {
       }
     }
   };
-
-  const handleSearchItem = (text) => {
-    if (text) {
-      const pattern = new RegExp(`(${text})`, "i");
-      const nMatchedProducts = products.filter((p) => pattern.test(p.id) || pattern.test(p.name));
-      setMatchedItems(nMatchedProducts);
-    } else {
-      setMatchedItems();
-    }
-  };
-  const handleOnPressEnter = (value) => {
-    if (value && matchedItems?.length) {
-      const autoSelectedItem =
-        matchedItems.length === 1 ? matchedItems[0] : matchedItems.find((mp) => mp.id === value);
-      if (autoSelectedItem) {
-        handleAddItem(autoSelectedItem.id);
+  const handleSelectMatchedItem = (product) => {
+    let isItemInTable = false;
+    //update qty of existing item in table
+    const nDataSource = dataSource.map((row) => {
+      if (row.key === product.id) {
+        isItemInTable = true;
+        return { ...row, qty: row.qty + 1 };
+      } else {
+        return row;
       }
+    });
+    if (isItemInTable) {
+      setDataSource(nDataSource);
+    }
+    //add new item in table
+    else {
+      setDataSource((prev) => [
+        ...prev,
+        {
+          // key: String(prev.length + 1),
+          key: product.id,
+          productId: product.id,
+          name: product.name,
+          description: product.description,
+          qty: 1,
+          rate: product.salesRate,
+        },
+      ]);
     }
   };
 
   //reset each individual discount in table
   const onResetTableDiscount = () => {
     setIsRequiredTooltip(true);
-    //reset each individuals' discount's fields in table & form states
+    //reset each individuals' discount's fields in table
     const nDataSource = dataSource.map((row) => {
       const { discount, ...rest } = row;
-      salesForm.setFieldValue(["items", row.key, "discount"], undefined); //reset each individuals' discount's fields
       return rest;
     });
     setDataSource(nDataSource);
@@ -195,23 +148,7 @@ const InvoiceAdd = () => {
       <Form form={salesForm} onFinish={onFinishInvoice}>
         <Row style={{ background: "#ecf0f1" }} gutter={[16, 1]}>
           <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-            <AutoComplete
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleOnPressEnter(searchItem);
-                }
-              }}
-              value={searchItem}
-              onChange={(value) => setSearchItem(value)}
-              loading={status === "loading"}
-              options={matchedItems?.map((p) => ({ label: p.name, value: p.id })) || []}
-              style={{
-                width: "25%",
-              }}
-              onSelect={handleAddItem}
-              onSearch={handleSearchItem}
-              placeholder="Start typing Item Name or scan Barcode.."
-            />
+            <ProductSearchBox onSelectMatchedItem={handleSelectMatchedItem} />
             {/* <Button type="dashed" onClick={handleAdd} style={{ marginTop: 16 }} icon={<PlusOutlined />}>
         Add Row
       </Button> */}

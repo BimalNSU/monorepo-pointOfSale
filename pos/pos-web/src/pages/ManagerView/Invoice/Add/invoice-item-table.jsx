@@ -1,10 +1,25 @@
 import { Table, Form, Button, InputNumber, Typography } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";
+import { useEffect } from "react";
 const { Text } = Typography;
 const { Summary } = Table;
 
-const InvoiceItemTable = ({ dataSource, onChangeRow, onDeleteRow }) => {
+const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) => {
+  useEffect(() => {
+    if (dataSource.length) {
+      const quantiesInForm = dataSource.reduce(
+        (pre, curr) => ({
+          ...pre,
+          [curr.key]: { qty: curr.qty, discount: curr.discount ?? undefined },
+        }),
+        {},
+      );
+      salesForm.setFieldsValue({ items: quantiesInForm });
+    } else {
+      salesForm.resetFields(["items"]);
+    }
+  }, [dataSource]);
   const columns = [
     {
       title: "#",
@@ -24,8 +39,8 @@ const InvoiceItemTable = ({ dataSource, onChangeRow, onDeleteRow }) => {
       dataIndex: "qty",
       render: (_, record) => (
         <Form.Item
+          // noStyle
           name={["items", record.key, "qty"]}
-          initialValue={record.qty}
           rules={[
             { required: true, message: "Qty is required" },
             {
