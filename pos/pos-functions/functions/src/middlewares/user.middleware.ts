@@ -21,6 +21,11 @@ export class UserMiddleware {
         // when userId or mobile or email don't match
         return res.status(401).json({ error: "Authentication failed!" });
       }
+      if (!userData.isActive) {
+        return res
+          .status(403)
+          .json({ error: "Your account is inactive. Please contact admin." });
+      }
       const { password, ...restData } = userData;
       const isValidPassword = await bcrypt.compare(
         req.body.password,

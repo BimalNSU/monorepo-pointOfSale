@@ -1,25 +1,26 @@
-import { User as UserModel, UserId } from "@pos/shared-models";
+import { User as UserModel, UserId, WithId } from "@pos/shared-models";
 import { AppError } from "../AppError";
-import { db } from "../firebase";
-import { COLLECTIONS } from "../constants/collections";
 import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
-type omitType =
-  | "createdBy"
+type omitType = "createdBy" | "updatedBy" | "deletedAt" | "deletedBy";
+export type AddDate = Omit<
+  UserModel,
+  | omitType
   | "createdAt"
-  | "updatedBy"
+  | "isActive"
   | "updatedAt"
   | "isDeleted"
   | "deletedAt"
-  | "deletedBy";
-export type MutableData = Omit<UserModel, omitType>;
+  | "deletedBy"
+>;
+export type MutableData = Omit<UserModel, omitType | "createdBy" | "createdAt">;
 
-const collectionRef = db.collection(COLLECTIONS.users);
 export class UserService {
-  async create(data: MutableData, createdBy: UserId) {
+  async create(data: AddDate, createdBy: UserId) {
     const now = new Date();
     const nData = {
       ...data,
+      isActive: true,
       createdAt: now,
       createdBy,
       updatedBy: createdBy,
@@ -47,7 +48,8 @@ export class UserService {
       { ...rest, password: hashedPassword },
       customUserId
     );
-    const { password: dbHashedPassword, ...restData } = nUser;
+    const { password: dbHashedPassword, ...restData } =
+      this.filterDocData(nUser);
     return restData;
   }
   async findOne(id: UserId) {
@@ -56,7 +58,7 @@ export class UserService {
       if (!nUser) {
         throw new AppError(404, "Not found", `Invalid user ID #${id}`);
       }
-      return nUser;
+      return this.filterDocData(nUser);
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
@@ -74,7 +76,7 @@ export class UserService {
       if (!nUser) {
         throw new AppError(404, "Not found", `Invalid user credential`);
       }
-      return nUser;
+      return this.filterDocData(nUser);
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
@@ -98,6 +100,7 @@ export class UserService {
         ...nUser,
         ...(hashedPassword && { password: hashedPassword }),
         updatedBy,
+        updatedAt: new Date(),
       });
       const { password: dbHashedPassword, ...restUserData } = nUser;
       return restUserData;
@@ -118,18 +121,7 @@ export class UserService {
       if (!nUser) {
         throw new AppError(404, `User ID #${id} isn't found`);
       }
-      const now = new Date();
-      return collectionRef.doc(id).set(
-        {
-          isDeleted: true,
-          isActive: false,
-          updatedBy,
-          updatedAt: now,
-          deletedBy: updatedBy,
-          deletedAt: now,
-        },
-        { merge: true }
-      );
+      return await new User().softDelete(id, updatedBy);
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
@@ -142,7 +134,7 @@ export class UserService {
     }
   }
   private generateCustomuserId(
-    usersData: (MutableData & { id: UserId })[],
+    usersData: WithId<UserModel>[],
     currentName: string
   ) {
     let filteredCurrentName = currentName.replace(/\s/g, "").toLowerCase(); // remove all white spaces n to lower case
@@ -160,7 +152,7 @@ export class UserService {
     }
   }
   private checkExistEmailNMobile(
-    usersData: (MutableData & { id: UserId })[],
+    usersData: WithId<UserModel>[],
     mobile = "",
     email = "",
     id = ""
@@ -175,5 +167,17 @@ export class UserService {
       }
     });
     return error;
+  }
+  private filterDocData(data: WithId<UserModel>) {
+    const {
+      createdAt,
+      createdBy,
+      updatedAt,
+      updatedBy,
+      deletedAt,
+      deletedBy,
+      ...rest
+    } = data;
+    return rest;
   }
 }

@@ -1,18 +1,9 @@
 import { db } from "../firebase";
 import { config } from "dotenv";
 import { COLLECTIONS } from "../constants/collections";
-import { UserId, User as UserModel } from "@pos/shared-models";
+import { UserId, User as UserModel, WithId } from "@pos/shared-models";
 import { CollectionReference } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
-type omitType =
-  | "createdBy"
-  | "createdAt"
-  | "updatedBy"
-  | "updatedAt"
-  | "isDeleted"
-  | "deletedAt"
-  | "deletedBy";
-type ViewData = Omit<UserModel, omitType> & { id: UserId };
 config();
 
 const userFirstoreConverter = firestoreConverter<UserModel>();
@@ -23,20 +14,21 @@ export class User {
       .collection(COLLECTIONS.users)
       .withConverter(userFirstoreConverter);
   }
-  async create(data: UserModel, customUserId: UserId): Promise<ViewData> {
+  async create(
+    data: UserModel,
+    customUserId: UserId
+  ): Promise<WithId<UserModel>> {
     await this.collectionRef
       .doc(customUserId)
       .withConverter(userFirstoreConverter)
       .set(data);
-    const filterData = this.filterDocData(data);
-    return { ...filterData, id: customUserId };
+    return { ...data, id: customUserId };
   }
   async update(id: UserId, data: Partial<UserModel>) {
-    const now = new Date();
     return await this.collectionRef
       .doc(id)
       .withConverter(userFirstoreConverter)
-      .set({ ...data, updatedAt: now }, { merge: true });
+      .set(data, { merge: true });
   }
   async get(id: UserId) {
     const userDocRef = this.collectionRef
@@ -46,7 +38,7 @@ export class User {
     const documentSnapshot = await userDocRef.get();
     if (documentSnapshot.exists) {
       const rawData = documentSnapshot.data();
-      return rawData ? { ...this.filterDocData(rawData), id } : undefined;
+      return rawData ? { ...rawData, id } : undefined;
     } else {
       return undefined;
     }
@@ -60,30 +52,29 @@ export class User {
       .where(fieldName, "==", fieldValue)
       .get();
     const data = snapshot.docs.map((doc) => {
-      const filterData = this.filterDocData(doc.data());
-      return { ...filterData, id: doc.id };
+      return { ...doc.data(), id: doc.id };
     });
     return data[0];
   }
   async findAll() {
     const snapshot = await this.collectionRef.get();
     const data = snapshot.docs.map((doc) => {
-      const filterData = this.filterDocData(doc.data());
-      return { ...filterData, id: doc.id };
+      return { ...doc.data(), id: doc.id };
     });
     return data;
   }
-  private filterDocData(data: UserModel) {
-    const {
-      createdAt,
-      createdBy,
-      updatedAt,
-      updatedBy,
-      isDeleted,
-      deletedAt,
-      deletedBy,
-      ...rest
-    } = data;
-    return rest;
+  async softDelete(id: UserId, updatedBy: UserId) {
+    const now = new Date();
+    return await this.collectionRef.doc(id).set(
+      {
+        isDeleted: true,
+        isActive: false,
+        updatedBy,
+        updatedAt: now,
+        deletedBy: updatedBy,
+        deletedAt: now,
+      },
+      { merge: true }
+    );
   }
 }
