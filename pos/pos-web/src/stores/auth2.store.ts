@@ -42,9 +42,12 @@ const initialState = {
 const useAuthStore2 = create<AuthState>()(
   persist(
     devtools(
-      (set) => ({
+      (set, get) => ({
         ...initialState,
-        updateStore: (data) => set(data), // partial update
+        updateStore: (data) => {
+          const currentState = get();
+          set({ ...data, ...(currentState.isLoggingOut && { isLoggingOut: undefined }) }); // partial update
+        },
         resetStore: (isLoggingOut?: boolean) => {
           set({ ...initialState, ...(isLoggingOut && { isLoggingOut }) });
           // localStorage.clear(); // hard reset

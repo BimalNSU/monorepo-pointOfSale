@@ -39,13 +39,13 @@ export const useFirebaseAuth = () => {
         };
         resetStore(true);
         const res = await apiProvider.removeSession(tempAuthStore.session?.id, token);
-        if (res.status === 200) {
+        if (res?.status === 200) {
           await signOut(auth);
           navigate("/login", { replace: true });
           resetStore();
         } else {
           updateStore({ ...Object(tempAuthStore) }); //restore previous auth data
-          throw new Error(res.statusText);
+          throw new Error(res?.statusText);
         }
       }
     } catch (e) {
