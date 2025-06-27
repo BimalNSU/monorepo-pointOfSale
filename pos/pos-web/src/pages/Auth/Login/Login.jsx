@@ -35,7 +35,7 @@ function Login() {
         // const userData = { ...res.data.userData, currentLoginType };
         const { accessToken, sessionId, userData } = res.data;
         await signInWithCustomToken(auth, accessToken);
-        updateStore({ session: { id: sessionId } });
+        updateStore({ session: { id: sessionId }, isLoadingAuth: true });
         const { from } = location.state || { from: { pathname: "/dashboard" } };
         navigate(from, { replace: true });
       } else {

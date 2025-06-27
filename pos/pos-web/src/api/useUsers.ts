@@ -3,14 +3,28 @@ import { WithId, User } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import { collection, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
+import { useMemo } from "react";
+import dayjs from "dayjs";
+import { DATE_FORMAT } from "@/constants/dateFormat";
 const userFirestoreConverter = firestoreConverter<WithId<User>>();
 
-export const useUsers = () => {
+export const useUsers = (isDeleted?: boolean) => {
   const db = useFirestore();
   const userCollectionRef = collection(db, COLLECTIONS.users).withConverter(userFirestoreConverter);
-  const queryInUser = query(userCollectionRef, where("isDeleted", "==", false));
-  const { status, data } = useFirestoreCollectionData(queryInUser, {
-    idField: "id",
-  });
-  return { status, data };
+  const queryInUser = query(userCollectionRef, where("isDeleted", "==", isDeleted ?? false));
+  const { status, data } = useFirestoreCollectionData(
+    isDeleted == undefined ? userCollectionRef : queryInUser,
+    {
+      idField: "id",
+    },
+  );
+  const users = useMemo(
+    () =>
+      data?.map((u) => {
+        const { createdAt, ...rest } = u;
+        return { ...rest, createdBy: dayjs(createdAt).format(DATE_FORMAT) };
+      }),
+    [data],
+  );
+  return { status, data: users };
 };

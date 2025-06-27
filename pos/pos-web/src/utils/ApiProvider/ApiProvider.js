@@ -25,6 +25,9 @@ const post = (url, data, headers = {}) =>
 const put = (url, data, headers = {}) =>
   instance.put(url, data, { headers }).then(successHandler).catch(errorHandler);
 
+const patch = (url, data, headers = {}) =>
+  instance.patch(url, data, { headers }).then(successHandler).catch(errorHandler);
+
 const axiosDelete = (url, headers = {}) =>
   instance.delete(url, { headers }).then(successHandler).catch(errorHandler);
 
@@ -33,13 +36,22 @@ const axiosDelete = (url, headers = {}) =>
 //   post(`/users/`, data, { authorization: `Bearer ${recaptchaToken}` });
 
 const login = (data) => post("/auth/login/", data);
-const changePassword = (token, currentPassword, newPassword) =>
-  post(`users/change-password`, { currentPassword, newPassword }, { authorization: token });
-const updateUser = (data, token) => put(`/users/${userId}`, userId, data, { authorization: token });
+const changePassword = (token, sessionId, currentPassword, newPassword) =>
+  post(
+    `users/change-password`,
+    { currentPassword, newPassword },
+    { authorization: token, session_id: sessionId },
+  );
+const updateUser = (userId, data, token, sessionId) =>
+  put(`/users/${userId}`, data, { authorization: token, session_id: sessionId });
 
-const addUserByAdmin = async (data, accessToken) =>
+const updateUserStatus = (userId, data, token, sessionId) =>
+  patch(`/users/${userId}/status`, data, { authorization: token, session_id: sessionId });
+
+const addUserByAdmin = async (data, accessToken, sessionId) =>
   await post(`/admin/users/`, data, {
     authorization: `Bearer ${accessToken}`,
+    session_id: sessionId,
   });
 
 // const addProperty = async (data, token) => post(`/properties/`, data, { authorization: token });
@@ -50,14 +62,16 @@ const addUserByAdmin = async (data, accessToken) =>
 //   axiosDelete(`/properties/${id}/`, { authorization: token });
 
 const updateSession = async (id, data, token) =>
-  put(`/sessions/${id}`, data, { authorization: token });
-const removeSession = async (id, token) => axiosDelete(`/sessions/${id}`, { authorization: token });
+  put(`/sessions`, data, { authorization: token, session_id: id });
+const removeSession = async (id, token) =>
+  axiosDelete(`/sessions`, { authorization: token, session_id: id });
 
 export const apiProvider = {
   login,
   // register,
   updateUser,
   addUserByAdmin,
+  updateUserStatus,
   changePassword,
   updateSession,
   removeSession,

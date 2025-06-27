@@ -12,6 +12,7 @@ let initialState = {
   // uid: "SOMEIMPOSSIBLEID123",
   id: "",
   role: undefined,
+  shopRoles: undefined,
   status: undefined,
   name: undefined,
   firstName: undefined,

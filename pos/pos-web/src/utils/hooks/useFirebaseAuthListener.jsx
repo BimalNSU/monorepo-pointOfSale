@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { getAuth, onIdTokenChanged } from "firebase/auth";
-import useAuthStore2 from "@/stores/auth2.store";
+import useAuthStore from "@/stores/auth.store";
 
 export const useFirebaseAuthListener = () => {
-  const { userId, user, session, updateStore, resetStore } = useAuthStore2();
+  const { userId, user, session, updateStore, resetStore } = useAuthStore();
   const auth = getAuth();
 
   useEffect(() => {

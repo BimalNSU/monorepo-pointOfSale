@@ -17,6 +17,7 @@ type UpdateData = Pick<UserModel, "firstName" | "lastName" | "shopRoles"> & {
   userId: string;
   session: SessionType;
   user: User;
+  isLoadingAuth?: boolean;
 };
 interface AuthState {
   userId: UserId | null;
@@ -27,6 +28,7 @@ interface AuthState {
   user: User | null;
   updateStore: (data: Partial<UpdateData>) => void;
   resetStore: (isLoggingOut?: boolean) => void;
+  isLoadingAuth?: boolean;
   isLoggingOut?: boolean;
 }
 const initialState = {
@@ -36,17 +38,21 @@ const initialState = {
   shopRoles: undefined,
   session: undefined,
   user: undefined,
-  isLoggingOut: undefined,
+  isLoadingAuth: undefined, //only use after logging attempt once
+  isLoggingOut: undefined, //only use during logging out
 };
 
-const useAuthStore2 = create<AuthState>()(
+const useAuthStore = create<AuthState>()(
   persist(
     devtools(
       (set, get) => ({
         ...initialState,
         updateStore: (data) => {
           const currentState = get();
-          set({ ...data, ...(currentState.isLoggingOut && { isLoggingOut: undefined }) }); // partial update
+          set({
+            ...data,
+            ...(currentState.isLoggingOut && { isLoggingOut: undefined }),
+          }); // partial update
         },
         resetStore: (isLoggingOut?: boolean) => {
           set({ ...initialState, ...(isLoggingOut && { isLoggingOut }) });
@@ -58,4 +64,4 @@ const useAuthStore2 = create<AuthState>()(
     { name: "auth22" },
   ),
 );
-export default useAuthStore2;
+export default useAuthStore;

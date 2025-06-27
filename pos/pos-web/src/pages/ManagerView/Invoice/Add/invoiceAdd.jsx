@@ -11,7 +11,7 @@ import { error, success } from "@/utils/Utils/Utils";
 import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
-import useAuthStore2 from "@/stores/auth2.store";
+import useAuthStore from "@/stores/auth.store";
 import ProductSearchBox from "@/components/Product/productSearchBox";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -21,7 +21,7 @@ const InvoiceAdd = () => {
   const db = useFirestore();
   const [newInvoice, setNewInvoice] = useState();
   const invoiceService = new InvoiceService(db);
-  const { userId } = useAuthStore2();
+  const { userId } = useAuthStore();
   const { status: fetchDocumentCounter, documentId: newInvoiceId } = useDocumentFormat(
     DOCUMENT_FORMAT.VALUES.Invoice,
   );
@@ -130,8 +130,13 @@ const InvoiceAdd = () => {
   const handleAfterPrint = () => {
     setNewInvoice();
   };
+  const demoPrint = async () => {
+    const nInvoice = await invoiceService.get("20241225002");
+    setNewInvoice(nInvoice); //temporary store data for printing
+  };
   return (
     <div>
+      <Button onClick={demoPrint}>Demo print</Button>
       {newInvoice ? (
         <PrintReceipt directPrint={true} onAfterPrint={handleAfterPrint} invoice={newInvoice} />
       ) : null}

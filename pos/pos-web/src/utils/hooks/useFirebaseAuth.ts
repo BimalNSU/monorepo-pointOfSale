@@ -1,7 +1,7 @@
 import { getAuth, signOut } from "firebase/auth";
-import useAuthStore2 from "@/stores/auth2.store";
+import useAuthStore from "@/stores/auth.store";
 import { apiProvider } from "../ApiProvider/ApiProvider";
-import { ActiveSession, User } from "@pos/shared-models";
+import { ActiveSession, User, WithId } from "@pos/shared-models";
 import { useNavigate } from "react-router-dom";
 
 export const useFirebaseAuth = () => {
@@ -14,10 +14,11 @@ export const useFirebaseAuth = () => {
     shopRoles,
     session,
     user,
+    isLoadingAuth,
     isLoggingOut,
     updateStore,
     resetStore,
-  } = useAuthStore2();
+  } = useAuthStore();
 
   const clearAuth = async () => {
     resetStore(true); //clear local auth
@@ -55,61 +56,71 @@ export const useFirebaseAuth = () => {
   const getToken = async () => {
     return user ? user.getIdToken() : null;
   };
-  const updateUserInfo = async (dbUser: User) => {
-    if (!dbUser) {
+  const updateAuth = async (data: { user: User; session: ActiveSession }) => {
+    if (!data.user || !data.session) {
       return await clearAuth();
     }
-    const newUpdates: Partial<Pick<User, "firstName" | "lastName" | "shopRoles">> = {};
-    if (firstName !== dbUser.firstName) {
-      newUpdates.firstName = dbUser.firstName;
+
+    //check update for user
+    const newUpdates: Partial<
+      Pick<User, "firstName" | "lastName" | "shopRoles"> & {
+        session: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">>;
+        isLoadingAuth: boolean;
+      }
+    > = {};
+    if (firstName !== data.user.firstName) {
+      newUpdates.firstName = data.user.firstName;
     }
-    if (lastName !== dbUser.lastName) {
-      newUpdates.lastName = dbUser.lastName;
+    if (lastName !== data.user.lastName) {
+      newUpdates.lastName = data.user.lastName;
     }
 
-    const numOfNewShopRoles = Object.keys(dbUser.shopRoles ?? {}).length;
+    const numOfNewShopRoles = Object.keys(data.user.shopRoles ?? {}).length;
     const numOfCurrentShopRoles = Object.keys(shopRoles ?? {}).length;
     if (
       (!numOfCurrentShopRoles || !numOfNewShopRoles) &&
       numOfCurrentShopRoles !== numOfNewShopRoles
     ) {
-      newUpdates.shopRoles = dbUser.shopRoles;
+      newUpdates.shopRoles = data.user.shopRoles;
     } else if (numOfCurrentShopRoles && numOfNewShopRoles) {
       const condition1 =
         numOfCurrentShopRoles &&
         shopRoles &&
-        Object.entries(dbUser.shopRoles ?? {}).every(
+        Object.entries(data.user.shopRoles ?? {}).every(
           ([shopId, shopRole]) => shopRoles[shopId] === shopRole,
         );
       const condition2 =
         numOfNewShopRoles &&
         Object.entries(shopRoles ?? {}).every(
-          ([shopId, shopRole]) => dbUser.shopRoles![shopId] === shopRole,
+          ([shopId, shopRole]) => data.user.shopRoles![shopId] === shopRole,
         );
       if (!condition1 || !condition2) {
-        newUpdates.shopRoles = dbUser.shopRoles;
+        newUpdates.shopRoles = data.user.shopRoles;
       }
+    }
+
+    /*# region update of session data */
+
+    const newSessionUpdates: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">> = Object({
+      ...(session ?? {}),
+    });
+    if (newSessionUpdates.role !== data.session.role) {
+      newSessionUpdates.role = data.session.role;
+    }
+    if (newSessionUpdates.shopId !== data.session.shopId) {
+      newSessionUpdates.shopId = data.session.shopId;
+    }
+    if (newSessionUpdates.shopRole !== data.session.shopRole) {
+      newSessionUpdates.shopRole = data.session.shopRole;
+    }
+    if (Object.keys(newSessionUpdates).length) {
+      newUpdates.session = newSessionUpdates;
+    }
+    if (isLoadingAuth) {
+      newUpdates.isLoadingAuth = undefined; //it removes from auth
     }
     if (Object.keys(newUpdates).length) {
       updateStore({ ...newUpdates });
-    }
-  };
-  const updateSessionInfo = async (dbSession: ActiveSession) => {
-    if (!dbSession) {
-      return await clearAuth();
-    }
-    const newUpdates = Object({ ...(session ?? {}) });
-    if (newUpdates.role !== dbSession.role) {
-      newUpdates.role = dbSession.role;
-    }
-    if (newUpdates.shopId !== dbSession.shopId) {
-      newUpdates.shopId = dbSession.shopId;
-    }
-    if (newUpdates.shopRole !== dbSession.shopRole) {
-      newUpdates.shopRole = dbSession.shopRole;
-    }
-    if (Object.keys(newUpdates).length) {
-      updateStore({ session: newUpdates });
     }
   };
   return {
@@ -119,12 +130,12 @@ export const useFirebaseAuth = () => {
     shopRoles,
     user,
     session,
+    isLoadingAuth,
     isLoggingOut,
     updateStore,
     resetStore,
     getToken,
     logout,
-    updateUserInfo,
-    updateSessionInfo,
+    updateAuth,
   };
 };

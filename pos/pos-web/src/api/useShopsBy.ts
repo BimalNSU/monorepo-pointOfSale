@@ -30,7 +30,7 @@ export const useShopsBy = (ids: ShopId[]) => {
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [ids]);
 
   return { status, data: shops };
 };
