@@ -5,6 +5,10 @@ import recaptchaAuthorization from "../middlewares/recaptcha-authorization.middl
 import cors from "cors";
 import bcrypt from "@node-rs/bcrypt";
 import { UserMiddleware } from "../middlewares/user.middleware";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { RoleMiddleware } from "../middlewares/role.middleware";
+import { validateRequest } from "../middlewares/validateRequest.middleware";
+import { updateUserStatusSchema } from "../schemas/user.schema";
 
 config();
 
@@ -17,9 +21,16 @@ app.use(cors({ origin: originList }));
 
 router.post(
   "/change-password",
-  UserMiddleware.authorization,
+  AuthMiddleware.isAuthenticated,
   UserMiddleware.updatePassword
 );
-router.put("/:id", UserMiddleware.authorization, UserMiddleware.update);
+router.put("/:id", AuthMiddleware.isAuthenticated, UserMiddleware.update);
+router.patch(
+  "/:id/status",
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  validateRequest(updateUserStatusSchema),
+  UserMiddleware.updateStatus
+);
 
 export default router;

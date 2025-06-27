@@ -3,6 +3,10 @@ import { config } from "dotenv";
 import cors from "cors";
 import { UserMiddleware } from "../middlewares/user.middleware";
 import recaptchaAuthorization from "../middlewares/recaptcha-authorization.middleware";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
+import { RoleMiddleware } from "../middlewares/role.middleware";
+import { validateRequest } from "../middlewares/validateRequest.middleware";
+import { createUserSchema } from "../schemas/user.schema";
 
 config();
 
@@ -13,22 +17,25 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: originList }));
 
-router.post("/auth/login", UserMiddleware.login);
-// router.post("/auth/login/", UserMiddleware.login);
+router.post("/auth/login", AuthMiddleware.login);
+
+//TODO: test for validation inputs
 router.post(
   "/admin/users/",
-  UserMiddleware.authorization,
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  validateRequest(createUserSchema),
   UserMiddleware.create
 );
 router.put(
-  "/sessions/:id",
-  UserMiddleware.authorization,
-  UserMiddleware.updateSession
+  "/sessions",
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.updateSession
 );
 router.delete(
-  "/sessions/:id",
-  UserMiddleware.authorization,
-  UserMiddleware.removeSession
+  "/sessions",
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.removeSession
 );
 
 // router.put("/properties/:id/", userAuthorization, async (req, res) => {

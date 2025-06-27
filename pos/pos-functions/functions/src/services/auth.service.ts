@@ -4,7 +4,7 @@ import {
   UserId,
 } from "@pos/shared-models";
 import { AppError } from "../AppError";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { UserService } from "./user.service";
 import { ActiveSession } from "../db-collections/session.collection";
 
@@ -33,7 +33,9 @@ export class AuthService {
       }
     }
   }
-
+  static async getSession(userId: UserId, sessionId: ActiveSessionId) {
+    return await new ActiveSession(userId).get(sessionId);
+  }
   static async updateSession(
     sessionId: ActiveSessionId,
     sessionData: Pick<ActiveSessionModel, "role" | "shopId" | "shopRole">,
@@ -49,8 +51,9 @@ export class AuthService {
       ) {
         throw new AppError(401, "Unauthorized role switching");
       }
-
-      return await new ActiveSession(authUserId).update(sessionId, sessionData);
+      const batch = db.batch();
+      new ActiveSession(authUserId).update(sessionId, sessionData, batch);
+      return await batch.commit();
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
@@ -64,22 +67,9 @@ export class AuthService {
   }
   static async deleteSession(id: ActiveSessionId, authUserId: UserId) {
     try {
-      const userService = new UserService();
-      const user = await userService.findOne(authUserId);
-      const sessionObj = new ActiveSession(authUserId);
-      const sessionData = await sessionObj.get(id);
-      if (!sessionData) {
-        throw new AppError(401, "Unauthorized session update");
-      }
-      if (
-        sessionData.role !== user.role ||
-        (sessionData.shopRole &&
-          sessionData.shopId &&
-          (user.shopRoles ?? {})[sessionData.shopId] !== sessionData.shopRole)
-      ) {
-        throw new AppError(401, "Unauthorized role switching");
-      }
-      return await new ActiveSession(authUserId).delete(id);
+      const batch = db.batch();
+      new ActiveSession(authUserId).delete(id, batch);
+      return await batch.commit();
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
@@ -89,6 +79,18 @@ export class AuthService {
       } else {
         throw new Error(err as string);
       }
+    }
+  }
+  static async deleteAllSession(id: UserId) {
+    const sessonObj = new ActiveSession(id);
+    const activeSessions = await sessonObj.getAll();
+    if (activeSessions.length) {
+      const batch = db.batch();
+      sessonObj.deleteAll(
+        activeSessions.map((as) => as.id),
+        batch
+      );
+      await batch.commit();
     }
   }
 }

@@ -2,24 +2,26 @@ import { User as UserModel, UserId, WithId } from "@pos/shared-models";
 import { AppError } from "../AppError";
 import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
+import { CreateUserInput, UpdateUserStatusInput } from "../schemas/user.schema";
+import { AuthService } from "./auth.service";
 type omitType = "createdBy" | "updatedBy" | "deletedAt" | "deletedBy";
-export type AddDate = Omit<
-  UserModel,
-  | omitType
-  | "createdAt"
-  | "isActive"
-  | "updatedAt"
-  | "isDeleted"
-  | "deletedAt"
-  | "deletedBy"
->;
-export type MutableData = Omit<UserModel, omitType | "createdBy" | "createdAt">;
+export type EditData = Omit<UserModel, omitType | "createdBy" | "createdAt">;
 
 export class UserService {
-  async create(data: AddDate, createdBy: UserId) {
+  async create(data: CreateUserInput, createdBy: UserId) {
     const now = new Date();
     const nData = {
       ...data,
+
+      //additional info
+      gender: null,
+      maritalStatus: null,
+      religion: null,
+      profileImage: null,
+      shopId: null,
+      shopRoles: null,
+
+      //default
       isActive: true,
       createdAt: now,
       createdBy,
@@ -88,8 +90,8 @@ export class UserService {
       }
     }
   }
-  async update(id: UserId, newData: Partial<MutableData>, updatedBy: UserId) {
-    const { password, ...restNewData } = newData;
+  async update(id: UserId, newData: Partial<EditData>, updatedBy: UserId) {
+    const { password, ...restNewData } = newData as Partial<EditData>;
     try {
       const hashedPassword = password
         ? await bcrypt.hash(password, 10)
@@ -104,6 +106,47 @@ export class UserService {
       });
       const { password: dbHashedPassword, ...restUserData } = nUser;
       return restUserData;
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      } else if (err instanceof Error) {
+        // throw new Error(err.message);
+        throw err; // TODO: convert to AppError with 500 error code
+      } else {
+        throw new Error(err as string);
+      }
+    }
+  }
+  async updateStatus(
+    id: UserId,
+    data: UpdateUserStatusInput,
+    updatedBy: UserId
+  ) {
+    try {
+      const dbUser = await this.findOne(id);
+      if (
+        dbUser.isActive === data.isActive ||
+        dbUser.isDeleted === data.isDeleted
+      ) {
+        throw new AppError(204, "No change needed"); //Test working or not
+      }
+      const userObj = new User();
+      const now = new Date();
+      await userObj.update(id, {
+        ...data,
+        updatedBy,
+        updatedAt: now,
+        ...(data.isDeleted
+          ? { deletedAt: now, deletedBy: updatedBy, isActive: false }
+          : { deletedAt: null, deletedBy: null }),
+      });
+      if (
+        dbUser.isActive &&
+        ((data.isActive != undefined && !data.isActive) ||
+          (data.isDeleted != undefined && data.isDeleted))
+      ) {
+        await AuthService.deleteAllSession(id);
+      }
     } catch (err) {
       if (err instanceof AppError) {
         throw err;

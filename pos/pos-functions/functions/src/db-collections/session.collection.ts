@@ -5,8 +5,9 @@ import {
   UserId,
   COLLECTIONS,
   ActiveSession as ActiveSessionModel,
+  WithId,
 } from "@pos/shared-models";
-import { CollectionReference } from "firebase-admin/firestore";
+import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
 
 config();
@@ -14,11 +15,13 @@ config();
 const activeSessionFirstoreConverter = firestoreConverter<ActiveSessionModel>();
 export class ActiveSession {
   collectionRef: CollectionReference;
+  userId: UserId;
   constructor(userId: UserId) {
     this.collectionRef = db
       .collection(COLLECTIONS.sessions)
       .doc(userId)
       .collection(COLLECTIONS.activeSessions);
+    this.userId = userId;
   }
   async create(data: ActiveSessionModel) {
     const sessionRef = this.collectionRef
@@ -27,12 +30,16 @@ export class ActiveSession {
     await sessionRef.set(data);
     return sessionRef;
   }
-  async update(id: ActiveSessionId, data: Partial<ActiveSessionModel>) {
+  update(
+    id: ActiveSessionId,
+    data: Partial<ActiveSessionModel>,
+    batch: WriteBatch
+  ) {
     const now = new Date();
-    return await this.collectionRef
+    const docRef = this.collectionRef
       .doc(id)
-      .withConverter(activeSessionFirstoreConverter)
-      .set({ ...data, updatedAt: now }, { merge: true });
+      .withConverter(activeSessionFirstoreConverter);
+    return batch.set(docRef, { ...data, updatedAt: now }, { merge: true });
   }
   async get(id: ActiveSessionId) {
     const userDocRef = this.collectionRef
@@ -47,7 +54,28 @@ export class ActiveSession {
       return undefined;
     }
   }
-  async delete(id: ActiveSessionId) {
-    return await this.collectionRef.doc(id).delete();
+  async getAll() {
+    const snapshot = await this.collectionRef
+      .withConverter(activeSessionFirstoreConverter)
+      .get();
+    if (snapshot.empty) {
+      return [];
+    }
+    return snapshot.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id } as WithId<ActiveSessionModel>;
+    });
+  }
+  delete(id: ActiveSessionId, batch: WriteBatch) {
+    const docRef = this.collectionRef.doc(id);
+    return batch.delete(docRef);
+  }
+  async deleteAll(ids: ActiveSessionId[], batch: WriteBatch) {
+    // const docRef = db.collection(COLLECTIONS.sessions).doc(this.userId); //path: sessions/{userId}
+    // return await db.recursiveDelete(docRef); //TODO: test
+    // return await db.recursiveDelete(this.collectionRef);
+    return ids.map((id) => {
+      const docRef = this.collectionRef.doc(id); //path: sessions/{userId}/activeSessions/{id}
+      return batch.delete(docRef);
+    });
   }
 }
