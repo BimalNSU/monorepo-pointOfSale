@@ -12,11 +12,6 @@ import {
  **/
 export type UserRole = 1 | 2 | 3;
 /**
- * *@enum {1: "active", 2: "inactive", 3: "revoked"}
- **/
-export type RoleStatus = 1 | 2 | 3;
-
-/**
  * *@enum {1: "Manager", 2: "Cashier", 3: "Salesman"}
  **/
 export type ShopRole = 1 | 2 | 3;
@@ -32,10 +27,10 @@ export interface User extends BaseModel {
   maritalStatus: MaritalStatus | null;
   religion: Religion | null;
   role: UserRole;
-  status: RoleStatus;
+  isActive: boolean; //default true
   profileImage: string | null; //format: profile/{userId}/{fileNumber}.{extension}
 
   //Only for employee
-  shopId: ShopId[]; //To get selected shop's employees
-  shopRoles: Record<ShopId, ShopRole> | null;
+  shopId?: ShopId[] | null; //To get selected shop's employees
+  shopRoles?: Record<ShopId, ShopRole> | null;
 }
