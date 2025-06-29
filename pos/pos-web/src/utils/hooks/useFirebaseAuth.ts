@@ -1,4 +1,4 @@
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signInWithCustomToken, signOut } from "firebase/auth";
 import useAuthStore from "@/stores/auth.store";
 import { apiProvider } from "../ApiProvider/ApiProvider";
 import { ActiveSession, User, WithId } from "@pos/shared-models";
@@ -14,12 +14,23 @@ export const useFirebaseAuth = () => {
     shopRoles,
     session,
     user,
-    isLoadingAuth,
+    isLoggingIn,
     isLoggingOut,
     updateStore,
     resetStore,
   } = useAuthStore();
 
+  const login = async (data: { loginWith: string; password: string }) => {
+    const res = await apiProvider.login(data);
+    if (res.status === 200) {
+      // const userData = { ...res.data.userData, currentLoginType };
+      const { accessToken, sessionId, userData } = res.data;
+      await signInWithCustomToken(auth, accessToken);
+      updateStore(Object({ session: { id: sessionId }, isLoggingIn: true }));
+    } else {
+      throw new Error("Incorrect Email or password");
+    }
+  };
   const clearAuth = async () => {
     resetStore(true); //clear local auth
     await signOut(auth);
@@ -41,8 +52,10 @@ export const useFirebaseAuth = () => {
         resetStore(true);
         const res = await apiProvider.removeSession(tempAuthStore.session?.id, token);
         if (res?.status === 200) {
-          await signOut(auth);
+          //Note: following lines must be in order
           navigate("/login", { replace: true });
+          await signOut(auth);
+
           resetStore();
         } else {
           updateStore({ ...Object(tempAuthStore) }); //restore previous auth data
@@ -56,8 +69,8 @@ export const useFirebaseAuth = () => {
   const getToken = async () => {
     return user ? user.getIdToken() : null;
   };
-  const updateAuth = async (data: { user: User; session: ActiveSession }) => {
-    if (!data.user || !data.session) {
+  const updateAuth = async (dbUser: User, dbSession: WithId<ActiveSession>) => {
+    if (!dbUser || !dbSession) {
       return await clearAuth();
     }
 
@@ -65,59 +78,57 @@ export const useFirebaseAuth = () => {
     const newUpdates: Partial<
       Pick<User, "firstName" | "lastName" | "shopRoles"> & {
         session: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">>;
-        isLoadingAuth: boolean;
+        isLoggingIn?: boolean;
       }
     > = {};
-    if (firstName !== data.user.firstName) {
-      newUpdates.firstName = data.user.firstName;
+    if (firstName !== dbUser.firstName) {
+      newUpdates.firstName = dbUser.firstName;
     }
-    if (lastName !== data.user.lastName) {
-      newUpdates.lastName = data.user.lastName;
+    if (lastName !== dbUser.lastName) {
+      newUpdates.lastName = dbUser.lastName;
     }
 
-    const numOfNewShopRoles = Object.keys(data.user.shopRoles ?? {}).length;
+    const numOfNewShopRoles = Object.keys(dbUser.shopRoles ?? {}).length;
     const numOfCurrentShopRoles = Object.keys(shopRoles ?? {}).length;
     if (
       (!numOfCurrentShopRoles || !numOfNewShopRoles) &&
       numOfCurrentShopRoles !== numOfNewShopRoles
     ) {
-      newUpdates.shopRoles = data.user.shopRoles;
+      newUpdates.shopRoles = dbUser.shopRoles;
     } else if (numOfCurrentShopRoles && numOfNewShopRoles) {
       const condition1 =
         numOfCurrentShopRoles &&
         shopRoles &&
-        Object.entries(data.user.shopRoles ?? {}).every(
+        Object.entries(dbUser.shopRoles ?? {}).every(
           ([shopId, shopRole]) => shopRoles[shopId] === shopRole,
         );
       const condition2 =
         numOfNewShopRoles &&
         Object.entries(shopRoles ?? {}).every(
-          ([shopId, shopRole]) => data.user.shopRoles![shopId] === shopRole,
+          ([shopId, shopRole]) => dbUser.shopRoles![shopId] === shopRole,
         );
       if (!condition1 || !condition2) {
-        newUpdates.shopRoles = data.user.shopRoles;
+        newUpdates.shopRoles = dbUser.shopRoles;
       }
     }
 
     /*# region update of session data */
 
-    const newSessionUpdates: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">> = Object({
-      ...(session ?? {}),
-    });
-    if (newSessionUpdates.role !== data.session.role) {
-      newSessionUpdates.role = data.session.role;
+    const newSessionUpdates: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">> = Object();
+    if (session?.role !== dbSession.role) {
+      newSessionUpdates.role = dbSession.role;
     }
-    if (newSessionUpdates.shopId !== data.session.shopId) {
-      newSessionUpdates.shopId = data.session.shopId;
+    if (session?.shopId !== dbSession.shopId) {
+      newSessionUpdates.shopId = dbSession.shopId;
     }
-    if (newSessionUpdates.shopRole !== data.session.shopRole) {
-      newSessionUpdates.shopRole = data.session.shopRole;
+    if (session?.shopRole !== dbSession.shopRole) {
+      newSessionUpdates.shopRole = dbSession.shopRole;
     }
     if (Object.keys(newSessionUpdates).length) {
-      newUpdates.session = newSessionUpdates;
+      newUpdates.session = { ...newSessionUpdates, id: dbSession.id };
     }
-    if (isLoadingAuth) {
-      newUpdates.isLoadingAuth = undefined; //it removes from auth
+    if (isLoggingIn) {
+      newUpdates.isLoggingIn = undefined; //it removes from auth
     }
     if (Object.keys(newUpdates).length) {
       updateStore({ ...newUpdates });
@@ -130,11 +141,12 @@ export const useFirebaseAuth = () => {
     shopRoles,
     user,
     session,
-    isLoadingAuth,
+    isLoggingIn,
     isLoggingOut,
     updateStore,
     resetStore,
     getToken,
+    login,
     logout,
     updateAuth,
   };

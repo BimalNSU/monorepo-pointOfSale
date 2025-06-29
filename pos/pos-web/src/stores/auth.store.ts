@@ -17,7 +17,7 @@ type UpdateData = Pick<UserModel, "firstName" | "lastName" | "shopRoles"> & {
   userId: string;
   session: SessionType;
   user: User;
-  isLoadingAuth?: boolean;
+  isLoggingIn?: boolean;
 };
 interface AuthState {
   userId: UserId | null;
@@ -28,7 +28,7 @@ interface AuthState {
   user: User | null;
   updateStore: (data: Partial<UpdateData>) => void;
   resetStore: (isLoggingOut?: boolean) => void;
-  isLoadingAuth?: boolean;
+  isLoggingIn?: boolean;
   isLoggingOut?: boolean;
 }
 const initialState = {
@@ -38,7 +38,7 @@ const initialState = {
   shopRoles: undefined,
   session: undefined,
   user: undefined,
-  isLoadingAuth: undefined, //only use after logging attempt once
+  isLoggingIn: undefined, //only use after logging attempt once
   isLoggingOut: undefined, //only use during logging out
 };
 

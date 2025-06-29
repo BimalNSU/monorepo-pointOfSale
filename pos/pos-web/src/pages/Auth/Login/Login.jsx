@@ -1,51 +1,36 @@
-import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth, useSigninCheck } from "reactfire";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  signInWithCustomToken,
-} from "firebase/auth";
-import { Form, Input, Button, Checkbox, message, Typography, Space, Row } from "antd";
+import { useState } from "react";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useAuth } from "reactfire";
+import { Form, Input, Button, Checkbox, Typography, Row } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { success, error } from "@/utils/Utils/Utils";
+import { error } from "@/utils/Utils/Utils";
 import "./Login.css";
-import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
 import logo from "../../../images/logo.png";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 
 const { Title } = Typography;
-
-// const key = 'updatable'
 
 function Login() {
   const auth = useAuth();
   const [isLoaded, setIsLoaded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { updateStore } = useFirebaseAuth();
+  const { login, isLoggingIn, session, updateStore } = useFirebaseAuth();
 
   const onFinish = async (values) => {
     setIsLoaded(false);
-    const res = await apiProvider.login(values);
     try {
-      if (res.status === 200) {
-        // const userData = { ...res.data.userData, currentLoginType };
-        const { accessToken, sessionId, userData } = res.data;
-        await signInWithCustomToken(auth, accessToken);
-        updateStore({ session: { id: sessionId }, isLoadingAuth: true });
-        const { from } = location.state || { from: { pathname: "/dashboard" } };
-        navigate(from, { replace: true });
-      } else {
-        error("Incorrect Email or password");
-      }
+      await login(values);
+      const { from } = location.state || { from: { pathname: "/dashboard" } };
+      navigate(from, { replace: true });
     } catch (err) {
       error(err);
     }
     setIsLoaded(true);
   };
+  if (!isLoggingIn && session?.id) {
+    return <Navigate to="/dashboard" />;
+  }
   return (
     <div className="addPadding-40">
       <Row type="flex" justify="center" align="middle">
