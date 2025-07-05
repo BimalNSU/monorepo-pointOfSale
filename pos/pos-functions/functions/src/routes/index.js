@@ -7,6 +7,7 @@ import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RoleMiddleware } from "../middlewares/role.middleware";
 import { validateRequest } from "../middlewares/validateRequest.middleware";
 import { createUserSchema } from "../schemas/user.schema";
+import { BkashMiddleware } from "../middlewares/bkash.middleware";
 
 config();
 
@@ -37,6 +38,8 @@ router.delete(
   AuthMiddleware.isAuthenticated,
   AuthMiddleware.removeSession
 );
+//NOTE: only for test purpose. It will call automatically from bkash merchant portal during payment
+router.post("/bkash/webhook", BkashMiddleware.handleWebhook);
 
 // router.put("/properties/:id/", userAuthorization, async (req, res) => {
 //   const { uid } = res.locals;
