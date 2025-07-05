@@ -1,8 +1,14 @@
+import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { Button, Result } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const NotFound = () => {
-  const navigate = useNavigate();
+  const { isLoggingIn, session } = useFirebaseAuth();
+  const location = useLocation();
+
+  if (location.pathname === "/" && !isLoggingIn && session?.id) {
+    return <Navigate to="/dashboard" />;
+  }
   return (
     <Result
       status="404"
