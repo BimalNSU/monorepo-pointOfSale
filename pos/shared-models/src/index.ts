@@ -8,6 +8,7 @@ export * from "./models/shop.model";
 export * from "./models/employee-assignments.model";
 export * from "./models/session.model";
 export * from "./models/common.model";
+export * from "./models/bkashTransaction.model";
 
 //COLLECTIONS
 export * from "./constants/collections";

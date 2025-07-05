@@ -10,6 +10,7 @@ export const COLLECTIONS = {
   //NEW
   purchase_orders: "purchase_orders",
   sessions: "sessions",
+  bkashTransactions: "bkashTransactions",
 
   // -- sub collections --
 
