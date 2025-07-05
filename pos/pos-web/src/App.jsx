@@ -18,6 +18,7 @@ import Products from "./pages/ManagerView/Product/Products";
 import UserAdd from "./pages/adminView/User/userAdd";
 import Users from "./pages/adminView/User/users";
 import Dashboard from "./components/dashboard/dashboard";
+import BkashTransactions from "./pages/common/bkashTransactions";
 import AuthLoader from "./pages/Layout/authLoader";
 import LoggedInLayout from "./pages/Layout/Logged-in-layout/LoggedInLayout";
 import RequireRole from "./pages/requireRole";
@@ -138,6 +139,21 @@ const App = () => {
                     ]}
                   >
                     <InvoiceReport />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="btransactions"
+                element={
+                  <RequireRole
+                    allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
+                    allowedShopRoles={[
+                      SHOP_ROLE.VALUES.Manager,
+                      SHOP_ROLE.VALUES.Salesman,
+                      SHOP_ROLE.VALUES.Cashier,
+                    ]}
+                  >
+                    <BkashTransactions />
                   </RequireRole>
                 }
               />
