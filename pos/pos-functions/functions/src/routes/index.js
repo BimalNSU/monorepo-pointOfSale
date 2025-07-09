@@ -8,6 +8,8 @@ import { RoleMiddleware } from "../middlewares/role.middleware";
 import { validateRequest } from "../middlewares/validateRequest.middleware";
 import { createUserSchema } from "../schemas/user.schema";
 import { BkashMiddleware } from "../middlewares/bkash.middleware";
+import { createInvoiceSchema } from "../schemas/invoice.schema";
+import { InvoiceMiddleware } from "../middlewares/invoice.middleware";
 
 config();
 
@@ -40,6 +42,12 @@ router.delete(
 );
 //NOTE: only for test purpose. It will call automatically from bkash merchant portal during payment
 router.post("/bkash/webhook", BkashMiddleware.handleWebhook);
+router.post(
+  "/invoice",
+  AuthMiddleware.isAuthenticated,
+  validateRequest(createInvoiceSchema),
+  InvoiceMiddleware.create
+);
 
 // router.put("/properties/:id/", userAuthorization, async (req, res) => {
 //   const { uid } = res.locals;
