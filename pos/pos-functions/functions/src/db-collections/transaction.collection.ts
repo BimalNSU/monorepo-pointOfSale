@@ -7,20 +7,22 @@ import {
 } from "@pos/shared-models";
 import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
+import { monotonicFactory, ULIDFactory } from "ulid";
 config();
 
 const transactionFirestoreConverter = firestoreConverter<TransactionModel>();
 export class Transaction {
   collectionRef: CollectionReference<TransactionModel>;
+  generateUlid: ULIDFactory;
   constructor() {
     this.collectionRef = db
       .collection(COLLECTIONS.transactions)
       .withConverter(transactionFirestoreConverter);
+    this.generateUlid = monotonicFactory(); // One generator instance
   }
   create(batch: WriteBatch, data: TransactionModel, customId?: TransactionId) {
-    const docRef = !customId
-      ? this.collectionRef.doc()
-      : this.collectionRef.doc(customId);
+    const docId = customId ?? this.generateUlid();
+    const docRef = this.collectionRef.doc(docId);
     batch.create(docRef, data);
     return docRef;
   }
