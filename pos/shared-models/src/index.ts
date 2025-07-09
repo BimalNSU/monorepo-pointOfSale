@@ -9,6 +9,10 @@ export * from "./models/employee-assignments.model";
 export * from "./models/session.model";
 export * from "./models/common.model";
 export * from "./models/bkashTransaction.model";
+export * from "./models/transaction.model";
+export * from "./models/chartOfAccount.model";
+export * from "./models/accountType.model";
+export * from "./models/accountBalance.model";
 
 //COLLECTIONS
 export * from "./constants/collections";

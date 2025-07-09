@@ -14,7 +14,7 @@ export interface Invoice {
   status: InvoiceStatus; //default 'paid'
   totalAmount: number; // amount after discount
   discount: number | null;
-  note: string | null;
+  subject: string | null;
   items: InvoiceItem[];
   createdAt: Date | FieldValue;
   createdBy: UserId;

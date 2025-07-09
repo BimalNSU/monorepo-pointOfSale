@@ -68,6 +68,10 @@ export type DocumentCounterId = string;
 export type ShopId = string;
 export type ActiveSessionId = string;
 export type BkashTransactionId = string;
+export type TransactionId = string;
+export type ChartOfAccountId = string;
+export type AccountTypeId = string;
+export type AccountBalanceId = string;
 export interface BaseModel {
   createdAt: Date;
   createdBy: UserId;
