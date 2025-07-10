@@ -1,5 +1,4 @@
-import { InvoiceId, UserId, WithId } from "@pos/shared-models/dist/models/common.model";
-import { Invoice as InvoiceModel } from "@pos/shared-models/dist/models/invoice.model";
+import { InvoiceId, UserId, WithId, Invoice as InvoiceModel } from "@pos/shared-models";
 import { Firestore, increment, writeBatch } from "firebase/firestore";
 import { Invoice } from "@/db-collections/invoice.collection";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";
@@ -16,7 +15,7 @@ type omitKeys =
   | "deletedAt"
   | "deletedBy";
 
-type Data = WithId<Pick<InvoiceModel, "discount" | "note" | "items">>;
+type Data = WithId<Pick<InvoiceModel, "discount" | "subject" | "items">>;
 
 class InvoiceService extends Invoice {
   db: Firestore;
@@ -40,7 +39,7 @@ class InvoiceService extends Invoice {
         status: INVOICE_STATUS.VALUES.Paid,
         totalAmount,
         discount: data.discount ?? null,
-        note: data.note ?? null,
+        subject: data.subject ?? null,
         items,
         targetUserId: null,
       },

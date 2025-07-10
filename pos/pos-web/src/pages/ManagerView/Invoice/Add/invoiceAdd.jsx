@@ -205,8 +205,8 @@ const InvoiceAdd = () => {
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>
             <Form.Item
-              name="note"
-              label="Note"
+              name="subject"
+              label="Subject"
               rules={[{ whitespace: true, message: validator.BLANK_SPACE_MESSAGE }]}
             >
               <TextArea />
