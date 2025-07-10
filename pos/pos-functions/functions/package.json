@@ -16,7 +16,8 @@
     "start": "npm run shell",
     "deploy": "npm run build && firebase deploy --only functions --project default",
     "logs": "firebase functions:log",
-    "script-get-data": "cross-env GOOGLE_APPLICATION_CREDENTIALS=\"./service-account.json\" ts-node ./src/scripts/get-data.ts"
+    "script-get-data": "cross-env GOOGLE_APPLICATION_CREDENTIALS=\"./service-account.json\" ts-node ./src/scripts/get-data.ts",
+    "script-seed-data": "cross-env GOOGLE_APPLICATION_CREDENTIALS=\"./service-account.json\" ts-node ./src/scripts/seed-accounting.ts"
   },
   "engines": {
     "node": "20"
