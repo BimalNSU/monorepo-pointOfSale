@@ -1,6 +1,8 @@
-import { COLLECTIONS } from "@pos/shared-models";
-import { DocumentCounterId } from "@pos/shared-models/dist/models/common.model";
-import { DocumentCounter as DocumentCounterModel } from "@pos/shared-models/dist/models/documentCounter.model";
+import {
+  COLLECTIONS,
+  DocumentCounterId,
+  DocumentCounter as DocumentCounterModel,
+} from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import {
   CollectionReference,

@@ -1,6 +1,4 @@
-import { COLLECTIONS } from "@pos/shared-models";
-import { WithId } from "@pos/shared-models/dist/models/common.model";
-import { Category } from "@pos/shared-models/dist/models/category.model";
+import { COLLECTIONS, WithId, Category } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import { collection, query, where } from "firebase/firestore";
 import { useMemo } from "react";
