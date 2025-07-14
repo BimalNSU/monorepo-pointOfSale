@@ -1,8 +1,11 @@
-import { AccountTypeId, BaseModel } from "./common.model";
+import { BaseModel } from "./common.model";
+import { NatureType } from "./transaction.model";
 
 export interface ChartOfAccount extends BaseModel {
   name: string;
-  accountTypeId: AccountTypeId;
-  accountTypeName: string;
-  accountTypeHead: number; // 1....5
+  parentId: string | null;
+  // type: string;
+  // subtype: string | null;
+  normalBalance: NatureType | null;
+  isPostable: boolean;
 }

@@ -16,3 +16,4 @@ export * from "./models/accountBalance.model";
 
 //COLLECTIONS
 export * from "./constants/collections";
+export * from "./constants/reserve_chartOfAccount";
