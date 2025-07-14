@@ -5,7 +5,7 @@ import { collection, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import { useMemo } from "react";
 import dayjs from "dayjs";
-import { DATE_FORMAT } from "@/constants/dateFormat";
+import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const userFirestoreConverter = firestoreConverter<WithId<User>>();
 
 export const useUsers = (isDeleted?: boolean) => {
@@ -22,7 +22,7 @@ export const useUsers = (isDeleted?: boolean) => {
     () =>
       data?.map((u) => {
         const { createdAt, ...rest } = u;
-        return { ...rest, createdBy: dayjs(createdAt).format(DATE_FORMAT) };
+        return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT) };
       }),
     [data],
   );
