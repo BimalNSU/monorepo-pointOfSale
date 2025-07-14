@@ -166,7 +166,7 @@ export class AuthMiddleware {
       await AuthService.deleteSession(session.id, authUserId);
       return res
         .status(200)
-        .json({ message: "Session is updated successfully." });
+        .json({ message: "Session is removed successfully." });
     } catch (e) {
       return res
         .status(500)

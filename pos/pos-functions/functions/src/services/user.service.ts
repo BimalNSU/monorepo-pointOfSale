@@ -14,9 +14,6 @@ export class UserService {
       ...data,
 
       //additional info
-      gender: null,
-      maritalStatus: null,
-      religion: null,
       profileImage: null,
       shopId: null,
       shopRoles: null,
@@ -45,7 +42,7 @@ export class UserService {
     }
     const customUserId = this.generateCustomuserId(allUsers, data.firstName);
     const { password, ...rest } = nData;
-    const hashedPassword = await bcrypt.hash(password ?? "", 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const nUser = await userObj.create(
       { ...rest, password: hashedPassword },
       customUserId
