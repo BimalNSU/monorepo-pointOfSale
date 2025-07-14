@@ -3,6 +3,7 @@ import {
   AppstoreOutlined,
   CloseOutlined,
   DashboardOutlined,
+  FileSearchOutlined,
   FileTextOutlined,
   ProductOutlined,
   ShoppingCartOutlined,
@@ -12,6 +13,7 @@ import { Layout, Menu, Drawer } from "antd";
 import { useMemo, useState } from "react";
 import { AppVersion } from "@/pages/AppVersion";
 import logo from "../../../images/logo.png";
+import bkash_logo from "../../../images/bkash-logo-transparent.png";
 import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 const { Sider } = Layout;
@@ -95,11 +97,28 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         });
       }
     }
-    nLeftSiderItems.push({
-      key: "6",
-      label: <Link to="/barcode">"Test Barcode"</Link>,
-      icon: <FileTextOutlined />,
-    });
+    nLeftSiderItems.push(
+      {
+        key: "6",
+        label: <Link to="/btransactions">Transactions</Link>,
+        icon: <img src={bkash_logo} alt="bKash" style={{ height: 24 }} />,
+      },
+      {
+        key: "7",
+        label: <Link to="/gl-report">GL Report</Link>,
+        icon: <FileSearchOutlined />,
+      },
+      {
+        key: "8",
+        label: <Link to="/barcode">"Test Barcode"</Link>,
+        icon: <FileTextOutlined />,
+      },
+      {
+        key: "9",
+        label: <Link to="/print-barcode">Print Barcode</Link>,
+        icon: <FileTextOutlined />,
+      },
+    );
     return nLeftSiderItems;
   }, [session]);
 

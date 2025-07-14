@@ -25,6 +25,7 @@ import RequireRole from "./pages/requireRole";
 import { SHOP_ROLE, USER_ROLE } from "./constants/role";
 import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
+import GLReport from "./pages/common/gl_report/generalLedgerReport";
 
 const App = () => {
   useFirebaseAuthListener(); //Called once to sync with auth
@@ -154,6 +155,17 @@ const App = () => {
                     ]}
                   >
                     <BkashTransactions />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="gl-report"
+                element={
+                  <RequireRole
+                    allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
+                    allowedShopRoles={[SHOP_ROLE.VALUES.Manager]}
+                  >
+                    <GLReport />
                   </RequireRole>
                 }
               />

@@ -3,6 +3,7 @@ import { Button, Result } from "antd";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+  const navigate = useNavigate();
   const { isLoggingIn, session } = useFirebaseAuth();
   const location = useLocation();
 

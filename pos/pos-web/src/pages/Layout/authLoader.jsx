@@ -12,7 +12,7 @@ const AuthLoader = () => {
 
   useEffect(() => {
     if (status === "success" && fetchUser === "success") {
-      updateAuth({ user: dbUser, session: dbSession, isLoadingAuth: undefined });
+      updateAuth(dbUser, dbSession);
     }
   }, [dbUser, dbSession]);
 
