@@ -1,6 +1,13 @@
-import { User as UserModel, ProductId, ShopId, UserId, WithId, User } from "@pos/shared-models";
+import {
+  User as UserModel,
+  ProductId,
+  ShopId,
+  UserId,
+  WithId,
+  User,
+  ActiveSessionId,
+} from "@pos/shared-models";
 import { Firestore, writeBatch } from "firebase/firestore";
-import { Product } from "@/db-collections/product.collection";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 // import CustomAuthService from "./customAuth.service";
@@ -14,7 +21,7 @@ type omitKeys =
   | "isDeleted"
   | "deletedAt"
   | "deletedBy";
-
+type AddData = Omit<UserModel, omitKeys>;
 type EditData = Omit<UserModel, omitKeys>;
 // type PartialAuthData = { userId: UserId; role: UserRole; shopId?: ShopId; shopRole: ShopRole };
 class UserService {
@@ -22,7 +29,12 @@ class UserService {
   constructor(db: Firestore) {
     this.db = db;
   }
-  async update(id: UserId, newData: EditData, upatedBy: UserId) {}
+  async add(data: AddData, idToken: string, sessionId: ActiveSessionId) {
+    await apiProvider.addUserByAdmin(data, idToken, sessionId);
+  }
+  async update(id: UserId, newData: EditData, idToken: string, sessionId: ActiveSessionId) {
+    //TODO
+  }
   async updateStatus(
     id: UserId,
     newData: Partial<Pick<User, "isActive" | "isDeleted">>,
