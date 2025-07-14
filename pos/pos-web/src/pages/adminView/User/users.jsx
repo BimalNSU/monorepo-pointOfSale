@@ -1,8 +1,8 @@
-import { Card, Dropdown, Modal, Space, Table, Tag, Typography } from "antd";
+import { Button, Card, Dropdown, Modal, Row, Space, Table, Tag, Typography } from "antd";
 import { useUsers } from "@/api/useUsers";
 import { USER_ROLE } from "@/constants/role";
 import { Link } from "react-router-dom";
-import { DeleteOutlined, DownOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined, PlusOutlined } from "@ant-design/icons";
 import UserService from "@/service/user.service";
 import { useFirestore } from "reactfire";
 import { useMemo } from "react";
@@ -114,9 +114,9 @@ const Users = () => {
               textDecoration: "none",
             }}
           >
-            <Text strong>#:</Text> {record.id}
-            <br />
             <Text strong>Date:</Text> {record.createdAt}
+            <br />
+            <Text strong>#:</Text> {record.id}
             <br />
             <Text strong>Name:</Text>{" "}
             {`${record.firstName}${record.lastName ? ` ${record.lastName}` : ""}`}
@@ -142,14 +142,14 @@ const Users = () => {
       responsive: ["xs"],
     },
     {
-      title: "#",
-      dataIndex: "id",
+      title: "Date",
+      dataIndex: "createdAt",
       render: renderValueCell,
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
-      title: "Date",
-      dataIndex: "createdAt",
+      title: "#",
+      dataIndex: "id",
       render: renderValueCell,
       responsive: ["md", "lg", "xl", "xxl"],
     },
@@ -231,12 +231,29 @@ const Users = () => {
     <Card
       title="User List"
       bordered={false}
-      style={{
+      styles={{
         // width: 300,
-        margin: "10px",
+        // margin: "10px",
+        body: {
+          paddingTop: 0,
+          paddingBottom: 16,
+        },
       }}
     >
       <Table
+        title={() => (
+          <Row gutter={[16, 1]} justify="end">
+            <Link
+              to={{ pathname: "/users/add" }}
+              style={{
+                color: "black",
+                textDecoration: "none",
+              }}
+            >
+              <Button icon={<PlusOutlined />} />
+            </Link>
+          </Row>
+        )}
         size="small"
         loading={status === "loading"}
         columns={columns}
