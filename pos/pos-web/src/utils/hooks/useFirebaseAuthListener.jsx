@@ -9,7 +9,7 @@ export const useFirebaseAuthListener = () => {
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        updateStore({ user: firebaseUser, ...(!userId && { userId: firebaseUser.uid }) });
+        updateStore({ user: firebaseUser });
 
         // //only for testing
         // const token = await firebaseUser.getIdToken();

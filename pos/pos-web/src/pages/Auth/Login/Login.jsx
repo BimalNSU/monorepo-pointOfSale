@@ -15,7 +15,7 @@ function Login() {
   const [isLoaded, setIsLoaded] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoggingIn, session, updateStore } = useFirebaseAuth();
+  const { login, isLoggingIn, session } = useFirebaseAuth();
 
   const onFinish = async (values) => {
     setIsLoaded(false);

@@ -20,31 +20,15 @@ export const useFirebaseAuth = () => {
     resetStore,
   } = useAuthStore();
 
-  const waitForUserId = () =>
-    new Promise<void>((resolve) => {
-      const { userId, session } = useAuthStore.getState();
-      // ✅ If already ready — resolve immediately
-      if (userId && session?.id) {
-        resolve();
-        return;
-      }
-      // ❗ If not ready — subscribe and wait for the change
-      const unsub = useAuthStore.subscribe((state) => {
-        if (state.userId && state.session?.id) {
-          unsub();
-          resolve();
-        }
-      });
-    });
-
   const login = async (data: { loginWith: string; password: string }) => {
     const res = await apiProvider.login(data);
     if (res.status === 200) {
       // const userData = { ...res.data.userData, currentLoginType };
       const { accessToken, sessionId, userData } = res.data;
-      await signInWithCustomToken(auth, accessToken);
-      updateStore(Object({ session: { id: sessionId }, isLoggingIn: true }));
-      await waitForUserId();
+      const signInResult = await signInWithCustomToken(auth, accessToken);
+      updateStore(
+        Object({ userId: signInResult.user.uid, session: { id: sessionId }, isLoggingIn: true }),
+      );
     } else {
       throw new Error("Incorrect Email or password");
     }
