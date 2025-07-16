@@ -1,113 +1,112 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "reactfire";
-import { Form, Input, Button, Checkbox, Typography, Row } from "antd";
+import { Form, Input, Button, Checkbox, Typography, Row, Col, Alert } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { error } from "@/utils/Utils/Utils";
 import "./Login.css";
 import logo from "../../../images/logo.png";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 
 const { Title } = Typography;
+const { Password } = Input;
 
-function Login() {
+const Login = () => {
   const auth = useAuth();
-  const [isLoaded, setIsLoaded] = useState(true);
+  const [formError, setFormError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoggingIn, session } = useFirebaseAuth();
 
   const onFinish = async (values) => {
-    setIsLoaded(false);
+    setLoading(true);
     try {
       await login(values);
       const { from } = location.state || { from: { pathname: "/dashboard" } };
       navigate(from, { replace: true });
     } catch (err) {
-      error(err);
+      setFormError("Login credentials do not match.");
+    } finally {
+      setLoading(false);
     }
-    setIsLoaded(true);
   };
+
   if (!isLoggingIn && session?.id) {
     return <Navigate to="/dashboard" />;
   }
+
   return (
     <div className="addPadding-40">
-      <Row type="flex" justify="center" align="middle">
-        <div className="border p-3 rounded" style={{ backgroundColor: "#f4f4f4" }}>
-          <div style={{ padding: "5%" }}>
-            <Title level={2} align="center">
-              <img src={logo} alt="logo" />
-            </Title>
-            <Title level={2}>Sign in with Email, Mobile or User ID</Title>
-            <Title level={5}>
-              Don&apos;t have an account? <Link to="/signup">Sign Up!!</Link>
-            </Title>
-            <br />
-            <br />
-            <br />
-            <Form
-              name="normal_login"
-              layout="vertical"
-              className="login-form"
-              initialValues={{
-                remember: true,
-              }}
-              onFinish={onFinish}
-            >
-              <Form.Item
-                label="Email, Mobile Number or User ID:"
-                name="loginWith"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your Email, Mobile or User ID!",
-                  },
-                ]}
+      <Row justify="center" align="middle">
+        <Col xs={24} sm={18} md={12} lg={8}>
+          <div className="border p-3 rounded" style={{ backgroundColor: "#f4f4f4" }}>
+            <div style={{ padding: "5%" }}>
+              <Title level={2} style={{ textAlign: "center" }}>
+                <img src={logo} alt="logo" style={{ maxWidth: 150 }} />
+              </Title>
+
+              {formError && (
+                <Alert message={formError} type="error" showIcon style={{ marginBottom: 16 }} />
+              )}
+
+              <Form
+                name="login_form"
+                layout="vertical"
+                className="login-form"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
               >
-                <Input
-                  style={{ width: "100%" }}
-                  type={"text"}
-                  prefix={<UserOutlined className="site-form-item-icon" />}
-                  placeholder="email"
-                />
-              </Form.Item>
-              <Form.Item
-                label="Password:"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your password!",
-                  },
-                ]}
-              >
-                <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} />
-              </Form.Item>
-              <Form.Item>
-                <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-                <br />
-                <a className="login-form-forgot" href="/forgotpassword">
-                  Forgot password
-                </a>
-              </Form.Item>
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="login-form-button"
-                  loading={isLoaded ? false : true}
+                <Form.Item
+                  label="User ID / Mobile Number / Email"
+                  name="loginWith"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your User ID, Mobile Number, or Email",
+                    },
+                  ]}
                 >
-                  Log in
-                </Button>
-              </Form.Item>
-            </Form>
+                  <Input
+                    prefix={<UserOutlined className="site-form-item-icon" />}
+                    placeholder="Enter User ID / Mobile / Email"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label="Password"
+                  name="password"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your password",
+                    },
+                  ]}
+                >
+                  <Password
+                    prefix={<LockOutlined className="site-form-item-icon" />}
+                    placeholder="Enter password"
+                  />
+                </Form.Item>
+
+                <Form.Item>
+                  <Checkbox name="remember">Remember me</Checkbox>
+                  <div style={{ float: "right" }}>
+                    <Link to="/forgotpassword">Forgot password?</Link>
+                  </div>
+                </Form.Item>
+
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" block loading={loading}>
+                    Log in
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
           </div>
-        </div>
+        </Col>
       </Row>
     </div>
   );
-}
+};
+
 export default Login;
