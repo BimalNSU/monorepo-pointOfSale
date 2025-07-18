@@ -31,6 +31,6 @@ export interface User extends BaseModel {
   profileImage: string | null; //format: profile/{userId}/{fileNumber}.{extension}
 
   //Only for employee
-  shopId?: ShopId[] | null; //To get selected shop's employees
+  shopIds?: ShopId[] | null; //To get selected shop's employees
   shopRoles?: Record<ShopId, ShopRole> | null;
 }
