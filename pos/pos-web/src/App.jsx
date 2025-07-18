@@ -26,6 +26,8 @@ import { SHOP_ROLE, USER_ROLE } from "./constants/role";
 import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
 import GLReport from "./pages/common/gl_report/generalLedgerReport";
+import UserEdit from "./pages/adminView/User/userEdit";
+import Shops from "./pages/adminView/shop/shops";
 
 const App = () => {
   useFirebaseAuthListener(); //Called once to sync with auth
@@ -79,6 +81,20 @@ const App = () => {
               >
                 <Route index element={<Users />} />
                 <Route path="add" element={<UserAdd />} />
+                <Route path=":id" element={<UserEdit />} />
+              </Route>
+
+              <Route
+                path="shops"
+                element={
+                  <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
+                    <Outlet />
+                  </RequireRole>
+                }
+              >
+                <Route index element={<Shops />} />
+                {/* <Route path="add" element={<UserAdd />} />
+                <Route path=":id" element={<UserEdit />} /> */}
               </Route>
 
               <Route
@@ -161,10 +177,7 @@ const App = () => {
               <Route
                 path="gl-report"
                 element={
-                  <RequireRole
-                    allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
-                    allowedShopRoles={[SHOP_ROLE.VALUES.Manager]}
-                  >
+                  <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
                     <GLReport />
                   </RequireRole>
                 }
