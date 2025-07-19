@@ -1,200 +1,99 @@
-// import { COLLECTIONS } from "./constants/collections";
-// import { db } from "./firebase";
-// import { PropertyId, UserId, WithId } from "./models/common.model";
-// import { ParkingLot } from "./models/parkingLot.model";
-// import { Property } from "./models/category.model";
-// import { Residential } from "./models/residential.model";
-// import { Shop } from "./models/product.model";
-// import { TenantAgreement } from "./models/tenantAgreement.model";
-// import { TenantUser } from "./models/user.model";
-// import { firestoreConverter } from "./utils/converter";
-// import { regionalFunctions } from "./utils/functions";
-// import { getIntersection } from "./utils/array";
-// import {
-//   RecurringBill,
-//   RecurringBillIssue,
-// } from "./models/recurringBill.model";
-// import dayjs from "dayjs";
+import {
+  ChartOfAccountId,
+  COLLECTIONS,
+  Transaction as TransactionModel,
+  ChartOfAccount as ChartOfAccountModel,
+  WithId,
+  NatureType,
+} from "@pos/shared-models";
+import { db, Timestamp } from "./firebase";
+import { firestoreConverter } from "./utils/converter";
+import { regionalFunctions } from "./utils/functions";
+import dayjs from "dayjs";
+import { AccountBalance } from "./db-collections/accountBalance.collection";
+import { ChartOfAccount } from "./db-collections/chartOfAccount.collection";
+type Amount = number;
 
-// const deactivate = async () => {
-//   const ref = db
-//     .collectionGroup(COLLECTIONS.tenantAgreements)
-//     .withConverter(firestoreConverter<TenantAgreement>())
-//     .where("status", "==", "active")
-//     .where("endDate", "<", new Date());
-//   const tenantAgreements = await ref.get();
-//   const tenantAgreementsGrouped: Record<
-//     PropertyId,
-//     FirebaseFirestore.QueryDocumentSnapshot<TenantAgreement>[]
-//   > = {};
-//   tenantAgreements.docs.forEach((doc) => {
-//     const agreementDocRef = doc.ref;
-//     const agreementCollectionRef = agreementDocRef.parent; // parentCollectionRef
-//     const propertyDocRef = agreementCollectionRef.parent; // immediateParentDocumentRef
-//     const propertyId = propertyDocRef!.id; // TODO: solve typescript error
+const initiateOpeningBalances = async () => {
+  const now = dayjs();
+  const newAccountBalanceId = now.format("YYYY-MM-DD");
+  const yesterday = now.subtract(1, "day");
+  const currentBalanceId = yesterday.format("YYY-MM-DD");
+  const start = yesterday.startOf("day").toDate();
+  const end = yesterday.endOf("day").toDate();
+  const queryInTransactions = db
+    .collection(COLLECTIONS.transactions)
+    .withConverter(firestoreConverter<TransactionModel>())
+    .where("createdAt", ">=", Timestamp.fromDate(start))
+    .where("createdAt", "<=", Timestamp.fromDate(end))
+    .orderBy("createdAt", "desc");
+  const transactionSnapshots = await queryInTransactions.get();
+  const transactions = transactionSnapshots.docs.map((doc) => {
+    return { ...doc.data(), id: doc.id } as WithId<TransactionModel>;
+  });
 
-//     if (tenantAgreementsGrouped[propertyId] == undefined) {
-//       tenantAgreementsGrouped[propertyId] = [];
-//     }
-//     tenantAgreementsGrouped[propertyId].push(doc);
-//   });
+  // 1. Collect unique coaIds from all transactions
+  const coaIdsSet = new Set<ChartOfAccountId>();
+  transactions.forEach((t) => {
+    t.heads.forEach((head) => {
+      coaIdsSet.add(head.coaId);
+    });
+  });
+  const coaIds = Array.from(coaIdsSet);
 
-//   const propertyPromises = Object.entries(tenantAgreementsGrouped).map(
-//     async ([propertyId, tenantAgreementDocs]) => {
-//       await db.runTransaction(async (t) => {
-//         const propertyRef = db
-//           .collection(COLLECTIONS.properties)
-//           .withConverter(firestoreConverter<Property>())
-//           .doc(propertyId);
+  // 2. Batch fetch all ChartOfAccount once
+  const chartOfAccountObj = new ChartOfAccount();
+  const fetchedChartOfAccounts = await chartOfAccountObj.getByIds(coaIds);
 
-//         const residentialsRef = db
-//           .collection(COLLECTIONS.properties)
-//           .doc(propertyId)
-//           .collection(COLLECTIONS.residentials)
-//           .withConverter(firestoreConverter<Residential>());
-//         const residentials = Object.fromEntries(
-//           (await t.get(residentialsRef)).docs.map((doc) => [doc.id, doc.data()])
-//         );
+  // 3. Build map
+  const charOfAccountsMap: Record<
+    ChartOfAccountId,
+    Pick<ChartOfAccountModel, "normalBalance"> & { amount: Amount }
+  > = fetchedChartOfAccounts.reduce(
+    (pre, curr) => ({
+      ...pre,
+      [curr.id]: { normalBalance: curr.normalBalance, amount: 0 },
+    }),
+    {}
+  );
 
-//         const shopsRef = db
-//           .collection(COLLECTIONS.properties)
-//           .doc(propertyId)
-//           .collection(COLLECTIONS.shops)
-//           .withConverter(firestoreConverter<Shop>());
-//         const shops = Object.fromEntries(
-//           (await t.get(shopsRef)).docs.map((doc) => [doc.id, doc.data()])
-//         );
+  const accountBalance = new AccountBalance();
+  const currentBalances = await accountBalance.get(currentBalanceId);
 
-//         const parkingLotsRef = db
-//           .collection(COLLECTIONS.properties)
-//           .doc(propertyId)
-//           .collection(COLLECTIONS.parkingLots)
-//           .withConverter(firestoreConverter<ParkingLot>());
-//         const parkingLots = Object.fromEntries(
-//           (await t.get(parkingLotsRef)).docs.map((doc) => [doc.id, doc.data()])
-//         );
+  //4. loading last accountBalance to charOfAccountsMap
+  const newBalanceMap: Record<ChartOfAccountId, Amount> =
+    currentBalances?.accounts.reduce(
+      (pre, curr) => ({ ...pre, [curr.id]: curr.amount }),
+      Object()
+    );
 
-//         const tenantAgreementPromises = tenantAgreementDocs.map(async (doc) => {
-//           const tenantAgreement = doc.data();
-//           const tenantAgreementId = doc.id;
-
-//           const tenantRef = db
-//             .collection(COLLECTIONS.users)
-//             .doc(tenantAgreement.tenantId)
-//             .withConverter(firestoreConverter<TenantUser>());
-//           const tenantDoc = await t.get(tenantRef);
-
-//           const willUpdateResidentials =
-//             tenantAgreement.type === 1 || tenantAgreement.type === 2;
-//           const willUpdateParking =
-//             tenantAgreement.type === 1 ||
-//             tenantAgreement.type === 3 ||
-//             tenantAgreement.type === 4;
-//           const willUpdateShops =
-//             tenantAgreement.type === 4 || tenantAgreement.type === 5;
-
-//           const changes = {
-//             tenantAgreementId: null,
-//             tenantId: null,
-//           };
-//           // Update residentials in property doc
-//           if (willUpdateResidentials) {
-//             tenantAgreement.unitIds!.map((unitId) => {
-//               const ref = db
-//                 .collection(COLLECTIONS.properties)
-//                 .doc(propertyId)
-//                 .collection(COLLECTIONS.residentials)
-//                 .doc(unitId)
-//                 .withConverter(firestoreConverter<Residential>());
-
-//               // !following will fail if unit doesn't exist in residentials subcollection
-//               t.update(ref, changes);
-//               residentials[unitId] = { ...residentials[unitId], ...changes };
-//             });
-//           }
-
-//           // Update shops in property doc
-//           if (willUpdateShops) {
-//             tenantAgreement.shopIds!.map((shopId) => {
-//               const ref = db
-//                 .collection(COLLECTIONS.properties)
-//                 .doc(propertyId)
-//                 .collection(COLLECTIONS.shops)
-//                 .doc(shopId)
-//                 .withConverter(firestoreConverter<Shop>());
-
-//               // !following will fail if shop doesn't exist in residentials subcollection
-//               t.update(ref, changes);
-//               shops[shopId] = { ...shops[shopId], ...changes };
-//             });
-//           }
-
-//           // Update parkingLots in property doc
-//           if (willUpdateParking) {
-//             tenantAgreement.parkingIds!.map((parkingLotId) => {
-//               const ref = db
-//                 .collection(COLLECTIONS.properties)
-//                 .doc(propertyId)
-//                 .collection(COLLECTIONS.parkingLots)
-//                 .doc(parkingLotId)
-//                 .withConverter(firestoreConverter<ParkingLot>());
-//               // !following will fail if parkingLot doesn't exist in parkingLots subcollection
-//               t.update(ref, changes);
-//               parkingLots[parkingLotId] = {
-//                 ...parkingLots[parkingLotId],
-//                 ...changes,
-//               };
-//             });
-//           }
-
-//           // Update tenant agreement
-//           t.update(doc.ref, {
-//             status: "expired",
-//             actualEndDate: tenantAgreement.endDate,
-//           });
-
-//           // Update user (tenant)
-//           const tenant = tenantDoc.data()!;
-//           const ind = tenant.tenantAssignmentList[
-//             propertyId
-//           ].agreementIds.findIndex((val) => val === tenantAgreementId);
-//           if (ind > -1) {
-//             tenant.tenantAssignmentList[propertyId].agreementIds.splice(ind, 1);
-//             if (
-//               tenant.tenantAssignmentList[propertyId].agreementIds.length === 0
-//             ) {
-//               delete tenant.tenantAssignmentList[propertyId];
-//             }
-//           }
-//           t.update(tenantRef, {
-//             tenantAssignmentList: tenant.tenantAssignmentList,
-//           });
-//         });
-//         await Promise.all(tenantAgreementPromises);
-
-//         // Update property doc
-//         const newTenantIds: Set<UserId> = new Set();
-
-//         Object.values(residentials)
-//           .filter((unit) => unit.tenantId != undefined)
-//           .forEach((unit) => newTenantIds.add(unit.tenantId!));
-
-//         Object.values(shops)
-//           .filter((shop) => shop.tenantId != undefined)
-//           .forEach((shop) => newTenantIds.add(shop.tenantId!));
-
-//         Object.values(parkingLots)
-//           .filter((parking) => parking.tenantId != undefined)
-//           .forEach((parking) => newTenantIds.add(parking.tenantId!));
-
-//         t.update(propertyRef, {
-//           agreementedTenantIds: Array.from(newTenantIds),
-//         });
-//       });
-//     }
-//   );
-//   await Promise.all(propertyPromises);
-// };
+  // 5. Sum transaction heads to charOfAccountsMap
+  transactions.forEach(async (t) =>
+    t.heads.map((head) => {
+      const newAmount =
+        charOfAccountsMap[head.coaId].normalBalance === NatureType.debit
+          ? head.nature === NatureType.debit
+            ? head.amount
+            : -head.amount
+          : head.nature === NatureType.credit
+          ? head.amount
+          : -head.amount;
+      charOfAccountsMap[head.coaId].amount += newAmount;
+    })
+  );
+  const batch = db.batch();
+  accountBalance.set(
+    batch,
+    {
+      accounts: Object.entries(charOfAccountsMap).map(([coaId, value]) => ({
+        id: coaId,
+        amount: (newBalanceMap[coaId] ?? 0) + value.amount,
+      })),
+    },
+    newAccountBalanceId
+  );
+  await batch.commit();
+};
 
 // const activate = async () => {
 //   const ref = db
@@ -399,69 +298,9 @@
 //   await Promise.all(propertyPromises);
 // };
 
-// export const processTenantAgreements = regionalFunctions.pubsub
-//   .schedule("5 0 * * *") // Everyday at 00:05
-//   .timeZone("Asia/Dhaka")
-//   .onRun(async () => {
-//     await deactivate();
-//     await activate();
-//   });
-
-// export const issueRecurringBill = regionalFunctions.pubsub
-//   .schedule("5 0 * * *") // Everyday at 00:05
-//   .timeZone("Asia/Dhaka")
-//   .onRun(async () => {
-//     // current month iter  - duration end < createdAt month
-//     const now = new Date();
-//     const todayDate = now.getDate();
-//     const recurringBillDocs = await db
-//       .collection(COLLECTIONS.recurringBills)
-//       .where("dueDate", "==", todayDate)
-//       .withConverter(firestoreConverter<RecurringBill>())
-//       .get();
-
-//     const applicableRBills: WithId<RecurringBill>[] = [];
-//     const recurringBills = recurringBillDocs.docs.map((doc) => ({
-//       id: doc.id,
-//       ...doc.data(),
-//     }));
-//     for (const rbill of recurringBills) {
-//       if (rbill.durationType === 1) {
-//         applicableRBills.push(rbill);
-//       } else {
-//         // TODO: update the following with `.count()` after migrating to new Firebase Functions version
-//         const rbillIssues = await db
-//           .collection(COLLECTIONS.recurringBillIssues)
-//           .where("rBillId", "==", rbill.id)
-//           .withConverter(firestoreConverter<RecurringBillIssue>())
-//           .get();
-//         if (rbillIssues.docs.length < rbill.durationEnd!) {
-//           applicableRBills.push(rbill);
-//         }
-//       }
-//     }
-
-//     if (applicableRBills.length === 0) {
-//       return;
-//     }
-
-//     const batch = db.batch();
-//     // TODO: change according to requirements if necessary
-//     const month = dayjs(new Date()).format("MMM-YYYY");
-
-//     applicableRBills.forEach((rbill) => {
-//       const recurringBillIssue: RecurringBillIssue = {
-//         month,
-//         rBillId: rbill.id,
-//         propertyId: rbill.propertyId,
-//         createdAt: now,
-//         isDeleted: false,
-//       };
-//       batch.create(
-//         db.collection(COLLECTIONS.recurringBillIssues).doc(),
-//         recurringBillIssue
-//       );
-//     });
-
-//     await batch.commit();
-//   });
+export const processOpeningBalances = regionalFunctions.pubsub
+  .schedule("1 0 * * *") // Everyday at 00:01
+  .timeZone("Asia/Dhaka")
+  .onRun(async () => {
+    await initiateOpeningBalances();
+  });
