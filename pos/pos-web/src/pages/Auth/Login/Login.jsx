@@ -16,7 +16,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoggingIn, session } = useFirebaseAuth();
+  const { login, session } = useFirebaseAuth();
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -31,7 +31,7 @@ const Login = () => {
     }
   };
 
-  if (!isLoggingIn && session?.id) {
+  if (session?.id) {
     return <Navigate to="/dashboard" />;
   }
 
