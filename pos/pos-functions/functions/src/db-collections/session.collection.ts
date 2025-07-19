@@ -1,50 +1,41 @@
 import { db } from "../firebase";
 import { config } from "dotenv";
 import {
-  ActiveSessionId,
+  SessionId,
   UserId,
   COLLECTIONS,
-  ActiveSession as ActiveSessionModel,
+  Session as SessionModel,
   WithId,
 } from "@pos/shared-models";
 import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
 
 config();
-
-const activeSessionFirstoreConverter = firestoreConverter<ActiveSessionModel>();
-export class ActiveSession {
+type MutableData = Partial<Omit<SessionModel, "userId">>;
+const sessionFirestoreConverter = firestoreConverter<SessionModel>();
+export class Session {
   collectionRef: CollectionReference;
-  userId: UserId;
-  constructor(userId: UserId) {
-    this.collectionRef = db
-      .collection(COLLECTIONS.sessions)
-      .doc(userId)
-      .collection(COLLECTIONS.activeSessions);
-    this.userId = userId;
+  constructor() {
+    this.collectionRef = db.collection(COLLECTIONS.sessions);
   }
-  async create(data: ActiveSessionModel) {
+  async create(data: SessionModel) {
     const sessionRef = this.collectionRef
       .doc()
-      .withConverter(activeSessionFirstoreConverter);
+      .withConverter(sessionFirestoreConverter);
     await sessionRef.set(data);
     return sessionRef;
   }
-  update(
-    id: ActiveSessionId,
-    data: Partial<ActiveSessionModel>,
-    batch: WriteBatch
-  ) {
+  update(id: SessionId, data: MutableData, batch: WriteBatch) {
     const now = new Date();
     const docRef = this.collectionRef
       .doc(id)
-      .withConverter(activeSessionFirstoreConverter);
+      .withConverter(sessionFirestoreConverter);
     return batch.set(docRef, { ...data, updatedAt: now }, { merge: true });
   }
-  async get(id: ActiveSessionId) {
+  async get(id: SessionId) {
     const userDocRef = this.collectionRef
       .doc(id)
-      .withConverter(activeSessionFirstoreConverter);
+      .withConverter(sessionFirestoreConverter);
 
     const documentSnapshot = await userDocRef.get();
     if (documentSnapshot.exists) {
@@ -56,20 +47,32 @@ export class ActiveSession {
   }
   async getAll() {
     const snapshot = await this.collectionRef
-      .withConverter(activeSessionFirstoreConverter)
+      .withConverter(sessionFirestoreConverter)
       .get();
     if (snapshot.empty) {
       return [];
     }
     return snapshot.docs.map((doc) => {
-      return { ...doc.data(), id: doc.id } as WithId<ActiveSessionModel>;
+      return { ...doc.data(), id: doc.id } as WithId<SessionModel>;
     });
   }
-  delete(id: ActiveSessionId, batch: WriteBatch) {
+  async findByUserId(userId: UserId) {
+    const snapshot = await this.collectionRef
+      .where("userId", "==", userId)
+      .withConverter(sessionFirestoreConverter)
+      .get();
+    if (snapshot.empty) {
+      return [];
+    }
+    return snapshot.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id } as WithId<SessionModel>;
+    });
+  }
+  delete(id: SessionId, batch: WriteBatch) {
     const docRef = this.collectionRef.doc(id);
     return batch.delete(docRef);
   }
-  async deleteAll(ids: ActiveSessionId[], batch: WriteBatch) {
+  async deleteAll(ids: SessionId[], batch: WriteBatch) {
     // const docRef = db.collection(COLLECTIONS.sessions).doc(this.userId); //path: sessions/{userId}
     // return await db.recursiveDelete(docRef); //TODO: test
     // return await db.recursiveDelete(this.collectionRef);

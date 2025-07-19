@@ -1,12 +1,8 @@
-import {
-  ActiveSession as ActiveSessionModel,
-  ActiveSessionId,
-  UserId,
-} from "@pos/shared-models";
+import { Session as SessionModel, SessionId, UserId } from "@pos/shared-models";
 import { AppError } from "../AppError";
 import { auth, db } from "../firebase";
 import { UserService } from "./user.service";
-import { ActiveSession } from "../db-collections/session.collection";
+import { Session } from "../db-collections/session.collection";
 
 export class AuthService {
   static async authorization(authorization: string) {
@@ -33,12 +29,12 @@ export class AuthService {
       }
     }
   }
-  static async getSession(userId: UserId, sessionId: ActiveSessionId) {
-    return await new ActiveSession(userId).get(sessionId);
+  static async getSession(sessionId: SessionId) {
+    return await new Session().get(sessionId);
   }
   static async updateSession(
-    sessionId: ActiveSessionId,
-    sessionData: Pick<ActiveSessionModel, "role" | "shopId" | "shopRole">,
+    sessionId: SessionId,
+    sessionData: Pick<SessionModel, "role" | "shopId" | "shopRole">,
     authUserId: UserId
   ) {
     try {
@@ -52,7 +48,7 @@ export class AuthService {
         throw new AppError(401, "Unauthorized role switching");
       }
       const batch = db.batch();
-      new ActiveSession(authUserId).update(sessionId, sessionData, batch);
+      new Session().update(sessionId, sessionData, batch);
       return await batch.commit();
     } catch (err) {
       if (err instanceof AppError) {
@@ -65,10 +61,10 @@ export class AuthService {
       }
     }
   }
-  static async deleteSession(id: ActiveSessionId, authUserId: UserId) {
+  static async deleteSession(id: SessionId) {
     try {
       const batch = db.batch();
-      new ActiveSession(authUserId).delete(id, batch);
+      new Session().delete(id, batch);
       return await batch.commit();
     } catch (err) {
       if (err instanceof AppError) {
@@ -82,12 +78,12 @@ export class AuthService {
     }
   }
   static async deleteAllSession(id: UserId) {
-    const sessonObj = new ActiveSession(id);
-    const activeSessions = await sessonObj.getAll();
-    if (activeSessions.length) {
+    const sessionObj = new Session();
+    const targetSessions = await sessionObj.findByUserId(id);
+    if (targetSessions.length) {
       const batch = db.batch();
-      sessonObj.deleteAll(
-        activeSessions.map((as) => as.id),
+      sessionObj.deleteAll(
+        targetSessions.map((s) => s.id),
         batch
       );
       await batch.commit();
