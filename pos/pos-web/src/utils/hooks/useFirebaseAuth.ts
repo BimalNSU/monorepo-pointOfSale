@@ -1,7 +1,7 @@
 import { getAuth, signInWithCustomToken, signOut } from "firebase/auth";
 import useAuthStore from "@/stores/auth.store";
 import { apiProvider } from "../ApiProvider/ApiProvider";
-import { ActiveSession, User, WithId } from "@pos/shared-models";
+import { Session, User, WithId } from "@pos/shared-models";
 import { useNavigate } from "react-router-dom";
 
 export const useFirebaseAuth = () => {
@@ -49,7 +49,7 @@ export const useFirebaseAuth = () => {
           lastName,
           shopRoles: { ...shopRoles },
           session: { ...session },
-          user: { ...user },
+          user,
         };
         resetStore(true);
         const res = await apiProvider.removeSession(tempAuthStore.session?.id, token);
@@ -71,7 +71,7 @@ export const useFirebaseAuth = () => {
   const getToken = async () => {
     return user ? user.getIdToken() : null;
   };
-  const updateAuth = async (dbUser: User, dbSession: WithId<ActiveSession>) => {
+  const updateAuth = async (dbUser: User, dbSession: WithId<Session>) => {
     if (!dbUser || !dbSession) {
       return await clearAuth();
     }
@@ -79,7 +79,7 @@ export const useFirebaseAuth = () => {
     //check update for user
     const newUpdates: Partial<
       Pick<User, "firstName" | "lastName" | "shopRoles"> & {
-        session: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">>;
+        session: WithId<Pick<Session, "role" | "shopId" | "shopRole">>;
         isLoggingIn?: boolean;
       }
     > = {};
@@ -116,7 +116,7 @@ export const useFirebaseAuth = () => {
 
     /*# region update of session data */
 
-    const newSessionUpdates: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">> = Object();
+    const newSessionUpdates: WithId<Pick<Session, "role" | "shopId" | "shopRole">> = Object();
     if (session?.role !== dbSession.role) {
       newSessionUpdates.role = dbSession.role;
     }

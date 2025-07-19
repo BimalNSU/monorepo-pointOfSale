@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 
 const AuthLoader = () => {
   const { userId, updateAuth, session } = useFirebaseAuth();
-  const { status, data: dbSession } = useSession(userId, session.id);
+  const { status, data: dbSession } = useSession(session.id);
   const { status: fetchUser, data: dbUser } = useUser(userId);
 
   useEffect(() => {

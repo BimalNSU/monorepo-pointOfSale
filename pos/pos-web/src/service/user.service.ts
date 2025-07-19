@@ -5,7 +5,7 @@ import {
   UserId,
   WithId,
   User,
-  ActiveSessionId,
+  SessionId,
 } from "@pos/shared-models";
 import { Firestore, writeBatch } from "firebase/firestore";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";
@@ -13,6 +13,7 @@ import { DOCUMENT_FORMAT } from "@/constants/document-format";
 // import CustomAuthService from "./customAuth.service";
 import { ShopRole, UserRole } from "@pos/shared-models";
 import { apiProvider } from "@/utils/ApiProvider/ApiProvider";
+import { Axios, AxiosResponse } from "axios";
 type omitKeys =
   | "createdAt"
   | "createdBy"
@@ -29,10 +30,10 @@ class UserService {
   constructor(db: Firestore) {
     this.db = db;
   }
-  async add(data: AddData, idToken: string, sessionId: ActiveSessionId) {
-    await apiProvider.addUserByAdmin(data, idToken, sessionId);
+  async add(data: AddData, idToken: string, sessionId: SessionId): Promise<AxiosResponse> {
+    return await apiProvider.addUserByAdmin(data, idToken, sessionId);
   }
-  async update(id: UserId, newData: EditData, idToken: string, sessionId: ActiveSessionId) {
+  async update(id: UserId, newData: EditData, idToken: string, sessionId: SessionId) {
     //TODO
   }
   async updateStatus(

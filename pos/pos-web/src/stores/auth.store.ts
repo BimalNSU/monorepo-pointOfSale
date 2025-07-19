@@ -2,16 +2,16 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { User } from "firebase/auth";
 import {
-  ActiveSession,
-  ActiveSessionId,
+  Session,
+  SessionId,
   User as UserModel,
   UserId,
   ShopId,
   ShopRole,
 } from "@pos/shared-models";
 
-type SessionType = Pick<ActiveSession, "role" | "shopId" | "shopRole"> & {
-  id: ActiveSessionId;
+type SessionType = Pick<Session, "role" | "shopId" | "shopRole"> & {
+  id: SessionId;
 };
 type UpdateData = Pick<UserModel, "firstName" | "lastName" | "shopRoles"> & {
   userId: string;

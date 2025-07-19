@@ -1,19 +1,12 @@
-import { ActiveSession, ActiveSessionId, COLLECTIONS } from "@pos/shared-models";
-import { UserId } from "@pos/shared-models";
+import { Session, SessionId, COLLECTIONS } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import { doc } from "firebase/firestore";
 import { useFirestore, useFirestoreDocData } from "reactfire";
-const sessionFirestoreConverter = firestoreConverter<ActiveSession>();
+const sessionFirestoreConverter = firestoreConverter<Session>();
 
-export const useSession = (userId: UserId, id: ActiveSessionId) => {
+export const useSession = (id: SessionId) => {
   const db = useFirestore();
-  const docRef = doc(
-    db,
-    COLLECTIONS.sessions,
-    userId,
-    COLLECTIONS.activeSessions,
-    id,
-  ).withConverter(sessionFirestoreConverter);
+  const docRef = doc(db, COLLECTIONS.sessions, id).withConverter(sessionFirestoreConverter);
   const { status, data } = useFirestoreDocData(docRef, {
     idField: "id",
   });
