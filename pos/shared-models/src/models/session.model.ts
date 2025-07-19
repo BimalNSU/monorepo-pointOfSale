@@ -1,6 +1,8 @@
+import { UserId } from "./common.model";
 import { ShopRole, UserRole } from "./user.model";
 
-export interface ActiveSession {
+export interface Session {
+  userId: UserId;
   role: UserRole;
   shopId?: string;
   shopRole?: ShopRole;

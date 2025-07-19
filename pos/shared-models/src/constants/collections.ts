@@ -17,7 +17,4 @@ export const COLLECTIONS = {
   accountBalances: "accountBalances",
 
   // -- sub collections --
-
-  //sessions
-  activeSessions: "activeSessions",
 };
