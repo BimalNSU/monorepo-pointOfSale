@@ -7,17 +7,26 @@ import { useMemo } from "react";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const userFirestoreConverter = firestoreConverter<WithId<User>>();
-
-export const useUsers = (isDeleted?: boolean) => {
+type Filter = {
+  role?: 1 | 2 | 3;
+  isDeleted?: boolean;
+};
+export const useUsers = (filter?: Filter) => {
   const db = useFirestore();
+  const conditions = Object.entries(filter ?? {})
+    .filter(([_, value]) => value !== undefined)
+    .map(([key, value]) => where(key, "==", value));
   const userCollectionRef = collection(db, COLLECTIONS.users).withConverter(userFirestoreConverter);
-  const queryInUser = query(userCollectionRef, where("isDeleted", "==", isDeleted ?? false));
-  const { status, data } = useFirestoreCollectionData(
-    isDeleted == undefined ? userCollectionRef : queryInUser,
-    {
-      idField: "id",
-    },
-  );
+  const queryInUser = query(userCollectionRef, ...conditions);
+  // const { status, data } = useFirestoreCollectionData(
+  //   isDeleted == undefined ? userCollectionRef : queryInUser,
+  //   {
+  //     idField: "id",
+  //   },
+  // );
+  const { status, data } = useFirestoreCollectionData(queryInUser, {
+    idField: "id",
+  });
   const users = useMemo(
     () =>
       data?.map((u) => {
