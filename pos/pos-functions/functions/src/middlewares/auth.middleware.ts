@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
-import { UserService } from "../services/user.service";
+import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
 import { auth } from "../firebase";
 import { Session } from "../db-collections/session.collection";
@@ -28,13 +28,13 @@ export class AuthMiddleware {
     };
 
     const loginWith = req.body.loginWith;
-    const userService = new UserService();
+    const userObj = new User();
     const fieldName = AuthMiddleware.getLoginType(loginWith);
     try {
       const userData =
         fieldName === "id"
-          ? await userService.findOne(loginWith)
-          : await userService.findOneBy(fieldName, loginWith);
+          ? await userObj.get(loginWith)
+          : await userObj.findOneBy(fieldName, loginWith);
       if (!userData) {
         // when userId or mobile or email don't match
         return res.status(401).json({ error: "Authentication failed!" });
@@ -124,8 +124,9 @@ export class AuthMiddleware {
       if (!authorization || !session_id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const { uid } = await AuthService.authorization(authorization);
-      const dbSession = await AuthService.getSession(session_id);
+      const authService = new AuthService();
+      const { uid } = await authService.authorization(authorization);
+      const dbSession = await authService.getSession(session_id);
       if (!dbSession || dbSession.userId !== uid) {
         return res.status(403).json({ error: "Invalid session" });
       }
@@ -152,7 +153,7 @@ export class AuthMiddleware {
     const { authUserId, session } = res.locals as CustomAuth;
     const reqData = req.body;
     try {
-      await AuthService.updateSession(session.id, reqData, authUserId);
+      await new AuthService().updateSession(session.id, reqData, authUserId);
       return res
         .status(200)
         .json({ message: "Session is updated successfully." });
@@ -165,7 +166,7 @@ export class AuthMiddleware {
   static async removeSession(req: Request, res: Response, next: NextFunction) {
     const { session } = res.locals as CustomAuth;
     try {
-      await AuthService.deleteSession(session.id);
+      await new AuthService().deleteSession(session.id);
       return res
         .status(200)
         .json({ message: "Session is removed successfully." });

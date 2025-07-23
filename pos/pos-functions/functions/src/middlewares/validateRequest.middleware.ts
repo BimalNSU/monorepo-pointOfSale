@@ -1,5 +1,6 @@
 import { ZodSchema, ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../utils/AppError";
 
 export const validateRequest = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -8,16 +9,20 @@ export const validateRequest = (schema: ZodSchema) => {
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        res.status(400).json({
-          message: "Validation error",
-          errors: err.errors,
-        });
-      } else {
-        res.status(500).json({
-          message: "Unexpected server error",
-          error: String(err),
-        });
+        const rawErrors = err.flatten().fieldErrors;
+
+        const fieldErrors = Object.entries(rawErrors).reduce(
+          (acc, [key, val]) => {
+            if (val !== undefined) acc[key] = val;
+            return acc;
+          },
+          {} as Record<string, string[]>
+        );
+
+        return next(new AppError("Validation failed", 400, fieldErrors));
       }
+
+      next(err); // unexpected error
     }
   };
 };

@@ -6,7 +6,7 @@ import recaptchaAuthorization from "../middlewares/recaptcha-authorization.middl
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RoleMiddleware } from "../middlewares/role.middleware";
 import { validateRequest } from "../middlewares/validateRequest.middleware";
-import { createUserSchema } from "../schemas/user.schema";
+import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { BkashMiddleware } from "../middlewares/bkash.middleware";
 import { createInvoiceSchema } from "../schemas/invoice.schema";
 import { InvoiceMiddleware } from "../middlewares/invoice.middleware";
@@ -30,6 +30,14 @@ router.post(
   validateRequest(createUserSchema),
   UserMiddleware.create
 );
+router.put(
+  "/admin/users/:id",
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  validateRequest(updateUserSchema),
+  UserMiddleware.updatedByAdmin
+);
+
 router.put(
   "/sessions",
   AuthMiddleware.isAuthenticated,

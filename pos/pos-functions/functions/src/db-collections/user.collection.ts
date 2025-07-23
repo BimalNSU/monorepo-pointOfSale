@@ -2,7 +2,7 @@ import { db } from "../firebase";
 import { config } from "dotenv";
 import { COLLECTIONS } from "../constants/collections";
 import { UserId, User as UserModel, WithId } from "@pos/shared-models";
-import { CollectionReference } from "firebase-admin/firestore";
+import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
 config();
 
@@ -24,11 +24,11 @@ export class User {
       .set(data);
     return { ...data, id: customUserId };
   }
-  async update(id: UserId, data: Partial<UserModel>) {
-    return await this.collectionRef
+  update(id: UserId, data: Partial<UserModel>, batch: WriteBatch) {
+    const docRef = this.collectionRef
       .doc(id)
-      .withConverter(userFirstoreConverter)
-      .set(data, { merge: true });
+      .withConverter(userFirstoreConverter);
+    return batch.set(docRef, data, { merge: true });
   }
   async get(id: UserId) {
     const userDocRef = this.collectionRef

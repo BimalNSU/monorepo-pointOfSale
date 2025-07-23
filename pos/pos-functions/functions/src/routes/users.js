@@ -8,7 +8,11 @@ import { UserMiddleware } from "../middlewares/user.middleware";
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RoleMiddleware } from "../middlewares/role.middleware";
 import { validateRequest } from "../middlewares/validateRequest.middleware";
-import { updateUserStatusSchema } from "../schemas/user.schema";
+import {
+  updateOwnUserSchema,
+  updateUserPasswordSchema,
+  updateUserStatusSchema,
+} from "../schemas/user.schema";
 
 config();
 
@@ -19,12 +23,18 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: originList }));
 
-router.post(
+router.put(
   "/change-password",
   AuthMiddleware.isAuthenticated,
+  validateRequest(updateUserPasswordSchema),
   UserMiddleware.updatePassword
 );
-router.put("/:id", AuthMiddleware.isAuthenticated, UserMiddleware.update);
+router.patch(
+  "/:id",
+  AuthMiddleware.isAuthenticated,
+  validateRequest(updateOwnUserSchema),
+  UserMiddleware.update
+);
 router.patch(
   "/:id/status",
   AuthMiddleware.isAuthenticated,

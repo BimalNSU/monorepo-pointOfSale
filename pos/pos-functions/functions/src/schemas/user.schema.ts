@@ -87,6 +87,18 @@ export const updateUserStatusSchema = z
   );
 export type UpdateUserStatusInput = z.infer<typeof updateUserStatusSchema>;
 
+export const updateOwnUserSchema = createUserSchema
+  .omit({
+    role: true,
+    password: true,
+    mobile: true,
+  })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided for update",
+  });
+export type UpdateOwnUserInput = z.infer<typeof updateOwnUserSchema>;
+
 export const updateUserPasswordSchema = z.object({
   currentPassword: z.string(),
   newPassword: z.string(),

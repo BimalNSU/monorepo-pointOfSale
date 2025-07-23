@@ -8,7 +8,7 @@ import {
 } from "@pos/shared-models";
 import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
-import { AppError } from "../AppError";
+import { AppError } from "../utils/AppError";
 config();
 
 const productFirestoreConverter = firestoreConverter<ProductModel>();
@@ -45,7 +45,7 @@ export class Product {
       }
       throw new Error();
     } else {
-      throw new AppError(401, `Product ID #${id} is not found`);
+      throw new AppError(`Product ID #${id} is not found`, 401);
     }
   }
   async getByIds(ids: ProductId[]) {

@@ -5,6 +5,7 @@ import bcrypt from "@node-rs/bcrypt";
 import { CustomAuth } from "../models/common.model";
 import {
   CreateUserInput,
+  UpdateOwnUserInput,
   UpdateUserInput,
   UpdateUserPasswordInput,
   UpdateUserStatusInput,
@@ -20,16 +21,14 @@ export class UserMiddleware {
     const userData = req.body;
     try {
       const nUser = await new UserService().create(userData, authUserId);
-      return res
+      res
         .status(201)
         .json({ data: nUser, message: "User created successfully!" });
-    } catch (error) {
-      return res.status(500).json({ error: error });
+    } catch (err) {
+      next(err); // will be handled by centralized errorHandler
     }
   }
-  //Only admin can call
-  //TODO: test
-  static async update(
+  static async updatedByAdmin(
     req: Request<{ id: UserId }, {}, UpdateUserInput>,
     res: Response,
     next: NextFunction
@@ -39,12 +38,35 @@ export class UserMiddleware {
     const updates = req.body;
     try {
       const nUser = await new UserService().update(userId, updates, authUserId);
+      res
+        .status(200)
+        .json({ message: `User ${userId} updated successfully.`, user: nUser });
+    } catch (err) {
+      next(err); // will be handled by centralized errorHandler
+    }
+  }
+  static async update(
+    req: Request<{ id: UserId }, {}, UpdateOwnUserInput>,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { authUserId } = res.locals as CustomAuth;
+    const { id: userId } = req.params;
+    if (userId !== authUserId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized to update this user",
+        errors: {},
+      });
+    }
+    const updates = req.body;
+    try {
+      const nUser = await new UserService().update(userId, updates, authUserId);
       return res
         .status(200)
         .json({ message: `User ${userId} updated successfully.`, user: nUser });
-    } catch (error) {
-      console.error("Error updating user", error);
-      return res.status(500).json({ error: error });
+    } catch (err) {
+      return next(err); // will be handled by centralized errorHandler
     }
   }
   //Only admin can call
@@ -58,13 +80,12 @@ export class UserMiddleware {
     const updates = { ...req.body };
     try {
       await new UserService().updateStatus(userId, updates, authUserId);
-      return res.status(200).json({
+      res.status(200).json({
         message: `User ${userId} updated successfully.`,
         data: updates,
       });
-    } catch (error) {
-      console.error("Error updating user", error);
-      return res.status(500).json({ error: error });
+    } catch (err) {
+      next(err); // will be handled by centralized errorHandler
     }
   }
   static async updatePassword(
@@ -89,10 +110,8 @@ export class UserMiddleware {
       return res
         .status(200)
         .json({ message: "Password changed successfully." });
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ error: "Internal server error. Please try again later." });
+    } catch (err) {
+      return next(err); // will be handled by centralized errorHandler
     }
   }
 }

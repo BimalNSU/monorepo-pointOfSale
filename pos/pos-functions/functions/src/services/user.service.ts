@@ -1,11 +1,14 @@
 import { User as UserModel, UserId, WithId } from "@pos/shared-models";
-import { AppError } from "../AppError";
+import { AppError } from "../utils/AppError";
 import { User } from "../db-collections/user.collection";
 import bcrypt from "@node-rs/bcrypt";
-import { CreateUserInput, UpdateUserStatusInput } from "../schemas/user.schema";
+import {
+  CreateUserInput,
+  UpdateUserInput,
+  UpdateUserStatusInput,
+} from "../schemas/user.schema";
 import { AuthService } from "./auth.service";
-type omitType = "createdBy" | "updatedBy" | "deletedAt" | "deletedBy";
-export type EditData = Omit<UserModel, omitType | "createdBy" | "createdAt">;
+import { db } from "../firebase";
 
 export class UserService {
   async create(data: CreateUserInput, createdBy: UserId) {
@@ -32,13 +35,13 @@ export class UserService {
     const allUsers = await userObj.findAll();
     const newUserMobile = data.mobile ? data.mobile : "";
     const newUserEmail = data.email ? data.email : "";
-    const errorMessage = this.checkExistEmailNMobile(
+    const errors = this.checkExistEmailNMobile(
       allUsers,
       newUserMobile,
       newUserEmail
     );
-    if (errorMessage.length) {
-      throw new AppError(404, errorMessage);
+    if (errors.mobile.length || errors.email.length) {
+      throw new AppError("Validation failed", 400, errors);
     }
     const customUserId = this.generateCustomuserId(allUsers, data.firstName);
     const { password, ...rest } = nData;
@@ -55,62 +58,70 @@ export class UserService {
     try {
       const nUser = await new User().get(id);
       if (!nUser) {
-        throw new AppError(404, "Not found", `Invalid user ID #${id}`);
+        throw new AppError("User not found", 404);
       }
       return this.filterDocData(nUser);
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
       } else if (err instanceof Error) {
-        // throw new Error(err.message);
-        throw err; // TODO: convert to AppError with 500 error code
+        console.error("Unexpected error in findOne:", err);
+        throw new AppError(err.message || "Internal Server Error", 500);
       } else {
-        throw new Error(err as string);
+        throw new AppError("Unknown error occurred", 500);
       }
     }
   }
-  async findOneBy(fieldName: "mobile" | "email", fieldValue: string) {
-    try {
-      const nUser = await new User().findOneBy(fieldName, fieldValue);
-      if (!nUser) {
-        throw new AppError(404, "Not found", `Invalid user credential`);
-      }
-      return this.filterDocData(nUser);
-    } catch (err) {
-      if (err instanceof AppError) {
-        throw err;
-      } else if (err instanceof Error) {
-        // throw new Error(err.message);
-        throw err; // TODO: convert to AppError with 500 error code
-      } else {
-        throw new Error(err as string);
-      }
-    }
-  }
-  async update(id: UserId, newData: Partial<EditData>, updatedBy: UserId) {
-    const { password, ...restNewData } = newData as Partial<EditData>;
+  async update(id: UserId, newData: UpdateUserInput, updatedBy: UserId) {
+    const { password, ...restNewData } = newData;
     try {
       const hashedPassword = password
         ? await bcrypt.hash(password, 10)
         : undefined;
       const dbUser = await this.findOne(id);
-      const nUser = { ...dbUser, ...restNewData };
-      await new User().update(id, {
-        ...nUser,
-        ...(hashedPassword && { password: hashedPassword }),
-        updatedBy,
-        updatedAt: new Date(),
-      });
-      const { password: dbHashedPassword, ...restUserData } = nUser;
-      return restUserData;
+
+      //#region: validate for duplicate mobile or email
+      if (newData.mobile && dbUser.mobile !== newData.mobile) {
+        const userObj = new User();
+        const allUsers = await userObj.findAll();
+        const newUserMobile = newData.mobile ? newData.mobile : "";
+        const newUserEmail = newData.email ? newData.email : "";
+        const errors = this.checkExistEmailNMobile(
+          allUsers,
+          newUserMobile,
+          newUserEmail,
+          id
+        );
+        if (errors.mobile.length || errors.email.length) {
+          throw new AppError("Validation failed", 400, errors);
+        }
+      }
+      //#endregion
+      const batch = db.batch();
+      const now = new Date();
+      new User().update(
+        id,
+        {
+          ...restNewData,
+          ...(hashedPassword && { password: hashedPassword }),
+          updatedBy,
+          updatedAt: now,
+        },
+        batch
+      );
+      if (newData.role && newData.role !== dbUser.role) {
+        await new AuthService().deleteAllSession(id, batch);
+      }
+      await batch.commit();
+      return restNewData;
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
       } else if (err instanceof Error) {
-        // throw new Error(err.message);
-        throw err; // TODO: convert to AppError with 500 error code
+        console.error("Unexpected error in findOne:", err);
+        throw new AppError(err.message || "Internal Server Error", 500);
       } else {
-        throw new Error(err as string);
+        throw new AppError("Unknown error occurred", 500);
       }
     }
   }
@@ -125,51 +136,57 @@ export class UserService {
         dbUser.isActive === data.isActive ||
         dbUser.isDeleted === data.isDeleted
       ) {
-        throw new AppError(204, "No change needed"); //Test working or not
+        throw new AppError("No change needed", 204); //Test working or not
       }
-      const userObj = new User();
       const now = new Date();
-      await userObj.update(id, {
-        ...data,
-        updatedBy,
-        updatedAt: now,
-        ...(data.isDeleted
-          ? { deletedAt: now, deletedBy: updatedBy, isActive: false }
-          : { deletedAt: null, deletedBy: null }),
-      });
+      const batch = db.batch();
+      const userObj = new User();
+      userObj.update(
+        id,
+        {
+          ...data,
+          updatedBy,
+          updatedAt: now,
+          ...(data.isDeleted
+            ? { deletedAt: now, deletedBy: updatedBy, isActive: false }
+            : { deletedAt: null, deletedBy: null }),
+        },
+        batch
+      );
       if (
         dbUser.isActive &&
         ((data.isActive != undefined && !data.isActive) ||
           (data.isDeleted != undefined && data.isDeleted))
       ) {
-        await AuthService.deleteAllSession(id);
+        await new AuthService().deleteAllSession(id, batch);
       }
+      return await batch.commit();
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
       } else if (err instanceof Error) {
-        // throw new Error(err.message);
-        throw err; // TODO: convert to AppError with 500 error code
+        console.error("Unexpected error in findOne:", err);
+        throw new AppError(err.message || "Internal Server Error", 500);
       } else {
-        throw new Error(err as string);
+        throw new AppError("Unknown error occurred", 500);
       }
     }
   }
-  async delete(id: UserId, updatedBy: UserId) {
+  async delete(id: UserId, deletedBy: UserId) {
     try {
       const nUser = await this.findOne(id);
       if (!nUser) {
-        throw new AppError(404, `User ID #${id} isn't found`);
+        throw new AppError("User not found", 404);
       }
-      return await new User().softDelete(id, updatedBy);
+      return await new User().softDelete(id, deletedBy);
     } catch (err) {
       if (err instanceof AppError) {
         throw err;
       } else if (err instanceof Error) {
-        // throw new Error(err.message);
-        throw err; // TODO: convert to AppError with 500 error code
+        console.error("Unexpected error in findOne:", err);
+        throw new AppError(err.message || "Internal Server Error", 500);
       } else {
-        throw new Error(err as string);
+        throw new AppError("Unknown error occurred", 500);
       }
     }
   }
@@ -197,16 +214,26 @@ export class UserService {
     email = "",
     id = ""
   ) {
-    const error = new Array();
+    const errors = { mobile: new Array<string>(), email: new Array<string>() };
     usersData.forEach((user) => {
-      if (mobile && user.mobile === mobile && user.id !== id) {
-        error.push({ mobile: "Mobile number is already exists" });
+      if (
+        mobile &&
+        user.mobile === mobile &&
+        user.id !== id &&
+        !errors.mobile.length
+      ) {
+        errors.mobile.push("Mobile number already exists");
       }
-      if (email && user.email === email && user.id !== id) {
-        error.push({ email: "Email is already exists" });
+      if (
+        email &&
+        user.email === email &&
+        user.id !== id &&
+        !errors.email.length
+      ) {
+        errors.email.push("Email already exists");
       }
     });
-    return error;
+    return errors;
   }
   private filterDocData(data: WithId<UserModel>) {
     const {

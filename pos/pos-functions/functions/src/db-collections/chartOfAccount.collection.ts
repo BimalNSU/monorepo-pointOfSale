@@ -8,7 +8,7 @@ import {
 } from "@pos/shared-models";
 import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
-import { AppError } from "../AppError";
+import { AppError } from "../utils/AppError";
 config();
 
 const chartOfAccountFirestoreConverter =

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
-  ActiveSession,
+  Session,
   ShopId,
   ShopRole,
   UserRole as UserRoleType,
@@ -12,7 +12,7 @@ export class RoleMiddleware {
   static isAdmin(req: Request, res: Response, next: NextFunction) {
     const { session } = res.locals as {
       authUserId: string;
-      session: WithId<Pick<ActiveSession, "role" | "shopId" | "shopRole">>;
+      session: WithId<Pick<Session, "role" | "shopId" | "shopRole">>;
     };
     if (session.role !== USER_ROLE.VALUES.Admin) {
       return res.status(403).json({ message: "Access denied" });
