@@ -25,7 +25,7 @@ const Login = () => {
       const { from } = location.state || { from: { pathname: "/dashboard" } };
       navigate(from, { replace: true });
     } catch (err) {
-      setFormError("Login credentials do not match.");
+      setFormError(err.message ?? "Login credentials do not match.");
     } finally {
       setLoading(false);
     }

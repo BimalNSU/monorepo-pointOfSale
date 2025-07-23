@@ -22,6 +22,9 @@ export const useFirebaseAuth = () => {
 
   const login = async (data: { loginWith: string; password: string }) => {
     const res = await apiProvider.login(data);
+    if (!res) {
+      throw new Error(`Unable to connect server`);
+    }
     if (res.status === 200) {
       // const userData = { ...res.data.userData, currentLoginType };
       const { accessToken, sessionId, userData } = res.data;
@@ -30,13 +33,13 @@ export const useFirebaseAuth = () => {
         Object({ userId: signInResult.user.uid, session: { id: sessionId }, isLoggingIn: true }),
       );
     } else {
-      throw new Error("Incorrect Email or password");
+      throw new Error(res?.data?.error);
     }
   };
   const clearAuth = async () => {
     resetStore(true); //clear local auth
-    await signOut(auth);
     navigate("/login", { replace: true });
+    await signOut(auth);
     resetStore();
   };
   const logout = async () => {
