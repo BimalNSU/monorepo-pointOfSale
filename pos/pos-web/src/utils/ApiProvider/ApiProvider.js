@@ -36,15 +36,17 @@ const axiosDelete = (url, headers = {}) =>
 //   post(`/users/`, data, { authorization: `Bearer ${recaptchaToken}` });
 
 const login = (data) => post("/auth/login/", data);
+
 const changePassword = (token, sessionId, currentPassword, newPassword) =>
-  post(
+  put(
     `users/change-password`,
     { currentPassword, newPassword },
     { authorization: token, session_id: sessionId },
   );
 const updateUser = (userId, data, token, sessionId) =>
-  put(`/users/${userId}`, data, { authorization: token, session_id: sessionId });
+  patch(`/users/${userId}`, data, { authorization: token, session_id: sessionId });
 
+//#region: admin endpoints
 const updateUserStatus = (userId, data, token, sessionId) =>
   patch(`/users/${userId}/status`, data, { authorization: token, session_id: sessionId });
 
@@ -53,6 +55,9 @@ const addUserByAdmin = async (data, accessToken, sessionId) =>
     authorization: `Bearer ${accessToken}`,
     session_id: sessionId,
   });
+const updateUserByAdmin = (userId, data, token, sessionId) =>
+  put(`/admin/users/${userId}`, data, { authorization: token, session_id: sessionId });
+//#endregion
 
 // const addProperty = async (data, token) => post(`/properties/`, data, { authorization: token });
 // const updateProperty = async (id, data, token) =>
@@ -71,6 +76,7 @@ export const apiProvider = {
   // register,
   updateUser,
   addUserByAdmin,
+  updateUserByAdmin,
   updateUserStatus,
   changePassword,
   updateSession,
