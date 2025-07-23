@@ -1,10 +1,10 @@
-import { COLLECTIONS } from "@pos/shared-models";
+import { COLLECTIONS, ShopId, ShopRole } from "@pos/shared-models";
 import { UserId, WithId, User as UserModel } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import {
+  FieldValue,
   Firestore,
   WriteBatch,
-  collection,
   doc,
   getDoc,
   serverTimestamp,
@@ -12,7 +12,10 @@ import {
 const userConverter = firestoreConverter<WithId<UserModel>>();
 type omitKeys = "createdAt" | "createdBy" | "updatedAt" | "updatedBy";
 
-type EditData = Omit<UserModel, omitKeys>;
+type EditData = Omit<UserModel, omitKeys | "shopIds" | "shopRoles"> & {
+  shopIds?: ShopId[] | FieldValue;
+  shopRoles?: Record<ShopId, ShopRole> | FieldValue;
+};
 export class User {
   db: Firestore;
   constructor(db: Firestore) {
@@ -33,9 +36,9 @@ export class User {
   async getListByIds(userIds: UserId[]) {
     return await Promise.all<WithId<UserModel>>(userIds.map(async (id) => await this.get(id)));
   }
-  edit(batch: WriteBatch, id: UserId, data: EditData, updatedBy: UserId) {
+  edit(batch: WriteBatch, id: UserId, data: Partial<EditData>, updatedBy: UserId) {
     const now = serverTimestamp();
-    const docRef = doc(this.db, id).withConverter(userConverter);
+    const docRef = doc(this.db, COLLECTIONS.users, id).withConverter(userConverter);
     batch.set(
       docRef,
       {

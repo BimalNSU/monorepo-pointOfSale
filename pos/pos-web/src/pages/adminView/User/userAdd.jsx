@@ -22,11 +22,16 @@ const UserAdd = () => {
         form.resetFields();
         setResponseMessage("success");
       } else {
+        form.setFields(
+          Object.entries(res.data.errors).map(([field, errors]) => ({
+            name: field,
+            errors,
+          })),
+        );
         setResponseMessage("error");
       }
     } catch (err) {
-      console.log(err);
-      setResponseMessage("error");
+      setResponseMessage(err.message ?? "error");
     }
   };
   return (

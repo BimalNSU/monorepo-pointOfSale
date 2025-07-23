@@ -26,8 +26,7 @@ import { SHOP_ROLE, USER_ROLE } from "./constants/role";
 import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
 import GLReport from "./pages/common/gl_report/generalLedgerReport";
-import UserEdit from "./pages/adminView/User/userEdit";
-import Shops from "./pages/adminView/shop/shops";
+import UserDetails from "./pages/adminView/User/userDetails";
 
 const App = () => {
   useFirebaseAuthListener(); //Called once to sync with auth
@@ -81,20 +80,8 @@ const App = () => {
               >
                 <Route index element={<Users />} />
                 <Route path="add" element={<UserAdd />} />
-                <Route path=":id" element={<UserEdit />} />
-              </Route>
-
-              <Route
-                path="shops"
-                element={
-                  <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
-                    <Outlet />
-                  </RequireRole>
-                }
-              >
-                <Route index element={<Shops />} />
-                {/* <Route path="add" element={<UserAdd />} />
-                <Route path=":id" element={<UserEdit />} /> */}
+                {/* <Route path=":id" element={<UserEdit />} /> */}
+                <Route path=":id" element={<UserDetails />} />
               </Route>
 
               <Route

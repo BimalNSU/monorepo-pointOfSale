@@ -20,7 +20,10 @@ const getFileExtension = (fileName) => {
   return matchedResult[1];
 };
 const uploadFileToFirebase = async (storage, folderPath, file) => {
-  const fileToUpload = file.originFileObj;
+  const fileToUpload = file.originFileObj || file; // 👈 fallback
+  if (!fileToUpload) {
+    throw new Error("No file to upload");
+  }
   const fileName = fileToUpload.name;
   const randomFileName = randomAlphanumeric(fileNameLength);
   const fileExtension = getFileExtension(file.name);
@@ -35,54 +38,54 @@ const uploadFileToFirebase = async (storage, folderPath, file) => {
   };
   const uploadTask = uploadBytesResumable(newRef, fileToUpload, metadata);
   await uploadTask.then();
-  success(`${fileName} is uploaded`);
+  // success(`${fileName} is uploaded`);
   return newRef.fullPath;
 };
 
 const uploadUserProfile = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.profile}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserBrithCertificate = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.birthCertificate}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.birthCertificates}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserNid = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.nid}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.nid}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserPassport = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.passport}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.passport}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserTin = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.tin}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.tin}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserBin_vat = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.bin_vat}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.bin_vat}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserTradeLicense = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.tradeLicense}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.tradeLicense}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };
 
 const uploadUserOthers = async (storage, userId, file) => {
-  const folderPath = `${FOLDERS.others}/${userId}`;
+  const folderPath = `${FOLDERS.users}/${userId}/${FOLDERS.others}`;
   const pathRef = await uploadFileToFirebase(storage, folderPath, file);
   return pathRef;
 };

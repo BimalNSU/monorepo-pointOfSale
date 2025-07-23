@@ -1,5 +1,7 @@
 export const FOLDERS = {
-  profile: "profile",
+  users: "users",
+  profiles: "profiles",
+  birthCertificates: "birthCertificates",
   products: "products",
   // tin: "tin",
   // bin_vat: "bin_vat",

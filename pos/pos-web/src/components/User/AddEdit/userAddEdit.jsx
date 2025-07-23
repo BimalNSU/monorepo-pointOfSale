@@ -27,7 +27,7 @@ const bloodGroupsData = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 // import FileUpload from "../../FIleUpload/FileUpload";
 import ImageUploadWithPreview from "../../FIleUpload/ImageUploadWithPreview";
 import { DOB_dateFormat } from "@/constants/dateFormat";
-import { RELIGION_TYPE } from "@/constants/religion";
+import { MARITAL_TYPE, RELIGION_TYPE } from "@/constants/common";
 import { ROLE, USER_ROLE } from "@/constants/role";
 
 const { Option } = Select;
@@ -279,11 +279,11 @@ const UserAddEdit = ({ onSubmit, userData, children, authRole }) => {
             <Select
               style={{ width: 120 }}
               // onChange={handleChange}
-              options={Object.values(RELIGION_TYPE.KEYS).map((r) => ({
-                value: r.type,
-                label: r.text,
+              options={Object.entries(RELIGION_TYPE.KEYS).map(([key, text]) => ({
+                value: key,
+                label: text,
               }))}
-            ></Select>
+            />
           </Form.Item>
         </Col>
         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
@@ -300,12 +300,11 @@ const UserAddEdit = ({ onSubmit, userData, children, authRole }) => {
             <Select
               style={{ width: 120 }}
               // onChange={handleChange}
-            >
-              <Option value="unmarried">Unmarried</Option>
-              <Option value="married">Married</Option>
-              <Option value="divorced">Divorced</Option>
-              <Option value="other">Other</Option>
-            </Select>
+              options={Object.entries(MARITAL_TYPE.KEYS).map(([key, text]) => ({
+                value: key,
+                label: text,
+              }))}
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -342,14 +341,6 @@ const UserAddEdit = ({ onSubmit, userData, children, authRole }) => {
           </Form.Item>
         </Col>
       </Row>
-      {userData?.rawPassword ? (
-        <Space direction="horizontal">
-          <Text>Raw Password:</Text>{" "}
-          <Text type="danger" strong>
-            {userData.rawPassword}
-          </Text>
-        </Space>
-      ) : null}
       <Row gutter={16} justify="center" align="middle">
         {/* <Space>{children}</Space> */}
         <Col>
