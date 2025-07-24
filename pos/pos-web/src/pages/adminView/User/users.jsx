@@ -7,7 +7,7 @@ import UserService from "@/service/user.service";
 import { useFirestore } from "reactfire";
 import { useMemo } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-
+import styles from "../../../posButton.module.css";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -235,7 +235,7 @@ const Users = () => {
         // width: 300,
         // margin: "10px",
         body: {
-          paddingTop: 0,
+          paddingTop: 2,
           paddingBottom: 16,
         },
       }}
@@ -250,7 +250,9 @@ const Users = () => {
                 textDecoration: "none",
               }}
             >
-              <Button icon={<PlusOutlined />} />
+              <Button className={styles.posBtn} icon={<PlusOutlined />}>
+                Add User
+              </Button>
             </Link>
           </Row>
         )}
