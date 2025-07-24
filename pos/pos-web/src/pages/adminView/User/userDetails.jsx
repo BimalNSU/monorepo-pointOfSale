@@ -87,7 +87,7 @@ const UserDetails = () => {
     <div style={{ marginLeft: 5 }}>
       <Title level={4}>User Details</Title>
       <Row gutter={[11, 8]}>
-        <Col span={8}>
+        <Col xs={32} sm={24} md={24} lg={8} xl={8}>
           <Card
             styles={{
               // width: 300,
@@ -124,7 +124,7 @@ const UserDetails = () => {
             <UserPassword userId={userId} />
           </Card>
         </Col>
-        <Col span={16}>
+        <Col xs={32} sm={24} md={24} lg={16} xl={16}>
           <CustomCard
             title={
               <>
