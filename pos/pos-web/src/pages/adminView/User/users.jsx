@@ -1,8 +1,26 @@
-import { Button, Card, Dropdown, Modal, Row, Space, Table, Tag, Typography } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Modal,
+  Row,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
 import { useUsers } from "@/api/useUsers";
 import { USER_ROLE } from "@/constants/role";
 import { Link } from "react-router-dom";
-import { DeleteOutlined, DownOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  DownOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import UserService from "@/service/user.service";
 import { useFirestore } from "reactfire";
 import { useMemo } from "react";
@@ -19,15 +37,6 @@ const Users = () => {
   const { status, data } = useUsers();
   const users = useMemo(() => data?.map((u) => ({ ...u, key: u.id })) ?? [], [data]);
 
-  const handleDeleteUser = (e, record) => {
-    e.preventDefault();
-    confirm({
-      title: `Are you sure to delete the user?`,
-      async onOk() {
-        await userService.delete(record.id, userId);
-      },
-    });
-  };
   const handleRoleStatus = async (e, record) => {
     const verb = record.isActive ? "de-activate" : "activate";
     confirm({
@@ -106,38 +115,61 @@ const Users = () => {
       dataIndex: "mobileIndex",
       key: "mobileIndex",
       render: (_, record) => (
-        <div>
-          <Link
-            to={{ pathname: `/users/${record.id}` }}
-            style={{
-              color: "black",
-              textDecoration: "none",
-            }}
-          >
-            <Text strong>Date:</Text> {record.createdAt}
-            <br />
-            <Text strong>#:</Text> {record.id}
-            <br />
-            <Text strong>Name:</Text>{" "}
-            {`${record.firstName}${record.lastName ? ` ${record.lastName}` : ""}`}
-            <br />
-            <Text strong>Mobile:</Text> {record.mobile}
-            <br />
-            <Text strong>Role:</Text> {USER_ROLE.KEYS[record.role]}
-            <br />
-            <Text strong>Status:</Text> {record.isActive ? "Active" : "Inactive"}
-          </Link>
-          <div>
-            <Text strong>Action:</Text>{" "}
-            <span>
-              <DeleteOutlined
-                onClick={(e) => {
-                  handleDeleteUser(e, record);
-                }}
-              />
-            </span>
+        <Card
+          size="small"
+          style={{
+            marginBottom: 16,
+            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            borderRadius: 8,
+            body: {
+              padding: 12,
+            },
+          }}
+        >
+          <Row align="middle" justify="space-between">
+            <Col>
+              <Space>
+                <Avatar icon={<UserOutlined />} />
+                <div>
+                  <div style={{ fontWeight: 500 }}>
+                    {record.firstName} {record.lastName}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#888" }}>
+                    #{record.id} · {record.createdAt}
+                  </div>
+                </div>
+              </Space>
+            </Col>
+            {record.id !== userId && (
+              <Col>
+                <Dropdown menu={{ items: renderActionItems(record) }} trigger={["click"]}>
+                  <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
+                </Dropdown>
+              </Col>
+            )}
+          </Row>
+
+          <div style={{ marginTop: 12 }}>
+            <Text strong>Mobile:</Text>
+            <a href={`tel:${record.mobile}`} style={{ color: "#1677ff" }}>
+              {record.mobile}
+            </a>
           </div>
-        </div>
+
+          <div style={{ fontSize: 12, color: "#888", margin: "4px 0" }}>
+            <Text strong>Date:</Text> {record.createdAt}
+          </div>
+
+          <Row justify="space-between" style={{ marginTop: 8 }}>
+            <Col>
+              <Text strong>Role:</Text> {USER_ROLE.KEYS[record.role]}
+            </Col>
+            <Col>
+              <Text strong>Status:</Text>{" "}
+              {record.isActive ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}
+            </Col>
+          </Row>
+        </Card>
       ),
       responsive: ["xs"],
     },
@@ -225,6 +257,7 @@ const Users = () => {
             </div>
           </Space>
         ),
+      responsive: ["md", "lg", "xl", "xxl"],
     },
   ];
   return (
