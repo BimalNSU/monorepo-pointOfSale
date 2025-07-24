@@ -121,12 +121,10 @@ const Users = () => {
             marginBottom: 16,
             boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             borderRadius: 8,
-            body: {
-              padding: 12,
-            },
+            body: { padding: 12 },
           }}
         >
-          <Row align="middle" justify="space-between">
+          <Row justify="space-between" align="top">
             <Col>
               <Space>
                 <Avatar icon={<UserOutlined />} />
@@ -149,15 +147,11 @@ const Users = () => {
             )}
           </Row>
 
-          <div style={{ marginTop: 12 }}>
+          <div style={{ marginTop: 10 }}>
             <Text strong>Mobile:</Text>
             <a href={`tel:${record.mobile}`} style={{ color: "#1677ff" }}>
               {record.mobile}
             </a>
-          </div>
-
-          <div style={{ fontSize: 12, color: "#888", margin: "4px 0" }}>
-            <Text strong>Date:</Text> {record.createdAt}
           </div>
 
           <Row justify="space-between" style={{ marginTop: 8 }}>
@@ -165,7 +159,7 @@ const Users = () => {
               <Text strong>Role:</Text> {USER_ROLE.KEYS[record.role]}
             </Col>
             <Col>
-              <Text strong>Status:</Text>{" "}
+              <Text strong>Status:</Text>
               {record.isActive ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}
             </Col>
           </Row>
