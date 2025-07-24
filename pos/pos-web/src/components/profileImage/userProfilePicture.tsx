@@ -1,4 +1,4 @@
-import { Upload, Avatar, Button, message, Spin } from "antd";
+import { Upload, Avatar, Button, message, Spin, Skeleton } from "antd";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useCustomStorageDownloadUrl } from "@/api/useCustomStorageDownloadUrl";
@@ -6,7 +6,7 @@ import { UserId } from "@pos/shared-models";
 interface Props {
   storagePath?: string;
   userId: UserId;
-  onSubmit: Function;
+  onSubmit: (file: File) => Promise<void>;
 }
 
 const UserProfilePicture: React.FC<Props> = ({ storagePath, onSubmit }) => {
@@ -33,16 +33,28 @@ const UserProfilePicture: React.FC<Props> = ({ storagePath, onSubmit }) => {
   return (
     <div style={{ textAlign: "center" }}>
       <Spin spinning={loading}>
-        <Avatar
-          shape="square"
-          size={128}
-          icon={<UserOutlined />}
-          src={data?.url ?? undefined}
-          style={{ marginBottom: 16 }}
-        />
-        <Upload beforeUpload={handleUpload} showUploadList={false} accept="image/*">
-          <Button icon={<UploadOutlined />}>{data?.url ? "Change Photo" : "Upload Photo"}</Button>
-        </Upload>
+        {status === "loading" ? (
+          <>
+            <Skeleton.Avatar active size={128} shape="square" style={{ marginBottom: 16 }} />
+            <br />
+            <Skeleton.Button active size="default" style={{ width: 140 }} />
+          </>
+        ) : (
+          <>
+            <Avatar
+              shape="square"
+              size={128}
+              icon={<UserOutlined />}
+              src={data?.url ?? undefined}
+              style={{ marginBottom: 16 }}
+            />
+            <Upload beforeUpload={handleUpload} showUploadList={false} accept="image/*">
+              <Button icon={<UploadOutlined />}>
+                {data?.url ? "Change Photo" : "Upload Photo"}
+              </Button>
+            </Upload>
+          </>
+        )}
       </Spin>
     </div>
   );
