@@ -1,4 +1,4 @@
-import { Upload, Avatar, Button, message, Spin, Skeleton } from "antd";
+import { Upload, Avatar, Button, message, Spin, Skeleton, Row, Col } from "antd";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { useCustomStorageDownloadUrl } from "@/api/useCustomStorageDownloadUrl";
@@ -40,20 +40,28 @@ const UserProfilePicture: React.FC<Props> = ({ storagePath, onSubmit }) => {
             <Skeleton.Button active size="default" style={{ width: 140 }} />
           </>
         ) : (
-          <>
-            <Avatar
-              shape="square"
-              size={128}
-              icon={<UserOutlined />}
-              src={data?.url ?? undefined}
-              style={{ marginBottom: 16 }}
-            />
-            <Upload beforeUpload={handleUpload} showUploadList={false} accept="image/*">
-              <Button icon={<UploadOutlined />}>
-                {data?.url ? "Change Photo" : "Upload Photo"}
-              </Button>
-            </Upload>
-          </>
+          <Row
+            justify="center"
+            gutter={[16, 16]}
+            style={{ textAlign: "center", flexDirection: "column" }}
+          >
+            <Col>
+              <Avatar
+                shape="square"
+                size={128}
+                icon={<UserOutlined />}
+                src={data?.url ?? undefined}
+                style={{ marginBottom: 8 }}
+              />
+            </Col>
+            <Col>
+              <Upload beforeUpload={handleUpload} showUploadList={false} accept="image/*">
+                <Button icon={<UploadOutlined />}>
+                  {data?.url ? "Change Photo" : "Upload Photo"}
+                </Button>
+              </Upload>
+            </Col>
+          </Row>
         )}
       </Spin>
     </div>
