@@ -6,6 +6,7 @@ import { DOB_dateFormat } from "@/constants/dateFormat";
 import { MARITAL_TYPE, RELIGION_TYPE } from "@/constants/common";
 import { useEffect } from "react";
 import dayjs from "dayjs";
+import styles from "../../../..//posButton.module.css";
 const { Title } = Typography;
 const bloodGroupsData = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
@@ -282,7 +283,7 @@ const UserForm = ({ mode, userData, onSubmit, onCancel }) => {
           </Col>
           <Col>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button className={styles.posBtn} htmlType="submit">
                 {mode === "edit" ? "Update" : "Create"}
               </Button>
             </Form.Item>
