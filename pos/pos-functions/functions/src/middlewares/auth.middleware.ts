@@ -37,7 +37,8 @@ export class AuthMiddleware {
           : await userObj.findOneBy(fieldName, loginWith);
       if (!userData) {
         // when userId or mobile or email don't match
-        return res.status(401).json({ error: "Authentication failed!" });
+        console.warn(`Login attempt failed: user ${loginWith} not found`);
+        return res.status(401).json({ error: "Invalid login credentials." });
       }
       if (!userData.isActive) {
         return res
@@ -51,7 +52,10 @@ export class AuthMiddleware {
       );
       if (!isValidPassword) {
         // when password doesn't match
-        return res.status(401).json({ error: "Authentication failed!" });
+        console.warn(
+          `Login attempt failed: password mismatch for user ${loginWith}`
+        );
+        return res.status(401).json({ error: "Invalid login credentials." });
       }
 
       try {
