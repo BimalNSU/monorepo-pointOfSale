@@ -1,0 +1,16 @@
+
+/* :global(.ant-card-body) part is required 
+  because because Ant Design injects global styles(e.g. .ant-card-body),
+  not CSS module-scoped
+*/
+.mobileCardBody :global(.ant-card-body) {
+  padding-top: 2px;
+  padding-bottom: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+
+  @media (max-width: 768px) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

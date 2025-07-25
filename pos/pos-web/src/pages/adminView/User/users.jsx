@@ -28,6 +28,7 @@ import { useFirestore } from "reactfire";
 import { useMemo } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import styles from "../../../posButton.module.css";
+import customAntdStyles from "../../../customAntd.module.css";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -123,10 +124,16 @@ const Users = () => {
         <Card
           size="small"
           style={{
-            marginBottom: 16,
+            // marginBottom: 16,
             boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             borderRadius: 8,
-            body: { padding: 12 },
+          }}
+          styles={{
+            body: {
+              marginLeft: 8,
+              marginRight: 8,
+              marginTop: 8,
+            },
           }}
           hoverable
           onClick={() => navigate(`/users/${record.id}`)}
@@ -272,18 +279,7 @@ const Users = () => {
     },
   ];
   return (
-    <Card
-      title="User List"
-      bordered={false}
-      styles={{
-        // width: 300,
-        // margin: "10px",
-        body: {
-          paddingTop: 2,
-          paddingBottom: 16,
-        },
-      }}
-    >
+    <Card title="User List" bordered={false} className={customAntdStyles.mobileCardBody}>
       <Table
         title={() => (
           <Row gutter={[16, 1]} justify="end">
