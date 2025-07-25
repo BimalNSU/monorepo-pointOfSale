@@ -4,6 +4,7 @@ import {
   Card,
   Col,
   Dropdown,
+  message,
   Modal,
   Row,
   Space,
@@ -20,6 +21,7 @@ import {
   PlusOutlined,
   MoreOutlined,
   UserOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import UserService from "@/service/user.service";
 import { useFirestore } from "reactfire";
@@ -38,37 +40,51 @@ const Users = () => {
   const { status, data } = useUsers();
   const users = useMemo(() => data?.map((u) => ({ ...u, key: u.id })) ?? [], [data]);
 
-  const handleRoleStatus = async (e, record) => {
-    const verb = record.isActive ? "de-activate" : "activate";
+  const handleUpdateStatus = async (targetUserId, userStatus) => {
+    let verb;
+    let processStatus;
+    if (userStatus.isActive != undefined) {
+      verb = userStatus.isActive ? "activate" : "de-activate";
+      processStatus = { isActive: userStatus.isActive };
+    } else {
+      verb = userStatus.isDeleted && "remove";
+      processStatus = { isDeleted: true };
+    }
     confirm({
-      title: `Are you sure to ${verb} user role?`,
+      title: `Are you sure you want to ${verb} this user?`,
+      ...(userStatus.isActive != undefined &&
+        !userStatus.isActive && {
+          icon: <ExclamationCircleOutlined />,
+          content:
+            "This will immediately terminate all sessions for this user, logging them out from all devices.",
+        }),
       async onOk() {
         try {
           const idToken = await getToken();
-          await userService.updateStatus(
-            record.id,
-            { isActive: !record.isActive },
+          const res = await userService.updateStatus(
+            targetUserId,
+            processStatus,
             idToken,
             session.id,
           );
-        } catch (error) {
-          // TODO: to be implemented
+          if (res.status === 200) {
+            message.success(
+              userStatus.isDeleted ? "User is removed successfully" : "Status updated successfully",
+            );
+          } else {
+            throw new Error(`Fail to update`);
+          }
+        } catch (err) {
+          message.error(err.message);
         }
       },
     });
   };
+  const handleRoleStatus = async (e, record) => {
+    await handleUpdateStatus(record.id, { isActive: !record.isActive });
+  };
   const handleRemoveUser = async (e, record) => {
-    confirm({
-      title: `Are you sure to remove user?`,
-      async onOk() {
-        try {
-          const idToken = await getToken();
-          await userService.updateStatus(record.id, { isDeleted: true }, idToken, session.id);
-        } catch (error) {
-          // TODO: to be implemented
-        }
-      },
-    });
+    await handleUpdateStatus(record.id, { isDeleted: true });
   };
   const renderValueCell = (text, record) => (
     <Link
@@ -85,11 +101,7 @@ const Users = () => {
     {
       key: "1",
       label: (
-        <a
-          onClick={(e) => {
-            handleRoleStatus(e, record);
-          }}
-        >
+        <a onClick={(e) => handleRoleStatus(e, record)}>
           {record.isActive ? "De-activate" : "Activate"}
         </a>
       ),
@@ -98,15 +110,7 @@ const Users = () => {
     },
     {
       key: "2",
-      label: (
-        <a
-          onClick={(e) => {
-            handleRemoveUser(e, record);
-          }}
-        >
-          {"Delete"}
-        </a>
-      ),
+      label: <a onClick={(e) => handleRemoveUser(e, record)}>{"Delete"}</a>,
       icon: <DeleteOutlined />,
       danger: true,
     },
