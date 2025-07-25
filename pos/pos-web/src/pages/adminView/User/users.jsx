@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { useUsers } from "@/api/useUsers";
 import { USER_ROLE } from "@/constants/role";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DeleteOutlined,
   DownOutlined,
@@ -30,6 +30,7 @@ const { Text } = Typography;
 const { confirm } = Modal;
 
 const Users = () => {
+  const navigate = useNavigate();
   const { userId } = useFirebaseAuth();
   const db = useFirestore();
   const userService = new UserService(db);
@@ -123,6 +124,8 @@ const Users = () => {
             borderRadius: 8,
             body: { padding: 12 },
           }}
+          hoverable
+          onClick={() => navigate(`/users/${record.id}`)}
         >
           <Row justify="space-between" align="top">
             <Col>
@@ -140,9 +143,19 @@ const Users = () => {
             </Col>
             {record.id !== userId && (
               <Col>
-                <Dropdown menu={{ items: renderActionItems(record) }} trigger={["click"]}>
-                  <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
-                </Dropdown>
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    padding: 8,
+                    marginRight: -8,
+                    marginTop: -8,
+                    borderRadius: 4,
+                  }}
+                >
+                  <Dropdown menu={{ items: renderActionItems(record) }} trigger={["click"]}>
+                    <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
+                  </Dropdown>
+                </div>
               </Col>
             )}
           </Row>
