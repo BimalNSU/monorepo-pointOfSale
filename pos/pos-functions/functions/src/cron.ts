@@ -302,7 +302,7 @@ const initiateOpeningBalances = async () => {
 //   await Promise.all(propertyPromises);
 // };
 
-export const processOpeningBalances = regionalFunctions.pubsub
+export const openingBalanceInitiator = regionalFunctions.pubsub
   .schedule("1 0 * * *") // Everyday at 00:01
   .timeZone("Asia/Dhaka")
   .onRun(async () => {
