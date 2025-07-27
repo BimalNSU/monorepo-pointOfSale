@@ -12,6 +12,10 @@ import { regionalFunctions } from "./utils/functions";
 import dayjs from "dayjs";
 import { AccountBalance } from "./db-collections/accountBalance.collection";
 import { ChartOfAccount } from "./db-collections/chartOfAccount.collection";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
 type Amount = number;
 
 const initiateOpeningBalances = async () => {
