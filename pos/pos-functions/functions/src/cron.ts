@@ -19,10 +19,11 @@ dayjs.extend(timezone);
 type Amount = number;
 
 const initiateOpeningBalances = async () => {
+  const documentFormat = "YYYY-MM-DD";
   const now = dayjs().tz("Asia/Dhaka");
-  const newAccountBalanceId = now.format("YYYY-MM-DD");
+  const newAccountBalanceId = now.format(documentFormat);
   const yesterday = now.subtract(1, "day");
-  const currentBalanceId = yesterday.format("YYY-MM-DD");
+  const currentBalanceId = yesterday.format(documentFormat);
   const start = yesterday.startOf("day").toDate();
   const end = yesterday.endOf("day").toDate();
   const queryInTransactions = db
