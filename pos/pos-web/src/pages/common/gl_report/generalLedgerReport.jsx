@@ -1,6 +1,6 @@
 import { useGLReport } from "@/api/useGLReport";
 import { NatureType } from "@pos/shared-models";
-import { Button, Card, Spin } from "antd";
+import { Button, Card, Empty, Spin } from "antd";
 import dayjs from "dayjs";
 import React, { useMemo, useState } from "react";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
@@ -110,7 +110,7 @@ const GLReport = () => {
           {status === "loading" || !data?.length ? (
             <tr>
               <td colSpan={9} style={{ textAlign: "center", padding: "40px 0", height: "120px" }}>
-                {status === "loading" ? <Spin /> : "No data"}
+                {status === "loading" ? <Spin /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
               </td>
             </tr>
           ) : (
@@ -119,7 +119,7 @@ const GLReport = () => {
                 {/* Main account summary row */}
                 <tr style={tr}>
                   <td colSpan={3} style={td}>
-                    {account.name}
+                    {account.path}
                   </td>
                   <td colSpan={2} style={td}>
                     {"Opening Balance"}
@@ -134,9 +134,11 @@ const GLReport = () => {
                   </td>
                   <td style={td}>{/* Empty cell */}</td>
                   <td style={td}>
-                    <Button onClick={() => toggleRow(account.id)} type="text">
-                      {expandedIds.includes(account.id) ? <DownOutlined /> : <RightOutlined />}
-                    </Button>
+                    {account.transactions.length ? (
+                      <Button onClick={() => toggleRow(account.id)} type="text">
+                        {expandedIds.includes(account.id) ? <DownOutlined /> : <RightOutlined />}
+                      </Button>
+                    ) : null}
                   </td>
                 </tr>
                 {/* Transactions - directly as sibling rows */}

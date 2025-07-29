@@ -1,5 +1,4 @@
 import {
-  AccountTypeHead,
   ChartOfAccountId,
   COLLECTIONS,
   FetchStatus,
@@ -16,7 +15,6 @@ import { collection, doc, documentId, orderBy, query, Timestamp, where } from "f
 import { useFirestore, useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useMemo, useState } from "react";
-import { ChartOfAccount } from "@/db-collections/chartOfAccount.collection";
 import { DATE_FORMAT } from "@/constants/dateFormat";
 import ChartOfAccountService from "@/service/chartOfAccount.service";
 const balanceFirestoreConverter = firestoreConverter<WithId<AccountBalance>>();
@@ -63,10 +61,18 @@ export const useGLReport = (queries: { start: Dayjs; end: Dayjs }) => {
   const groupByTransactions = (
     data: WithId<Transaction>[],
     accountBalance: WithId<AccountBalance>,
-  ) => {
+  ): Array<
+    Pick<ChartOfAccountModel, "name" | "normalBalance"> & {
+      id: ChartOfAccountId;
+      path: string;
+      balance: { opening: number; closing: number };
+      transactions: WithId<AccountTransactions>[];
+    }
+  > => {
     const coaIdsMap: Record<
       ChartOfAccountId,
       Pick<ChartOfAccountModel, "name" | "normalBalance"> & {
+        path: string;
         balance: { opening: number; closing: number };
         transactions: WithId<AccountTransactions>[];
       }
@@ -75,15 +81,16 @@ export const useGLReport = (queries: { start: Dayjs; end: Dayjs }) => {
       t.heads.forEach((h) => {
         const coa = chartOfAccountsMap[h.coaId];
         const coaTransactions = coaIdsMap[h.coaId] ?? {
-          //   ...[AccountTypeHead.ASSET, AccountTypeHead.EXPENSE].includes(coa.accountTypeHead),
           normalBalance: coa.normalBalance,
           name: coa.name,
+          path: coa.path,
           balance: {
             opening: accountBalance?.accounts.find((a) => a.id === h.coaId)?.amount ?? 0,
             closing: 0,
           },
-          transactions: [],
+          transactions: new Array<WithId<AccountTransactions>>(),
         };
+        //cumulating all transaction's amount for closing_balance of each chartOfAccount
         coaTransactions.balance.closing +=
           coa.normalBalance === NatureType.debit
             ? h.nature === NatureType.debit
@@ -117,13 +124,15 @@ export const useGLReport = (queries: { start: Dayjs; end: Dayjs }) => {
         accountBalance?.accounts.map((act) => {
           const coa = chartOfAccountsMap[act.id];
           return {
+            id: act.id,
             normalBalance: coa.normalBalance,
             name: coa.name,
+            path: coa.path || "",
             balance: {
               opening: act.amount,
               closing: 0,
             },
-            transactions: [],
+            transactions: new Array<WithId<AccountTransactions>>(),
           };
         }) ?? []
       );
