@@ -51,52 +51,55 @@ const initiateOpeningBalances = async () => {
   const fetchedChartOfAccounts = await chartOfAccountObj.getByIds(coaIds);
 
   // 3. Build map
-  const charOfAccountsMap: Record<
+  const chartOfAccountsMap: Record<
     ChartOfAccountId,
     Pick<ChartOfAccountModel, "normalBalance"> & { amount: Amount }
-  > = fetchedChartOfAccounts.reduce(
-    (pre, curr) => ({
-      ...pre,
-      [curr.id]: { normalBalance: curr.normalBalance, amount: 0 },
-    }),
-    {}
-  );
+  > = fetchedChartOfAccounts.reduce((pre, curr) => {
+    pre[curr.id] = { normalBalance: curr.normalBalance, amount: 0 };
+    return pre;
+  }, Object());
 
   const accountBalance = new AccountBalance();
-  const currentBalances = await accountBalance.get(currentBalanceId);
+  const previousDayBalances = await accountBalance.get(currentBalanceId);
 
-  //4. loading last accountBalance to charOfAccountsMap
-  const newBalanceMap: Record<ChartOfAccountId, Amount> =
-    currentBalances?.accounts.reduce(
-      (pre, curr) => ({ ...pre, [curr.id]: curr.amount }),
-      Object()
-    );
+  //4. loading last accountBalance
+  const previousBalanceMap: Record<ChartOfAccountId, Amount> =
+    previousDayBalances?.accounts.reduce((pre, curr) => {
+      pre[curr.id] = curr.amount;
+      return pre;
+    }, Object()) ?? Object.create(null);
 
-  // 5. Sum transaction heads to charOfAccountsMap
-  transactions.forEach(async (t) =>
+  // 5. Sum transaction heads to chartOfAccountsMap
+  transactions.forEach((t) =>
     t.heads.map((head) => {
       const newAmount =
-        charOfAccountsMap[head.coaId].normalBalance === NatureType.debit
+        chartOfAccountsMap[head.coaId].normalBalance === NatureType.debit
           ? head.nature === NatureType.debit
             ? head.amount
             : -head.amount
           : head.nature === NatureType.credit
           ? head.amount
           : -head.amount;
-      charOfAccountsMap[head.coaId].amount += newAmount;
+      chartOfAccountsMap[head.coaId].amount += newAmount;
     })
   );
+  const newBalanceMap: Record<ChartOfAccountId, Amount> = Object.create(null);
+  //add new amounts from transactions to newBalanceMap
+  Object.entries(chartOfAccountsMap).forEach(([coaId, value]) => {
+    newBalanceMap[coaId] = (previousBalanceMap[coaId] ?? 0) + value.amount;
+  });
+  //append miss-matched oldBalance to newBalanceMap
+  Object.entries(previousBalanceMap).forEach(([coaId, amount]) => {
+    newBalanceMap[coaId] = newBalanceMap[coaId] ?? amount;
+  });
   const batch = db.batch();
-  accountBalance.set(
-    batch,
-    {
-      accounts: Object.entries(charOfAccountsMap).map(([coaId, value]) => ({
-        id: coaId,
-        amount: (newBalanceMap[coaId] ?? 0) + value.amount,
-      })),
-    },
-    newAccountBalanceId
-  );
+  const newAccountBalanceDoc = {
+    accounts: Object.entries(newBalanceMap).map(([coaId, value]) => ({
+      id: coaId,
+      amount: value,
+    })),
+  };
+  accountBalance.set(batch, newAccountBalanceDoc, newAccountBalanceId);
   await batch.commit();
 };
 
