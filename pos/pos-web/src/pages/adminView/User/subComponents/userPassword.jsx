@@ -44,8 +44,14 @@ const UserPassword = ({ userId }) => {
       {!isEditing ? (
         <Button onClick={() => setIsEditing(true)}> Change Password</Button>
       ) : (
-        <Form form={form} onFinish={onFinish} layout="vertical">
-          <Row gutter={[10, 8]}>
+        <Form
+          form={form}
+          onFinish={onFinish}
+          layout="horizontal"
+          labelCol={{ xs: { span: 10 }, sm: { span: 6 } }}
+          wrapperCol={{ xs: { span: 14 }, sm: { span: 18 } }}
+        >
+          <Row gutter={[10, 0]}>
             <Col xs={24} sm={24} md={24} lg={12} xl={12}>
               <Form.Item
                 name="password"
