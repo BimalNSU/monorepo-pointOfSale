@@ -44,7 +44,19 @@ export class User {
     }
   }
   async getByIds(ids: UserId[]) {
-    return await Promise.all(ids.map(async (id) => await this.get(id)));
+    const docRefs = ids.map((id) => this.collectionRef.doc(id));
+    const snapshots = await db.getAll(...docRefs);
+    return snapshots
+      .map((snapshot) => {
+        if (snapshot.exists) {
+          const rawData = snapshot.data();
+          if (rawData) {
+            return { ...rawData, id: snapshot.id } as WithId<UserModel>;
+          }
+        }
+        return null;
+      })
+      .filter((user) => user != undefined);
   }
   async findOneBy(fieldName: "mobile" | "email", fieldValue: string) {
     const snapshot = await this.collectionRef
