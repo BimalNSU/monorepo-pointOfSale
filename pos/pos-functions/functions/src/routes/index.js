@@ -43,11 +43,6 @@ router.put(
   AuthMiddleware.isAuthenticated,
   AuthMiddleware.updateSession
 );
-router.delete(
-  "/sessions",
-  AuthMiddleware.isAuthenticated,
-  AuthMiddleware.removeSession
-);
 //NOTE: only for test purpose. It will call automatically from bkash merchant portal during payment
 router.post("/bkash/webhook", BkashMiddleware.handleWebhook);
 router.post(

@@ -167,17 +167,4 @@ export class AuthMiddleware {
         .json({ error: "Internal server error. Please try again later." });
     }
   }
-  static async removeSession(req: Request, res: Response, next: NextFunction) {
-    const { session } = res.locals as CustomAuth;
-    try {
-      await new AuthService().deleteSession(session.id);
-      return res
-        .status(200)
-        .json({ message: "Session is removed successfully." });
-    } catch (e) {
-      return res
-        .status(500)
-        .json({ error: "Internal server error. Please try again later." });
-    }
-  }
 }
