@@ -68,8 +68,6 @@ const updateUserByAdmin = (userId, data, token, sessionId) =>
 
 const updateSession = async (id, data, token) =>
   put(`/sessions`, data, { authorization: token, session_id: id });
-const removeSession = async (id, token) =>
-  axiosDelete(`/sessions`, { authorization: token, session_id: id });
 
 export const apiProvider = {
   login,
@@ -80,7 +78,6 @@ export const apiProvider = {
   updateUserStatus,
   changePassword,
   updateSession,
-  removeSession,
   // addProperty,
   // updateProperty,
   // deleteProperty,

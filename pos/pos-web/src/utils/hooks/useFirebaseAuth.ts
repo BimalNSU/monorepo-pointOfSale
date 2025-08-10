@@ -1,11 +1,15 @@
 import { getAuth, signInWithCustomToken, signOut } from "firebase/auth";
 import useAuthStore from "@/stores/auth.store";
 import { apiProvider } from "../ApiProvider/ApiProvider";
-import { Session, User, WithId } from "@pos/shared-models";
+import { Session as SessionModel, User, WithId } from "@pos/shared-models";
 import { useNavigate } from "react-router-dom";
+import { Session } from "@/db-collections/session.collections";
+import { useFirestore } from "reactfire";
 
 export const useFirebaseAuth = () => {
   const auth = getAuth();
+  const db = useFirestore();
+  const sessionObj = new Session(db);
   const navigate = useNavigate();
   const {
     userId,
@@ -43,38 +47,32 @@ export const useFirebaseAuth = () => {
     resetStore();
   };
   const logout = async () => {
-    try {
-      const token = await user?.getIdToken();
-      if (token) {
-        const tempAuthStore = {
-          userId,
-          firstName,
-          lastName,
-          shopRoles: { ...shopRoles },
-          session: { ...session },
-          user,
-        };
+    if (session) {
+      const tempAuthStore = {
+        userId,
+        firstName,
+        lastName,
+        shopRoles: { ...shopRoles },
+        session,
+        user,
+      };
+      try {
         resetStore(true);
-        const res = await apiProvider.removeSession(tempAuthStore.session?.id, token);
-        if (res?.status === 200) {
-          //Note: following lines must be in order
-          navigate("/login", { replace: true });
-          await signOut(auth);
-
-          resetStore();
-        } else {
-          updateStore({ ...Object(tempAuthStore) }); //restore previous auth data
-          throw new Error(res?.statusText);
-        }
+        //Note: following lines must be in order
+        await sessionObj.delete(session.id);
+        navigate("/login", { replace: true });
+        await signOut(auth);
+        resetStore();
+      } catch (e) {
+        updateStore({ ...Object(tempAuthStore) }); //restore previous auth data
+        console.log(e);
       }
-    } catch (e) {
-      console.log(e);
     }
   };
   const getToken = async () => {
     return user ? user.getIdToken() : null;
   };
-  const updateAuth = async (dbUser: User, dbSession: WithId<Session>) => {
+  const updateAuth = async (dbUser: User, dbSession: WithId<SessionModel>) => {
     if (!dbUser || !dbSession) {
       return await clearAuth();
     }
@@ -82,7 +80,7 @@ export const useFirebaseAuth = () => {
     //check update for user
     const newUpdates: Partial<
       Pick<User, "firstName" | "lastName" | "shopRoles"> & {
-        session: WithId<Pick<Session, "role" | "shopId" | "shopRole">>;
+        session: WithId<Pick<SessionModel, "role" | "shopId" | "shopRole">>;
         isLoggingIn?: boolean;
       }
     > = {};
@@ -119,7 +117,7 @@ export const useFirebaseAuth = () => {
 
     /*# region update of session data */
 
-    const newSessionUpdates: WithId<Pick<Session, "role" | "shopId" | "shopRole">> = Object();
+    const newSessionUpdates: WithId<Pick<SessionModel, "role" | "shopId" | "shopRole">> = Object();
     if (session?.role !== dbSession.role) {
       newSessionUpdates.role = dbSession.role;
     }
