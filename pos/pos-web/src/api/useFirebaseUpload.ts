@@ -3,6 +3,7 @@ import { message } from "antd";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { useState } from "react";
 import { useStorage } from "reactfire";
+import { getFileExtension } from "./common/commonFunctions";
 type UploadFile = {
   file: File;
   folderPath: string;
@@ -25,7 +26,9 @@ const useFirebaseUpload = () => {
     setUploading(true);
     setProgress(0);
     try {
-      const storagePath = `${folderPath}/${file.name}`;
+      const fileId = generateAlphanumeric(10);
+      const fileExtension = getFileExtension(file.name);
+      const storagePath = `${folderPath}/${fileId}.${fileExtension}`;
       const storageRef = ref(storage, storagePath);
       const uploadTask = uploadBytesResumable(storageRef, file);
       uploadTask.on(
@@ -45,7 +48,6 @@ const useFirebaseUpload = () => {
             metadata: {
               size: file.size,
               contentType: file.type,
-              fileId: generateAlphanumeric(10),
               ...metadata,
             },
           };
