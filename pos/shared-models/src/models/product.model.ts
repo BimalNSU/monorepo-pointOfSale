@@ -7,7 +7,6 @@ export interface ProductImageType {
   order: number;
   // altText: "Back view of premium cotton t-shirt";
   metadata: {
-    fileId: string;
     size: number; //225891
     width: number; //1200
     height: number; //1600
