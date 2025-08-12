@@ -3,9 +3,11 @@ import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import ProductAddEdit from "@/components/Product/ProductAddEdit";
-import { Button, Card, Result, Row, Spin, Tag } from "antd";
+import { Button, Card, Result, Row, Tag } from "antd";
 import { useProduct } from "@/api/useProduct";
 import ProductService from "@/service/product.service";
+import Loading from "@/components/loading";
+import ProductImageManager from "./subComponent/productImage";
 
 const ProductEdit = () => {
   const { userId } = useFirebaseAuth();
@@ -27,11 +29,7 @@ const ProductEdit = () => {
     }
   };
   if (status === "loading") {
-    return (
-      <div className={`spin`}>
-        <Spin size="large" />
-      </div>
-    );
+    return <Loading />;
   }
   if (status === "error") {
     return (
@@ -67,6 +65,7 @@ const ProductEdit = () => {
         </Row>
       ) : null}
       <ProductAddEdit data={data} onSubmit={handleSubmit} />
+      <ProductImageManager product={data} />
     </Card>
   );
 };

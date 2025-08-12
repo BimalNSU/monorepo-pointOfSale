@@ -1,10 +1,18 @@
-import { Product as ProductModel, ProductId, ShopId, UserId, WithId } from "@pos/shared-models";
+import {
+  Product as ProductModel,
+  ProductId,
+  ShopId,
+  UserId,
+  WithId,
+  ProductImageType,
+} from "@pos/shared-models";
 import { Firestore, writeBatch } from "firebase/firestore";
 import { Product } from "@/db-collections/product.collection";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import CustomAuthService from "./customAuth.service";
 import { ShopRole, UserRole } from "@pos/shared-models";
+import { deleteObject, StorageReference } from "firebase/storage";
 type omitKeys =
   | "qty"
   | "createdAt"
@@ -17,6 +25,7 @@ type omitKeys =
 
 type Data = WithId<Omit<ProductModel, omitKeys> & { qty?: number }>;
 type PartialAuthData = { userId: UserId; role: UserRole; shopId?: ShopId; shopRole: ShopRole };
+type DeletedMedia = Omit<ProductImageType, "createdAt">;
 class ProductService {
   db: Firestore;
   constructor(db: Firestore) {
@@ -34,14 +43,13 @@ class ProductService {
       productObj.add(
         batch,
         {
-          // category: {},
           id: data.id,
           name: data.name,
           description: data.description ?? null,
           qty: data.qty ?? 0,
           purchaseRate: data.purchaseRate ?? null,
           salesRate: data.salesRate,
-          imagesFiles: null,
+          media: { images: null },
         },
         partialAuth.userId,
       );
@@ -69,6 +77,62 @@ class ProductService {
         },
         updatedBy,
       );
+      await batch.commit();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async editMedia(
+    id: ProductId,
+    targetImage: ProductImageType,
+    dbImages: ProductImageType[],
+    updatedBy: UserId,
+  ) {
+    try {
+      const productObj = new Product(this.db);
+      const editedMedia = [...dbImages];
+      const indexMatched = editedMedia.findIndex((dbImage) => dbImage.path === targetImage.path);
+      if (indexMatched > -1) {
+        editedMedia[indexMatched] = targetImage;
+      } else {
+        editedMedia.push(targetImage);
+      }
+      const batch = writeBatch(this.db);
+      productObj.edit(
+        batch,
+        id,
+        {
+          media: { images: editedMedia },
+        },
+        updatedBy,
+      );
+      await batch.commit();
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async deleteMedia(
+    id: ProductId,
+    imageRef: StorageReference,
+    deletedMedia: DeletedMedia,
+    dbImages: ProductImageType[],
+    updatedBy: UserId,
+  ) {
+    try {
+      const batch = writeBatch(this.db);
+      const productObj = new Product(this.db);
+      await deleteObject(imageRef); //remove image from firebase-storage
+
+      const mutatedImages = dbImages.reduce((pre, curr) => {
+        if (curr.path !== deletedMedia.path) {
+          pre.push({ ...curr });
+        }
+        return pre;
+      }, new Array<ProductImageType>());
+      if (deletedMedia.isPrimary && mutatedImages.length > 0) {
+        mutatedImages[0].isPrimary = true;
+      }
+      productObj.edit(batch, id, { media: { images: mutatedImages } }, updatedBy);
       await batch.commit();
     } catch (err) {
       console.log(err);
