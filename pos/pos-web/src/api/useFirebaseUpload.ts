@@ -4,11 +4,16 @@ import { ref, uploadBytesResumable } from "firebase/storage";
 import { useState } from "react";
 import { useStorage } from "reactfire";
 import { getFileExtension } from "./common/commonFunctions";
+type SuccessData = {
+  path: string;
+  filename: string;
+  metadata: { size: number; contentType: string };
+};
 type UploadFile = {
   file: File;
   folderPath: string;
   metadata: object;
-  onSuccess?: Function;
+  onSuccess?: (data: SuccessData) => Promise<void>;
   onError?: Function;
 };
 const useFirebaseUpload = () => {
