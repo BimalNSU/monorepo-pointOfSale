@@ -1,18 +1,19 @@
 import { BaseModel, CategoryId } from "./common.model";
 
+export interface MetadataType {
+  size: number; //225891
+  width: number; //1200
+  height: number; //1600
+  contentType: string; // "image/jpeg"
+  createdAt: Date;
+}
 export interface ProductImageType {
   path: string; //auto generate
   filename: string;
   isPrimary: boolean; //default false
   order: number;
   // altText: "Back view of premium cotton t-shirt";
-  metadata: {
-    size: number; //225891
-    width: number; //1200
-    height: number; //1600
-    contentType: "image/jpeg";
-    createdAt: Date;
-  };
+  metadata: MetadataType;
 }
 export interface Product extends BaseModel {
   name: string;
