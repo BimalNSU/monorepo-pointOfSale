@@ -47,9 +47,10 @@ class ProductService {
           name: data.name,
           description: data.description ?? null,
           qty: data.qty ?? 0,
+          unit: data.unit,
           purchaseRate: data.purchaseRate ?? null,
           salesRate: data.salesRate,
-          media: { images: null },
+          media: { images: data.media.images, videos: [] },
         },
         partialAuth.userId,
       );
@@ -74,6 +75,7 @@ class ProductService {
           qty: data.qty ?? 0,
           purchaseRate: data.purchaseRate ?? null,
           salesRate: data.salesRate,
+          unit: data.unit,
         },
         updatedBy,
       );
