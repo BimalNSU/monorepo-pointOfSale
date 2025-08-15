@@ -14,7 +14,7 @@ type UploadFile = {
   file: File;
   folderPath: string;
   metadata?: object;
-  onSuccess?: (data: SuccessData) => Promise<void> | void;
+  onSuccess?: (data: SuccessData) => void;
   onError?: (error: unknown) => void;
 };
 
@@ -47,7 +47,6 @@ export default function useFirebaseMultiUpload() {
     // Upload a single file
     const runUpload = async (fileObj: UploadFile) => {
       const { file, folderPath, metadata = {}, onSuccess, onError } = fileObj;
-
       return new Promise<void>((resolve) => {
         const fileId = generateAlphanumeric(10);
         const fileExtension = getFileExtension(file.name);
@@ -63,7 +62,9 @@ export default function useFirebaseMultiUpload() {
             const delta = snapshot.bytesTransferred - prevTransferred;
             prevTransferred = snapshot.bytesTransferred;
             uploadedBytes += delta;
-            setProgress((uploadedBytes / totalBytes) * 100);
+
+            // use functional update for immediate UI refresh
+            setProgress(() => Math.round((uploadedBytes / totalBytes) * 100));
           },
           (error) => {
             onError?.(error);
@@ -80,10 +81,8 @@ export default function useFirebaseMultiUpload() {
             if (file.type.startsWith("image/")) {
               const img = new Image();
               img.src = URL.createObjectURL(file);
-
               await new Promise<void>((resolveImg) => {
                 img.onload = () => {
-                  // Add width and height to metadata
                   fileData.metadata = {
                     ...fileData.metadata,
                     width: img.width,
@@ -92,7 +91,7 @@ export default function useFirebaseMultiUpload() {
                   resolveImg();
                 };
                 img.onerror = () => {
-                  console.warn("Failed to get image dimensions for", file.name);
+                  // console.warn("Failed to get image dimensions for", file.name);
                   resolveImg(); // still resolve so upload continues
                 };
               });
@@ -102,15 +101,15 @@ export default function useFirebaseMultiUpload() {
             }
 
             results.push(fileData);
-            setUploadedCount((count) => count + 1);
-            await onSuccess?.(fileData);
+            setUploadedCount((prev) => prev + 1);
+            onSuccess?.(fileData);
             resolve();
           },
         );
       });
     };
 
-    // Proper queue for concurrency
+    // Concurrency queue
     const queue: UploadFile[] = [...files];
     const workers: Promise<void>[] = [];
 
@@ -128,10 +127,11 @@ export default function useFirebaseMultiUpload() {
     }
 
     await Promise.all(workers);
-
-    setUploading(false);
-    setProgress(100);
     await onAllSuccess?.(results);
+    setUploading(false);
+    // setProgress(0);
+    // setUploadedCount(0);
+    // setTotalCount(0);
   };
 
   return { uploadFiles, progress, uploading, uploadedCount, totalCount };
