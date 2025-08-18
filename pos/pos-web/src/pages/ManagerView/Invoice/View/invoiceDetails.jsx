@@ -84,7 +84,7 @@ const InvoiceDetails = () => {
                   </td>
                   <td>{":"}</td>
                   <td style={{ textAlign: "right" }}>
-                    {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.discount ?? 0, 0))}
+                    {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.discount || 0, 0))}
                   </td>
                 </tr>
                 <tr>
