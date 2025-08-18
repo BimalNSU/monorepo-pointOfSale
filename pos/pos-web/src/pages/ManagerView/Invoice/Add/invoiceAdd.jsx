@@ -1,18 +1,28 @@
 import { useState } from "react";
-import { Input, Button, Row, Col, Form, Typography, Card, Space, Spin, Modal } from "antd";
+import {
+  Input,
+  Button,
+  Row,
+  Col,
+  Form,
+  Typography,
+  Card,
+  Spin,
+  Modal,
+  Divider,
+  InputNumber,
+} from "antd";
 import * as validator from "@/utils/Validation/Validation";
 import InvoiceItemTable from "./invoice-item-table";
-import InvoiceTotalDiscount from "./invoice-totalDiscount";
 import { useFirestore } from "reactfire";
 import InvoiceService from "@/service/invoice.service";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { error, success } from "@/utils/Utils/Utils";
 import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
-import dayjs from "dayjs";
-import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 import useAuthStore from "@/stores/auth.store";
 import ProductSearchBox from "@/components/Product/productSearchBox";
+import { convertToBD } from "@/constants/currency";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
@@ -29,6 +39,12 @@ const InvoiceAdd = () => {
   const [salesForm] = Form.useForm();
   const [totalDiscount, setTotalDiscount] = useState();
   const [isRequiredTooltip, setIsRequiredTooltip] = useState();
+
+  const resetSalesForm = () => {
+    setDataSource([]);
+    setTotalDiscount();
+    salesForm.resetFields();
+  };
 
   const onFinishInvoice = async (values) => {
     confirm({
@@ -51,10 +67,7 @@ const InvoiceAdd = () => {
             userId,
           );
 
-          //reset
-          setDataSource([]);
-          setTotalDiscount();
-          salesForm.resetFields();
+          resetSalesForm();
           success("New invoice is created successfully");
 
           setNewInvoice(nInvoice); //temporary store data for print
@@ -116,30 +129,19 @@ const InvoiceAdd = () => {
     }
   };
 
-  //reset each individual discount in table
-  const onResetTableDiscount = () => {
-    setIsRequiredTooltip(true);
-    //reset each individuals' discount's fields in table
-    const nDataSource = dataSource.map((row) => {
-      const { discount, ...rest } = row;
-      return rest;
-    });
-    setDataSource(nDataSource);
-  };
-
-  const handleAfterPrint = () => {
-    setNewInvoice();
-  };
-  const demoPrint = async () => {
-    const nInvoice = await invoiceService.get("20241225002");
-    setNewInvoice(nInvoice); //temporary store data for printing
-  };
+  // const handleAfterPrint = () => {
+  //   setNewInvoice();
+  // };
+  // const demoPrint = async () => {
+  //   const nInvoice = await invoiceService.get("20241225002");
+  //   setNewInvoice(nInvoice); //temporary store data for printing
+  // };
   return (
     <div>
-      <Button onClick={demoPrint}>Demo print</Button>
+      {/* <Button onClick={demoPrint}>Demo print</Button>
       {newInvoice ? (
         <PrintReceipt directPrint={true} onAfterPrint={handleAfterPrint} invoice={newInvoice} />
-      ) : null}
+      ) : null} */}
       <Row justify="center">
         <Title level={4}>
           Sales{" "}
@@ -168,37 +170,109 @@ const InvoiceAdd = () => {
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>
             <Card title="Summary & Payment">
-              <Space direction="vertical">
-                <Text>
-                  Subtotal:{" "}
-                  {dataSource.reduce((pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0), 0)}
-                </Text>
-                <InvoiceTotalDiscount
-                  totalDiscount={totalDiscount}
-                  setTotalDiscount={setTotalDiscount}
-                  onPromptYes={onResetTableDiscount}
-                  isRequiredTooltip={isRequiredTooltip}
-                />
-                <Text>
-                  Total:{" "}
-                  {dataSource.reduce(
-                    (pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0),
-                    -(totalDiscount ?? 0),
-                  )}
-                </Text>
-              </Space>
-              <Row gutter={[16, 1]} justify="end">
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  alignItems: "center",
+                  rowGap: 16,
+                  padding: "0 16px", // Added inner padding
+                }}
+              >
+                {/* Subtotal */}
+                <Text strong>Total Bill:</Text>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                  <Text style={{ textAlign: "right", minWidth: 60 }}>
+                    {convertToBD(
+                      dataSource.reduce((pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0), 0),
+                    )}
+                  </Text>
+                  <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
+                </div>
+                {/* Total Discount - Display Only */}
+                <Text strong>Total Discount:</Text>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                  <Text style={{ textAlign: "right", minWidth: 60 }}> {totalDiscount ?? 0}</Text>
+                  <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
+                </div>
+                {/* Special Discount - Input Field */}
+                <Text strong>Special Discount:</Text>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Form.Item name="specialDiscount" style={{ margin: 0 }}>
+                    <InputNumber
+                      disabled={!dataSource || !dataSource?.length}
+                      min={0}
+                      controls={false}
+                      style={{
+                        width: "100%",
+                        textAlign: "right",
+                        maxWidth: 150,
+                      }}
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    />
+                  </Form.Item>
+                  <Text style={{ width: 30, textAlign: "left", paddingLeft: 4 }}>TK.</Text>
+                </div>
+                <Divider style={{ gridColumn: "1 / -1", margin: "12px 0" }} /> {/* Total */}
+                <Title level={4} style={{ margin: 0 }}>
+                  Total:
+                </Title>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <Form.Item noStyle shouldUpdate dependencies={["specialDiscount"]}>
+                    {() => {
+                      const specialDiscount = salesForm.getFieldValue("specialDiscount");
+                      const total = dataSource.reduce(
+                        (pre, curr) =>
+                          pre + (curr.qty ?? 0) * (curr.rate ?? 0) - (curr.discount ?? 0),
+                        specialDiscount ? -specialDiscount : 0,
+                      );
+                      return (
+                        <Title level={4} style={{ margin: 0, minWidth: 60, textAlign: "right" }}>
+                          <span>{convertToBD(total)}</span>
+                        </Title>
+                      );
+                    }}
+                  </Form.Item>
+
+                  <Text style={{ paddingLeft: "2px", width: 30, textAlign: "left" }}>TK.</Text>
+                </div>
+              </div>
+
+              <Row
+                gutter={[16, 16]} // Increased vertical gutter
+                justify="center"
+                style={{
+                  marginTop: 24, // Increased top margin
+                  padding: "0 16px", // Match inner padding
+                  marginBottom: 8, // Added bottom margin
+                }}
+              >
                 <Col>
-                  {/* <Form.Item> */}
                   <Button
-                    // style={{ background: "#27ae60" }}
+                    type="default" // Changed to default for cancel button
+                    htmlType="button"
+                    disabled={!dataSource || !dataSource?.length}
+                    style={{ minWidth: 80 }} // Consistent button width
+                    onClick={resetSalesForm}
+                  >
+                    Cancel
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
                     type="primary"
                     htmlType="submit"
                     disabled={!dataSource || !dataSource?.length}
+                    style={{ minWidth: 80 }} // Consistent button width
                   >
                     Save
                   </Button>
-                  {/* </Form.Item> */}
                 </Col>
               </Row>
             </Card>
