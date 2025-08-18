@@ -20,10 +20,6 @@ const InvoiceItemTableView = ({ data }) => {
       dataIndex: "name",
     },
     {
-      title: "Description",
-      dataIndex: "description",
-    },
-    {
       title: "Qty",
       dataIndex: "qty",
     },
@@ -65,7 +61,6 @@ const InvoiceItemTableView = ({ data }) => {
             <Summary.Cell index={1}></Summary.Cell>
             <Summary.Cell index={2}></Summary.Cell>
             <Summary.Cell index={3}></Summary.Cell>
-            <Summary.Cell index={4}></Summary.Cell>
             <Summary.Cell index={5} align="right">
               <Text strong>Total</Text>
               {/* <b>Total</b> */}

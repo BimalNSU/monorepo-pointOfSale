@@ -15,7 +15,7 @@ type omitKeys =
   | "deletedAt"
   | "deletedBy";
 
-type Data = WithId<Pick<InvoiceModel, "discount" | "subject" | "items">>;
+type Data = WithId<Pick<InvoiceModel, "specialDiscount" | "subject" | "items">>;
 
 class InvoiceService extends Invoice {
   db: Firestore;
@@ -29,8 +29,8 @@ class InvoiceService extends Invoice {
       return { ...rest, discount: discount ?? null };
     });
     const totalAmount = items.reduce(
-      (pre, curr) => pre + curr.qty * curr.rate,
-      -(data.discount ?? 0),
+      (pre, curr) => pre + curr.qty * curr.rate - (curr.discount ?? 0),
+      data.specialDiscount ? -data.specialDiscount : 0,
     );
     const batch = writeBatch(this.db);
     const nInvoice = this.add(
@@ -38,7 +38,7 @@ class InvoiceService extends Invoice {
       {
         status: INVOICE_STATUS.VALUES.Paid,
         totalAmount,
-        discount: data.discount ?? null,
+        specialDiscount: data.specialDiscount ?? null,
         subject: data.subject ?? null,
         items,
         targetUserId: null,

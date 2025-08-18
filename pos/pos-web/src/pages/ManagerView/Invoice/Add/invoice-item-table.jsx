@@ -31,10 +31,6 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
       dataIndex: "name",
     },
     {
-      title: "Description",
-      dataIndex: "description",
-    },
-    {
       title: "Qty",
       dataIndex: "qty",
       render: (_, record) => (
@@ -83,7 +79,7 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
       ),
     },
     {
-      title: "Total",
+      title: "Amount",
       align: "right",
       render: (_, record) => (
         <Text strong>
@@ -131,7 +127,6 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
             <Summary.Cell index={1}></Summary.Cell>
             <Summary.Cell index={2}></Summary.Cell>
             <Summary.Cell index={3}></Summary.Cell>
-            <Summary.Cell index={4}></Summary.Cell>
             <Summary.Cell index={5} align="right">
               <Text strong>Total</Text>
               {/* <b>Total</b> */}

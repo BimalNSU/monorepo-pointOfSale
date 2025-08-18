@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Button } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
@@ -33,7 +33,10 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
       handlePrint();
     }
   }, [directPrint]);
-
+  const totalDiscount = useMemo(
+    () => invoice.items.reduce((pre, curr) => pre + curr.discount ?? 0, 0),
+    [invoice],
+  );
   return (
     <div>
       {!directPrint ? (
@@ -75,14 +78,17 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
           </tbody>
         </table>
         <div className={styles.totals}>
-          {invoice.discount ? (
+          {totalDiscount || invoice.specialDiscount ? (
             <div>
               <p>
                 <strong>Subtotal:</strong>{" "}
                 {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0))}
               </p>
               <p>
-                <strong>Discount:</strong> {convertToBD(invoice.discount)}
+                <strong>Discount:</strong> {convertToBD(totalDiscount)}
+              </p>
+              <p>
+                <strong>Special Discount:</strong> {convertToBD(invoice.specialDiscount)}
               </p>
             </div>
           ) : null}

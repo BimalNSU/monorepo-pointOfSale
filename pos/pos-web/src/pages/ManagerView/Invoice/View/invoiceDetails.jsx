@@ -1,11 +1,12 @@
 import { useInvoice } from "@/api/useInvoice";
-import { Button, Card, Col, Result, Row, Spin, Typography } from "antd";
+import { Button, Card, Col, Result, Row, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceItemTableView from "./invoiceItemTableView";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 import { convertToBD } from "@/constants/currency";
 import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
+import Loading from "@/components/loading";
 
 const { Title, Text } = Typography;
 
@@ -14,11 +15,7 @@ const InvoiceDetails = () => {
   const { id } = useParams();
   const { status, data: invoice } = useInvoice(id);
   if (status === "loading") {
-    return (
-      <div style={{ position: "relative", minHeight: 200, padding: 20, border: "1px solid #ddd" }}>
-        <Spin />
-      </div>
-    );
+    return <Loading />;
   }
   if (status === "error") {
     return (
@@ -72,7 +69,7 @@ const InvoiceDetails = () => {
               <tbody>
                 <tr>
                   <td>
-                    <Text strong>Subtotal</Text>
+                    <Text strong>Total Bill</Text>
                   </td>
                   <td>{":"}</td>
                   <td style={{ textAlign: "right" }}>
@@ -87,7 +84,16 @@ const InvoiceDetails = () => {
                   </td>
                   <td>{":"}</td>
                   <td style={{ textAlign: "right" }}>
-                    {invoice.discount && convertToBD(invoice.discount)}
+                    {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.discount ?? 0, 0))}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Text strong>Special Discount</Text>
+                  </td>
+                  <td>{":"}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {invoice.specialDiscount && convertToBD(invoice.specialDiscount)}
                   </td>
                 </tr>
                 <tr>
