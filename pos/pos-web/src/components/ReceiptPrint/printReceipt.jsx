@@ -34,7 +34,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
     }
   }, [directPrint]);
   const totalDiscount = useMemo(
-    () => invoice.items.reduce((pre, curr) => pre + curr.discount ?? 0, 0),
+    () => invoice.items.reduce((pre, curr) => pre + curr.discount || 0, 0),
     [invoice],
   );
   return (
@@ -85,7 +85,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
                 {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0))}
               </p>
               <p>
-                <strong>Discount:</strong> {convertToBD(totalDiscount)}
+                <strong>Item Discounts:</strong> {convertToBD(totalDiscount)}
               </p>
               <p>
                 <strong>Special Discount:</strong> {convertToBD(invoice.specialDiscount)}

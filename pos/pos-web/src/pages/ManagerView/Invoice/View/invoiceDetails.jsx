@@ -80,7 +80,7 @@ const InvoiceDetails = () => {
                 </tr>
                 <tr>
                   <td>
-                    <Text strong>Total Discount</Text>
+                    <Text strong>Item Discounts</Text>
                   </td>
                   <td>{":"}</td>
                   <td style={{ textAlign: "right" }}>
