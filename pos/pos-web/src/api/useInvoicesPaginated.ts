@@ -75,6 +75,9 @@ export const useInvoicesPaginated = (pageSize: number = 10) => {
           return {
             ...rest,
             createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
+            totalDiscount:
+              (rest.specialDiscount || 0) +
+              rest.items.reduce((pre, curr) => pre + (curr.discount || 0), 0),
             id: inv.id,
             key: inv.id,
           };

@@ -84,8 +84,8 @@ const Invoices = () => {
                 <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
               </Col>
               <Col span={12}>
-                <Text strong>Discount:</Text>{" "}
-                {record.discount ? convertToBD(record.discount) : record.discount}
+                <Text strong>Discount:</Text>
+                {record.totalDiscount ? convertToBD(record.totalDiscount) : record.totalDiscount}
               </Col>
             </Row>
           </Link>
@@ -137,7 +137,7 @@ const Invoices = () => {
     },
     {
       title: "Discount",
-      dataIndex: "discount",
+      dataIndex: "totalDiscount",
       align: "right",
       render: (text, record) => (text ? renderValueCell(convertToBD(text), record) : text),
       responsive: ["md", "lg", "xl", "xxl"],

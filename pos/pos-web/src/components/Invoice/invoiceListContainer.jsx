@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFirestore } from "reactfire";
 
-import { Button, Select, Row, Typography, Col, Table, Space, Modal, Tag, Card } from "antd";
+import { Button, Select, Row, Typography, Col, Table, Space, Modal, Tag } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 // import { removeInvoice, removeInvoices } from "@/api/manager/invoiceFunctions";
@@ -60,7 +60,7 @@ const InvoiceListContainer = ({ status, data: invoices }) => {
             <Text strong>Date:</Text> {record.createdAt}
             <br />
             <Text strong>Discount:</Text>{" "}
-            {record.discount ? convertToBD(record.discount) : record.discount}
+            {record.totalDiscount ? convertToBD(record.totalDiscount) : record.totalDiscount}
             <br />
             <Text strong>Amount:</Text> {convertToBD(record.totalAmount)}
             <br />
@@ -105,7 +105,7 @@ const InvoiceListContainer = ({ status, data: invoices }) => {
     },
     {
       title: "Discount",
-      dataIndex: "discount",
+      dataIndex: "totalDiscount",
       align: "right",
       render: (text, record) => (text ? renderValueCell(convertToBD(text), record) : text),
       responsive: ["md", "lg", "xl", "xxl"],

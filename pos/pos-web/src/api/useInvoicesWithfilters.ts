@@ -28,6 +28,9 @@ export const useInvoicesWithFilters = (dateRange?: { fromDate: Dayjs; toDate: Da
         const { createdAt, ...rest } = inv;
         return {
           ...rest,
+          totalDiscount:
+            (inv.specialDiscount || 0) +
+            inv.items.reduce((pre, curr) => pre + (curr.discount || 0), 0),
           createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
           key: inv.id,
         };
