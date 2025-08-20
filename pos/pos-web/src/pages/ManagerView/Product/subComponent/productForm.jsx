@@ -31,7 +31,7 @@ const ProductForm = ({ data, newProductFormat, form }) => {
   }, [data]);
 
   return (
-    <Row gutter={[16, 16]}>
+    <Row gutter={[16, 1]}>
       {/* Section 1: Basic Information */}
       <Col xs={24} sm={12}>
         <Form.Item label="Product ID" style={{ marginBottom: 16 }}>
