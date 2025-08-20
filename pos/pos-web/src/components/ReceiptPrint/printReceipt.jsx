@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from "react";
+import React, { useRef, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Button } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
@@ -22,9 +22,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
       }
     `,
     documentTitle: invoice.id,
-    onAfterPrint: () => {
-      onAfterPrint();
-    },
+    onAfterPrint: () => onAfterPrint && onAfterPrint(),
   });
 
   // Automatically trigger printing if directPrint is true
@@ -33,10 +31,6 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
       handlePrint();
     }
   }, [directPrint]);
-  const totalDiscount = useMemo(
-    () => invoice.items.reduce((pre, curr) => pre + curr.discount || 0, 0),
-    [invoice],
-  );
   return (
     <div>
       {!directPrint ? (
@@ -62,40 +56,109 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Name</th>
               <th>Qty</th>
+              <th>Description</th>
               <th>Amount</th>
             </tr>
           </thead>
           <tbody>
-            {invoice.items.map((item, index) => (
-              <tr key={index}>
-                <td>{item.name}</td>
-                <td>{item.qty}</td>
-                <td>{convertToBD(item.qty * item.rate)}</td>
-              </tr>
+            {invoice.items.map((item) => (
+              <React.Fragment key={item.productId}>
+                <tr>
+                  <td>{item.qty}</td>
+                  <td colSpan={2}>{item.name}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td style={{ textAlign: "right" }}>
+                    {`${item.qty} x ${item.rate}`}
+                    {item.discount ? ` - ${item.discount}` : ""}
+                    {" = "}
+                  </td>
+                  <td>{convertToBD(item.qty * item.rate - (item.discount || 0))}</td>
+                </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
-        <div className={styles.totals}>
-          {totalDiscount || invoice.specialDiscount ? (
-            <div>
-              <p>
-                <strong>Subtotal:</strong>{" "}
-                {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0))}
-              </p>
-              <p>
-                <strong>Item Discounts:</strong> {convertToBD(totalDiscount)}
-              </p>
-              <p>
-                <strong>Special Discount:</strong> {convertToBD(invoice.specialDiscount)}
-              </p>
-            </div>
-          ) : null}
-          <p>
-            <strong>Total:</strong> {convertToBD(invoice.totalAmount)}
-          </p>
-        </div>
+        <hr />
+        <table className={styles.summary}>
+          <tbody>
+            {invoice.specialDiscount ? (
+              <React.Fragment key={"specialDiscount"}>
+                <tr>
+                  <td>Subtotal:</td>
+                  <td>
+                    {convertToBD(
+                      invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0),
+                    )}
+                  </td>
+                </tr>
+                {/* <tr>
+                      <td>TAX (8.5%):</td>
+                      <td>20.40</td>
+                    </tr> */}
+                {/* <tr>
+                          <td colSpan="2">-----</td>
+                        </tr> */}
+                {/* <tr>
+                      <td>TOTAL BEFORE DISC:</td>
+                      <td>260.36</td>
+                    </tr> */}
+                <tr>
+                  <td>Special Disc.:</td>
+                  <td>-{invoice.specialDiscount}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <div className={styles.divider} />
+                  </td>
+                </tr>
+
+                {/* <tr>
+              <td>CASH:</td>
+              <td>250.00</td>
+            </tr>
+            <tr>
+              <td>CHANGE:</td>
+              <td>9.64</td>
+            </tr> */}
+              </React.Fragment>
+            ) : null}
+            <tr>
+              <td>Invoice Total:</td>
+              <td>{convertToBD(invoice.totalAmount)}</td>
+            </tr>
+            <tr>
+              <td colSpan={2}>
+                <div className={styles.divider} />
+              </td>
+            </tr>
+            <tr>
+              <td>Payment Methods</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Cash:</td>
+              <td>{convertToBD(invoice.totalAmount)}</td>
+            </tr>
+            {/* <tr>
+              <td>Bank:</td>
+              <td>{convertToBD(100)}</td>
+            </tr> */}
+            <tr>
+              <td></td>
+              <td>
+                <div className={styles.divider} />
+              </td>
+            </tr>
+            <tr>
+              <td>Total Payment:</td>
+              <td>{invoice.totalAmount}</td>
+            </tr>
+          </tbody>
+        </table>
         <hr />
         <div className={styles.note}>
           <p style={{ fontSize: "10px" }}>Thank you for your purchase!</p>
