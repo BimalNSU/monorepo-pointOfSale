@@ -56,32 +56,28 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Qty</th>
               <th>Description</th>
               <th>Amount</th>
             </tr>
           </thead>
           <tbody>
             {invoice.items.map((item) => (
-              <React.Fragment key={item.productId}>
-                <tr>
-                  <td>{item.qty}</td>
-                  <td colSpan={2}>{item.name}</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td style={{ textAlign: "right" }}>
-                    {`${item.qty} x ${item.rate}`}
-                    {item.discount ? ` - ${item.discount}` : ""}
-                    {" = "}
-                  </td>
-                  <td>{convertToBD(item.qty * item.rate - (item.discount || 0))}</td>
-                </tr>
-              </React.Fragment>
+              <tr key={item.productId}>
+                <td className={styles.description}>
+                  <div className={styles.productName}>{item.name}</div>
+                  <div className={styles.equation}>
+                    {`${item.qty} x ${convertToBD(item.rate)}${
+                      item.discount ? ` - ${convertToBD(item.discount)}` : ""
+                    } = `}
+                  </div>
+                </td>
+                <td className={styles.amount}>
+                  {convertToBD(item.qty * item.rate - (item.discount || 0))}
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
-        <hr />
         <table className={styles.summary}>
           <tbody>
             {invoice.specialDiscount ? (
