@@ -1,5 +1,5 @@
 import { FieldValue } from "firebase/firestore";
-import { ProductId, UserId } from "./common.model";
+import { ChartOfAccountId, ProductId, UserId } from "./common.model";
 
 export enum InvoiceStatus {
   Draft = 0,
@@ -38,4 +38,6 @@ export interface Invoice {
 
   // NEW
   targetUserId: UserId | null;
+  paymentAccountIds: ChartOfAccountId[];
+  payments: Record<ChartOfAccountId, number>;
 }
