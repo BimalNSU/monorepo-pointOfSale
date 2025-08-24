@@ -1,17 +1,5 @@
 import { useState } from "react";
-import {
-  Input,
-  Button,
-  Row,
-  Col,
-  Form,
-  Typography,
-  Card,
-  Spin,
-  Modal,
-  Divider,
-  InputNumber,
-} from "antd";
+import { Input, Row, Col, Form, Typography, Card, Spin, Modal, Divider, InputNumber } from "antd";
 import * as validator from "@/utils/Validation/Validation";
 import InvoiceItemTable from "./invoice-item-table";
 import { useFirestore } from "reactfire";
@@ -23,6 +11,7 @@ import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
 import useAuthStore from "@/stores/auth.store";
 import ProductSearchBox from "@/components/Product/productSearchBox";
 import { convertToBD } from "@/constants/currency";
+import PaymentCard from "./paymentCard";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { confirm } = Modal;
@@ -32,17 +21,17 @@ const InvoiceAdd = () => {
   const [newInvoice, setNewInvoice] = useState();
   const invoiceService = new InvoiceService(db);
   const { userId } = useAuthStore();
-  const { status: fetchDocumentCounter, documentId: newInvoiceId } = useDocumentFormat(
+  const { status: invoiceCounterStatus, documentId: newInvoiceId } = useDocumentFormat(
     DOCUMENT_FORMAT.VALUES.Invoice,
   );
-  const [dataSource, setDataSource] = useState([]);
+
+  const [invoiceItems, setInvoiceItems] = useState([]);
   const [salesForm] = Form.useForm();
-  const [totalDiscount, setTotalDiscount] = useState();
-  const [isRequiredTooltip, setIsRequiredTooltip] = useState();
+  const [discountTotal, setDiscountTotal] = useState();
 
   const resetSalesForm = () => {
-    setDataSource([]);
-    setTotalDiscount();
+    setInvoiceItems([]);
+    setDiscountTotal();
     salesForm.resetFields();
   };
 
@@ -51,7 +40,7 @@ const InvoiceAdd = () => {
       title: "Are you sure to generate a new invoice?",
       async onOk() {
         const { items, ...rest } = values;
-        const invoiceItems = dataSource.map((item) => {
+        const formattedItems = invoiceItems.map((item) => {
           const itemInForm = values.items[item.productId];
           return {
             productId: item.productId,
@@ -63,7 +52,7 @@ const InvoiceAdd = () => {
         });
         try {
           const nInvoice = await invoiceService.create(
-            { ...rest, id: newInvoiceId, discount: totalDiscount, items: invoiceItems },
+            { ...rest, id: newInvoiceId, discount: discountTotal, items: formattedItems },
             userId,
           );
 
@@ -79,29 +68,26 @@ const InvoiceAdd = () => {
   };
 
   const handleDelete = (key) => {
-    setDataSource((prev) => prev.filter((item) => item.key !== key));
+    setInvoiceItems((prev) => prev.filter((item) => item.key !== key));
   };
 
   // Update the row data when a field changes
   const handleTableRowChange = (value, field, key) => {
-    const nDataSource = dataSource.map((row) =>
+    const updatedItems = invoiceItems.map((row) =>
       row.key === key ? { ...row, [field]: value } : row,
     );
-    setDataSource(nDataSource);
+    setInvoiceItems(updatedItems);
 
     //update total discount
     if (field === "discount") {
-      const nTotalDiscount = nDataSource.reduce((pre, curr) => pre + (curr.discount ?? 0), 0);
-      setTotalDiscount(nTotalDiscount);
-      if (isRequiredTooltip) {
-        setIsRequiredTooltip(false);
-      }
+      const nDiscountTotal = updatedItems.reduce((pre, curr) => pre + (curr.discount ?? 0), 0);
+      setDiscountTotal(nDiscountTotal);
     }
   };
   const handleSelectMatchedItem = (product) => {
     let isItemInTable = false;
     //update qty of existing item in table
-    const nDataSource = dataSource.map((row) => {
+    const updatedItems = invoiceItems.map((row) => {
       if (row.key === product.id) {
         isItemInTable = true;
         return { ...row, qty: row.qty + 1 };
@@ -110,11 +96,11 @@ const InvoiceAdd = () => {
       }
     });
     if (isItemInTable) {
-      setDataSource(nDataSource);
+      setInvoiceItems(updatedItems);
     }
     //add new item in table
     else {
-      setDataSource((prev) => [
+      setInvoiceItems((prev) => [
         ...prev,
         {
           // key: String(prev.length + 1),
@@ -144,8 +130,8 @@ const InvoiceAdd = () => {
       ) : null} */}
       <Row justify="center">
         <Title level={4}>
-          Sales{" "}
-          {fetchDocumentCounter === "loading" ? (
+          Sales
+          {invoiceCounterStatus === "loading" ? (
             <Spin size="small" />
           ) : (
             <span>(Invoice# {newInvoiceId})</span>
@@ -163,13 +149,20 @@ const InvoiceAdd = () => {
           <Col xs={24} sm={24} md={8} lg={16} xl={16}>
             <InvoiceItemTable
               salesForm={salesForm}
-              dataSource={dataSource}
+              dataSource={invoiceItems}
               onChangeRow={handleTableRowChange}
               onDeleteRow={handleDelete}
             />
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-            <Card title="Summary & Payment">
+            <Card
+              title="Summary"
+              style={{ marginBottom: 16 }}
+              styles={{
+                header: { padding: "6px 12px", fontSize: 14 },
+                body: { padding: "10px 12px" },
+              }}
+            >
               <div
                 style={{
                   display: "grid",
@@ -179,12 +172,14 @@ const InvoiceAdd = () => {
                   padding: "0 16px", // Added inner padding
                 }}
               >
-                {/* Subtotal */}
                 <Text strong>Total Bill:</Text>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
                   <Text style={{ textAlign: "right", minWidth: 60 }}>
                     {convertToBD(
-                      dataSource.reduce((pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0), 0),
+                      invoiceItems.reduce(
+                        (pre, curr) => pre + (curr.qty ?? 0) * (curr.rate ?? 0),
+                        0,
+                      ),
                     )}
                   </Text>
                   <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
@@ -192,15 +187,14 @@ const InvoiceAdd = () => {
                 {/* Total Discount - Display Only */}
                 <Text strong>Total Discount:</Text>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-                  <Text style={{ textAlign: "right", minWidth: 60 }}> {totalDiscount ?? 0}</Text>
+                  <Text style={{ textAlign: "right", minWidth: 60 }}> {discountTotal ?? 0}</Text>
                   <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
                 </div>
-                {/* Special Discount - Input Field */}
                 <Text strong>Special Discount:</Text>
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <Form.Item name="specialDiscount" style={{ margin: 0 }}>
                     <InputNumber
-                      disabled={!dataSource || !dataSource?.length}
+                      disabled={!invoiceItems || !invoiceItems?.length}
                       min={0}
                       controls={false}
                       style={{
@@ -224,10 +218,10 @@ const InvoiceAdd = () => {
                     alignItems: "baseline",
                   }}
                 >
-                  <Form.Item noStyle shouldUpdate dependencies={["specialDiscount"]}>
+                  <Form.Item noStyle dependencies={["specialDiscount"]}>
                     {() => {
                       const specialDiscount = salesForm.getFieldValue("specialDiscount");
-                      const total = dataSource.reduce(
+                      const total = invoiceItems.reduce(
                         (pre, curr) =>
                           pre + (curr.qty ?? 0) * (curr.rate ?? 0) - (curr.discount ?? 0),
                         specialDiscount ? -specialDiscount : 0,
@@ -243,39 +237,13 @@ const InvoiceAdd = () => {
                   <Text style={{ paddingLeft: "2px", width: 30, textAlign: "left" }}>TK.</Text>
                 </div>
               </div>
-
-              <Row
-                gutter={[16, 16]} // Increased vertical gutter
-                justify="center"
-                style={{
-                  marginTop: 24, // Increased top margin
-                  padding: "0 16px", // Match inner padding
-                  marginBottom: 8, // Added bottom margin
-                }}
-              >
-                <Col>
-                  <Button
-                    type="default" // Changed to default for cancel button
-                    htmlType="button"
-                    disabled={!dataSource || !dataSource?.length}
-                    style={{ minWidth: 80 }} // Consistent button width
-                    onClick={resetSalesForm}
-                  >
-                    Cancel
-                  </Button>
-                </Col>
-                <Col>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={!dataSource || !dataSource?.length}
-                    style={{ minWidth: 80 }} // Consistent button width
-                  >
-                    Save
-                  </Button>
-                </Col>
-              </Row>
             </Card>
+            <PaymentCard
+              form={salesForm}
+              formName="payments"
+              onReset={resetSalesForm}
+              invoiceItems={invoiceItems}
+            />
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>
             <Form.Item

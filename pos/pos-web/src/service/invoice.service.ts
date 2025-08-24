@@ -1,4 +1,10 @@
-import { InvoiceId, UserId, WithId, Invoice as InvoiceModel } from "@pos/shared-models";
+import {
+  InvoiceId,
+  UserId,
+  WithId,
+  Invoice as InvoiceModel,
+  ChartOfAccountId,
+} from "@pos/shared-models";
 import { Firestore, increment, writeBatch } from "firebase/firestore";
 import { Invoice } from "@/db-collections/invoice.collection";
 import { INVOICE_STATUS } from "@/constants/paymentStatus";
@@ -15,7 +21,11 @@ type omitKeys =
   | "deletedAt"
   | "deletedBy";
 
-type Data = WithId<Pick<InvoiceModel, "specialDiscount" | "subject" | "items">>;
+type Data = WithId<
+  Pick<InvoiceModel, "specialDiscount" | "subject" | "items"> & {
+    payments: Array<{ accountId: ChartOfAccountId; amount: number }>;
+  }
+>;
 
 class InvoiceService extends Invoice {
   db: Firestore;
@@ -32,6 +42,14 @@ class InvoiceService extends Invoice {
       (pre, curr) => pre + curr.qty * curr.rate - (curr.discount ?? 0),
       data.specialDiscount ? -data.specialDiscount : 0,
     );
+    const { paymentIds, payments } = data.payments.reduce(
+      (pre, curr) => {
+        pre.paymentIds.push(curr.accountId);
+        pre.payments[curr.accountId] = curr.amount;
+        return pre;
+      },
+      { paymentIds: new Array<ChartOfAccountId>(), payments: Object() },
+    );
     const batch = writeBatch(this.db);
     const nInvoice = this.add(
       batch,
@@ -42,6 +60,8 @@ class InvoiceService extends Invoice {
         subject: data.subject ?? null,
         items,
         targetUserId: null,
+        paymentAccountIds: paymentIds,
+        payments,
       },
       createdBy,
       data.id,

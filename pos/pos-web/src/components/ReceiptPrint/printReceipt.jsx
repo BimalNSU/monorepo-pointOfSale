@@ -135,14 +135,12 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
               <td>Payment Methods</td>
               <td></td>
             </tr>
-            <tr>
-              <td>Cash:</td>
-              <td>{convertToBD(invoice.totalAmount)}</td>
-            </tr>
-            {/* <tr>
-              <td>Bank:</td>
-              <td>{convertToBD(100)}</td>
-            </tr> */}
+            {invoice.payments.map((p) => (
+              <tr>
+                <td>{p.name}:</td>
+                <td>{convertToBD(p.amount)}</td>
+              </tr>
+            ))}
             <tr>
               <td></td>
               <td>
@@ -151,7 +149,7 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
             </tr>
             <tr>
               <td>Total Payment:</td>
-              <td>{invoice.totalAmount}</td>
+              <td>{convertToBD(invoice.totalAmount)}</td>
             </tr>
           </tbody>
         </table>

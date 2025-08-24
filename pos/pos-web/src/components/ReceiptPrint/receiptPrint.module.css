@@ -57,7 +57,7 @@
   }
   .table th,
   .table td {
-    padding: 5px 5px;
+    padding: 2px 2px;
   }
 
   /* .table th {
@@ -95,8 +95,9 @@
     margin-left: auto
 }
 .amount {
-    width: 25%;
+    /* width: 25%; */
     text-align: right;
+    vertical-align: bottom;
     font-weight: 600;
     color: #2c3e50;
 }
@@ -105,19 +106,20 @@
   width: 100%;
   font-family: monospace;
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: 5px;
 }
 .summary td {
   text-align: right;
+  padding: 2px 2px;
+
 }
 .divider{
    /* border-top: 1px solid #000; */
   background-color: #f0f0f0;
   margin-right: 6px;
-  margin-top: 1px;
   border: none;
   border-top: 1px dashed #000;
-  margin: 5px 0;
+  margin: 1px 0;
 }
 
 .note {

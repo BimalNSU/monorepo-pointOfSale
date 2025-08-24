@@ -7,6 +7,7 @@ import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 import { convertToBD } from "@/constants/currency";
 import PrintReceipt from "@/components/ReceiptPrint/printReceipt";
 import Loading from "@/components/loading";
+import { useMemo } from "react";
 
 const { Title, Text } = Typography;
 
@@ -14,6 +15,10 @@ const InvoiceDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { status, data: invoice } = useInvoice(id);
+  const itemsDiscount = useMemo(
+    () => invoice?.items.reduce((pre, curr) => pre + curr.discount || 0, 0) || 0,
+    [invoice],
+  );
   if (status === "loading") {
     return <Loading />;
   }
@@ -64,48 +69,80 @@ const InvoiceDetails = () => {
           <InvoiceItemTableView data={invoice.items} />
         </Col>
         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
-          <Card title="Summary & Payment">
-            <table>
-              <tbody>
-                <tr>
-                  <td>
-                    <Text strong>Total Bill</Text>
-                  </td>
-                  <td>{":"}</td>
-                  <td style={{ textAlign: "right" }}>
-                    {convertToBD(
-                      invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0),
-                    )}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Text strong>Item Discounts</Text>
-                  </td>
-                  <td>{":"}</td>
-                  <td style={{ textAlign: "right" }}>
-                    {convertToBD(invoice.items.reduce((pre, curr) => pre + curr.discount || 0, 0))}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Text strong>Special Discount</Text>
-                  </td>
-                  <td>{":"}</td>
-                  <td style={{ textAlign: "right" }}>
-                    {invoice.specialDiscount && convertToBD(invoice.specialDiscount)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <Text strong>Total Paid</Text>
-                  </td>
-                  <td>{":"}</td>
-                  <td style={{ textAlign: "right" }}>{convertToBD(invoice.totalAmount)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </Card>
+          <Row gutter={[16, 10]} ustify="end">
+            <Col span={24}>
+              <Card
+                title="Summary"
+                styles={{
+                  header: { padding: "6px 12px", fontSize: 14 },
+                  body: { padding: "10px 12px" },
+                }}
+              >
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <Text strong>Total Bill</Text>
+                      </td>
+                      <td>{":"}</td>
+                      <td style={{ textAlign: "right" }}>
+                        {convertToBD(
+                          invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0),
+                        )}
+                      </td>
+                    </tr>
+                    {itemsDiscount ? (
+                      <tr>
+                        <td>
+                          <Text strong>Item Discounts</Text>
+                        </td>
+                        <td>{":"}</td>
+                        <td style={{ textAlign: "right" }}>{convertToBD(itemsDiscount)}</td>
+                      </tr>
+                    ) : null}
+                    {invoice.specialDiscount ? (
+                      <tr>
+                        <td>
+                          <Text strong>Special Discount</Text>
+                        </td>
+                        <td>{":"}</td>
+                        <td style={{ textAlign: "right" }}>
+                          {convertToBD(invoice.specialDiscount)}
+                        </td>
+                      </tr>
+                    ) : null}
+                    <tr>
+                      <td>
+                        <Text strong>Total Invoice</Text>
+                      </td>
+                      <td>{":"}</td>
+                      <td style={{ textAlign: "right" }}>{convertToBD(invoice.totalAmount)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Card>
+            </Col>
+            <Col span={24}>
+              <Card
+                title="Payment"
+                styles={{
+                  header: { padding: "6px 12px", fontSize: 14 },
+                  body: { padding: "10px 12px" },
+                }}
+              >
+                <table>
+                  <tbody>
+                    {invoice.payments.map((p) => (
+                      <tr key={p.accountId}>
+                        <td>{p.name}</td>
+                        <td>{`: ${convertToBD(p.amount)} TK.`}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </div>

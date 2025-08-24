@@ -55,9 +55,9 @@ const ProductSearchBox: React.FC<Props> = ({ onSelectMatchedItem }) => {
       }}
       value={searchItem}
       onChange={(value) => setSearchItem(value)}
-      // loading={status === "loading"}
       options={matchedItems?.map((p) => ({ label: p.name, value: p.id })) || []}
-      style={{ width: "25%" }}
+      style={{ width: "auto", minWidth: 200, maxWidth: "100%" }}
+      popupMatchSelectWidth={false}
       onSelect={onSelectItem}
       onSearch={handleSearchItem}
       placeholder="Start typing Item Name or scan Barcode.."
