@@ -15,8 +15,17 @@ const InvoiceDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { status, data: invoice } = useInvoice(id);
-  const itemsDiscount = useMemo(
-    () => invoice?.items.reduce((pre, curr) => pre + curr.discount || 0, 0) || 0,
+
+  const calculatedData = useMemo(
+    () =>
+      invoice?.items.reduce(
+        (pre, curr) => {
+          pre.discountTotal += curr.discount || 0;
+          pre.billTotal += curr.rate * curr.qty;
+          return pre;
+        },
+        { discountTotal: 0, billTotal: 0 },
+      ) || { discountTotal: 0, billTotal: 0 },
     [invoice],
   );
   if (status === "loading") {
@@ -86,18 +95,18 @@ const InvoiceDetails = () => {
                       </td>
                       <td>{":"}</td>
                       <td style={{ textAlign: "right" }}>
-                        {convertToBD(
-                          invoice.items.reduce((pre, curr) => pre + curr.qty * curr.rate, 0),
-                        )}
+                        {convertToBD(calculatedData.billTotal)}
                       </td>
                     </tr>
-                    {itemsDiscount ? (
+                    {calculatedData.discountTotal ? (
                       <tr>
                         <td>
                           <Text strong>Item Discounts</Text>
                         </td>
                         <td>{":"}</td>
-                        <td style={{ textAlign: "right" }}>{convertToBD(itemsDiscount)}</td>
+                        <td style={{ textAlign: "right" }}>
+                          {convertToBD(calculatedData.discountTotal)}
+                        </td>
                       </tr>
                     ) : null}
                     {invoice.specialDiscount ? (
