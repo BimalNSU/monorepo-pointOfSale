@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Row, Col, Form, Typography, Card, Spin, Modal, Divider, InputNumber } from "antd";
 import * as validator from "@/utils/Validation/Validation";
 import InvoiceItemTable from "./invoice-item-table";
@@ -25,13 +25,32 @@ const InvoiceAdd = () => {
     DOCUMENT_FORMAT.VALUES.Invoice,
   );
 
+  const [calculatedData, setCalculatedData] = useState({});
   const [invoiceItems, setInvoiceItems] = useState([]);
   const [salesForm] = Form.useForm();
-  const [discountTotal, setDiscountTotal] = useState();
+
+  const updateInvoiceTotal = () => {
+    const specialDiscount = salesForm.getFieldValue("specialDiscount");
+    const updatedData = invoiceItems.reduce(
+      (pre, curr) => {
+        pre.discountTotal += curr.discount || 0;
+        pre.invoiceTotal += curr.qty * curr.rate - (curr.discount || 0);
+        return pre;
+      },
+      { discountTotal: 0, invoiceTotal: specialDiscount ? -specialDiscount : 0 },
+    );
+    setCalculatedData(updatedData);
+  };
+
+  useEffect(() => {
+    if (invoiceItems.length) {
+      updateInvoiceTotal();
+    }
+  }, [invoiceItems]);
 
   const resetSalesForm = () => {
     setInvoiceItems([]);
-    setDiscountTotal();
+    setCalculatedData({});
     salesForm.resetFields();
   };
 
@@ -52,7 +71,7 @@ const InvoiceAdd = () => {
         });
         try {
           const nInvoice = await invoiceService.create(
-            { ...rest, id: newInvoiceId, discount: discountTotal, items: formattedItems },
+            { ...rest, id: newInvoiceId, items: formattedItems },
             userId,
           );
 
@@ -77,12 +96,6 @@ const InvoiceAdd = () => {
       row.key === key ? { ...row, [field]: value } : row,
     );
     setInvoiceItems(updatedItems);
-
-    //update total discount
-    if (field === "discount") {
-      const nDiscountTotal = updatedItems.reduce((pre, curr) => pre + (curr.discount ?? 0), 0);
-      setDiscountTotal(nDiscountTotal);
-    }
   };
   const handleSelectMatchedItem = (product) => {
     let isItemInTable = false;
@@ -115,9 +128,9 @@ const InvoiceAdd = () => {
     }
   };
 
-  // const handleAfterPrint = () => {
-  //   setNewInvoice();
-  // };
+  const handleAfterPrint = () => {
+    setNewInvoice();
+  };
   // const demoPrint = async () => {
   //   const nInvoice = await invoiceService.get("20241225002");
   //   setNewInvoice(nInvoice); //temporary store data for printing
@@ -125,9 +138,10 @@ const InvoiceAdd = () => {
   return (
     <div>
       {/* <Button onClick={demoPrint}>Demo print</Button>
+       */}
       {newInvoice ? (
         <PrintReceipt directPrint={true} onAfterPrint={handleAfterPrint} invoice={newInvoice} />
-      ) : null} */}
+      ) : null}
       <Row justify="center">
         <Title level={4}>
           Sales
@@ -184,10 +198,11 @@ const InvoiceAdd = () => {
                   </Text>
                   <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
                 </div>
-                {/* Total Discount - Display Only */}
                 <Text strong>Total Discount:</Text>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-                  <Text style={{ textAlign: "right", minWidth: 60 }}> {discountTotal ?? 0}</Text>
+                  <Text style={{ textAlign: "right", minWidth: 60 }}>
+                    {calculatedData.discountTotal ? convertToBD(calculatedData.discountTotal) : 0}
+                  </Text>
                   <Text style={{ paddingLeft: "4px", width: 30, textAlign: "left" }}>TK.</Text>
                 </div>
                 <Text strong>Special Discount:</Text>
@@ -197,6 +212,7 @@ const InvoiceAdd = () => {
                       disabled={!invoiceItems || !invoiceItems?.length}
                       min={0}
                       controls={false}
+                      onChange={() => updateInvoiceTotal()}
                       style={{
                         width: "100%",
                         textAlign: "right",
@@ -218,22 +234,13 @@ const InvoiceAdd = () => {
                     alignItems: "baseline",
                   }}
                 >
-                  <Form.Item noStyle dependencies={["specialDiscount"]}>
-                    {() => {
-                      const specialDiscount = salesForm.getFieldValue("specialDiscount");
-                      const total = invoiceItems.reduce(
-                        (pre, curr) =>
-                          pre + (curr.qty ?? 0) * (curr.rate ?? 0) - (curr.discount ?? 0),
-                        specialDiscount ? -specialDiscount : 0,
-                      );
-                      return (
-                        <Title level={4} style={{ margin: 0, minWidth: 60, textAlign: "right" }}>
-                          <span>{convertToBD(total)}</span>
-                        </Title>
-                      );
-                    }}
-                  </Form.Item>
-
+                  <Title level={4} style={{ margin: 0, minWidth: 60, textAlign: "right" }}>
+                    <span>
+                      {calculatedData.invoiceTotal
+                        ? convertToBD(calculatedData.invoiceTotal)
+                        : null}
+                    </span>
+                  </Title>
                   <Text style={{ paddingLeft: "2px", width: 30, textAlign: "left" }}>TK.</Text>
                 </div>
               </div>
@@ -241,8 +248,9 @@ const InvoiceAdd = () => {
             <PaymentCard
               form={salesForm}
               formName="payments"
-              onReset={resetSalesForm}
+              onResetPayment={resetSalesForm}
               invoiceItems={invoiceItems}
+              invoiceTotal={calculatedData.invoiceTotal}
             />
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>
