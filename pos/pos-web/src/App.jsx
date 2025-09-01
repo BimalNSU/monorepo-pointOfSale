@@ -12,7 +12,7 @@ import InvoiceReport from "./pages/ManagerView/Invoice/invoiceReport";
 import InvoiceDetails from "./pages/ManagerView/Invoice/View/invoiceDetails";
 import Invoices from "./pages/ManagerView/Invoice/invoices";
 import InvoiceAdd from "./pages/ManagerView/Invoice/Add/invoiceAdd";
-import ProductEdit from "./pages/ManagerView/Product/productEdit";
+import ProductDetails from "./pages/ManagerView/Product/productDetails";
 import ProductAdd from "./pages/ManagerView/Product/productAdd";
 import Products from "./pages/ManagerView/Product/Products";
 import UserAdd from "./pages/adminView/User/userAdd";
@@ -97,7 +97,7 @@ const App = () => {
               >
                 <Route index element={<Products />} />
                 <Route path="add" element={<ProductAdd />} />
-                <Route path=":id" element={<ProductEdit />} />
+                <Route path=":id" element={<ProductDetails />} />
               </Route>
 
               <Route

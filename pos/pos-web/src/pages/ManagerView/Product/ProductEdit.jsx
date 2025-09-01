@@ -10,12 +10,9 @@ import Loading from "@/components/loading";
 import ProductImageManager from "./subComponent/productImageManager";
 const { confirm } = Modal;
 
-const ProductEdit = () => {
+const ProductEdit = ({ product, resetMode }) => {
   const { userId } = useFirebaseAuth();
-  const navigate = useNavigate();
   const db = useFirestore();
-  const { id } = useParams();
-  const { status, data } = useProduct(id);
   const productService = new ProductService(db);
   const [responseMessage, setResponseMessage] = useState();
   const [productForm] = Form.useForm();
@@ -25,8 +22,9 @@ const ProductEdit = () => {
       title: "Are you sure to update product?",
       async onOk() {
         try {
-          await productService.edit(id, values, userId);
+          await productService.edit(product.id, values, userId);
           setResponseMessage("success");
+          resetMode();
         } catch (err) {
           console.log(err);
           setResponseMessage("error");
@@ -34,31 +32,9 @@ const ProductEdit = () => {
       },
     });
   };
-  if (status === "loading") {
-    return <Loading />;
-  }
-  if (status === "error") {
-    return (
-      <Result
-        status="error"
-        title="Data fetch error ...!"
-        extra={
-          <Button type="primary" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
-        }
-      />
-    );
-  }
   return (
-    <Card
-      title="Edit Product"
-      bordered={false}
-      style={{
-        // width: 300,
-        margin: "10px",
-      }}
-    >
+    <>
+      {" "}
       {/* Display the response message */}
       {responseMessage ? (
         <Row justify="end">
@@ -92,8 +68,7 @@ const ProductEdit = () => {
         labelWrap
         // onFinishFailed={onFinishFailed}
       >
-        <ProductForm data={data} form={productForm} />
-        <ProductImageManager product={data} />
+        <ProductForm data={product} form={productForm} />
         <div
           style={{
             display: "flex",
@@ -101,12 +76,15 @@ const ProductEdit = () => {
             gap: 16,
           }}
         >
+          <Button size="large" onClick={resetMode}>
+            Cancel
+          </Button>
           <Button type="primary" size="large" htmlType="submit">
             {"Update Product"}
           </Button>
         </div>
       </Form>
-    </Card>
+    </>
   );
 };
 export default ProductEdit;

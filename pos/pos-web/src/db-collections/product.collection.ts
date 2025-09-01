@@ -1,5 +1,5 @@
 import { firestoreConverter } from "@/utils/converter";
-import { COLLECTIONS } from "@pos/shared-models";
+import { COLLECTIONS, ProductImageType } from "@pos/shared-models";
 import { ProductId, UserId, WithId, Product as ProductModel } from "@pos/shared-models";
 import {
   CollectionReference,
@@ -22,7 +22,10 @@ type omitKeys =
   | "deletedAt"
   | "deletedBy";
 type AddData = WithId<Omit<ProductModel, omitKeys>>;
-type EditData = Omit<ProductModel, omitKeys | "qty"> & { qty: number | FieldValue };
+type EditData = Omit<ProductModel, omitKeys | "qty" | "media"> & {
+  qty: number | FieldValue;
+  media: { images: ProductImageType[] | FieldValue };
+};
 
 export class Product {
   collectionRef: CollectionReference;

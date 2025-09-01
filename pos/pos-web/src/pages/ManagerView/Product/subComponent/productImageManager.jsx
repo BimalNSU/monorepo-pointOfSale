@@ -147,7 +147,6 @@ const ProductImageManager = ({ product }) => {
   return (
     <Card
       title="Product Images"
-      bordered={false}
       extra={
         <Upload
           customRequest={handleUpload}
