@@ -58,56 +58,64 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         },
       );
     }
-    if (session.shopId) {
-      if ([SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)) {
-        nLeftSiderItems.push({
-          key: "4",
-          label: (
-            <span>
-              <Link to="/sales">Sales</Link>
-            </span>
-          ),
-          icon: <ShoppingCartOutlined />,
-        });
-      }
-      if (session.shopRole === SHOP_ROLE.VALUES.Manager) {
-        nLeftSiderItems.push({
-          key: "5",
-          label: "Product",
-          icon: <AppstoreOutlined />,
-          children: [
-            {
-              key: "5.1",
-              label: <Link to="/products/add">Add Product</Link>,
-              icon: <ProductOutlined />,
-            },
-            {
-              key: "5.2",
-              label: <Link to="/products">Products</Link>,
-              icon: <AppstoreOutlined />,
-            },
-          ],
-        });
-      }
-      if ([SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)) {
-        nLeftSiderItems.push({
-          key: "6",
-          label: "Invoices",
-          icon: <FileTextOutlined />,
-          children: [
-            {
-              key: "6.1",
-              label: <Link to="/invoices">History</Link>,
-              icon: <ProductOutlined />,
-            },
-            {
-              key: "6.2",
-              label: <Link to="/reports">Report</Link>,
-              icon: <AppstoreOutlined />,
-            },
-          ],
-        });
-      }
+    if (
+      session.shopId &&
+      [SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)
+    ) {
+      nLeftSiderItems.push({
+        key: "4",
+        label: (
+          <span>
+            <Link to="/sales">Sales</Link>
+          </span>
+        ),
+        icon: <ShoppingCartOutlined />,
+      });
+    }
+    if (
+      USER_ROLE.VALUES.Admin === session.role ||
+      (session.shopId && session.shopRole === SHOP_ROLE.VALUES.Manager)
+    ) {
+      nLeftSiderItems.push({
+        key: "5",
+        label: "Product",
+        icon: <AppstoreOutlined />,
+        children: [
+          {
+            key: "5.1",
+            label: <Link to="/products/add">Add Product</Link>,
+            icon: <ProductOutlined />,
+          },
+          {
+            key: "5.2",
+            label: <Link to="/products">Products</Link>,
+            icon: <AppstoreOutlined />,
+          },
+        ],
+      });
+    }
+    if (
+      USER_ROLE.VALUES.Admin === session.role ||
+      (session.shopId &&
+        [SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole))
+    ) {
+      nLeftSiderItems.push({
+        key: "6",
+        label: "Invoices",
+        icon: <FileTextOutlined />,
+        children: [
+          {
+            key: "6.1",
+            label: <Link to="/invoices">History</Link>,
+            icon: <ProductOutlined />,
+          },
+          {
+            key: "6.2",
+            label: <Link to="/reports">Report</Link>,
+            icon: <AppstoreOutlined />,
+          },
+        ],
+      });
     }
     nLeftSiderItems.push({
       key: "7",
