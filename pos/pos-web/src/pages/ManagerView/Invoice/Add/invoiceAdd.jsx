@@ -29,7 +29,7 @@ const InvoiceAdd = () => {
   const [invoiceItems, setInvoiceItems] = useState([]);
   const [salesForm] = Form.useForm();
 
-  const updateInvoiceTotal = () => {
+  const updateInvoiceSummary = () => {
     const specialDiscount = salesForm.getFieldValue("specialDiscount");
     const updatedData = invoiceItems.reduce(
       (pre, curr) => {
@@ -43,9 +43,7 @@ const InvoiceAdd = () => {
   };
 
   useEffect(() => {
-    if (invoiceItems.length) {
-      updateInvoiceTotal();
-    }
+    updateInvoiceSummary();
   }, [invoiceItems]);
 
   const resetSalesForm = () => {
@@ -212,7 +210,7 @@ const InvoiceAdd = () => {
                       disabled={!invoiceItems || !invoiceItems?.length}
                       min={0}
                       controls={false}
-                      onChange={() => updateInvoiceTotal()}
+                      onChange={() => updateInvoiceSummary()}
                       style={{
                         width: "100%",
                         textAlign: "right",
@@ -248,9 +246,9 @@ const InvoiceAdd = () => {
             <PaymentCard
               form={salesForm}
               formName="payments"
-              onResetPayment={resetSalesForm}
+              onPaymentReset={resetSalesForm}
               invoiceItems={invoiceItems}
-              invoiceTotal={calculatedData.invoiceTotal}
+              invoiceTotal={calculatedData.invoiceTotal || 0}
             />
           </Col>
           <Col xs={24} sm={24} md={8} lg={8} xl={8}>

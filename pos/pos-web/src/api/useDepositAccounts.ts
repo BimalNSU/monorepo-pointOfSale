@@ -4,7 +4,7 @@ import { collection, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
 const coaFirestoreConverter = firestoreConverter<WithId<ChartOfAccount>>();
 
-export const useDespositAccounts = () => {
+export const useDepositAccounts = () => {
   const db = useFirestore();
   const queryInChartOfAccounts = query(
     collection(db, COLLECTIONS.chartOfAccounts),

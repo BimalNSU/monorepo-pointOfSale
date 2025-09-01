@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Form, Button, Row, Col, Card, InputNumber, Select, Spin } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { useDespositAccounts } from "@/api/useDepositAccounts";
+import { useDepositAccounts } from "@/api/useDepositAccounts";
 import { ChartOfAccountId, RESERVE_ACCOUNT_ID } from "@pos/shared-models";
 
 type PaymentAccount = {
-  id: ChartOfAccountId;
-  name: string;
+  accountId: ChartOfAccountId;
   amount?: number;
 };
 
@@ -15,7 +14,7 @@ type PaymentCardProps = {
   formName: string; // Form.List name
   invoiceTotal: number;
   invoiceItems?: any[];
-  onResetPayment: () => void;
+  onPaymentReset: () => void;
 };
 
 const PaymentCard: React.FC<PaymentCardProps> = ({
@@ -23,66 +22,58 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
   formName,
   invoiceTotal,
   invoiceItems,
-  onResetPayment,
+  onPaymentReset,
 }) => {
-  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
-  const { status: accountStatus, data } = useDespositAccounts();
+  const { status: accountStatus, data } = useDepositAccounts();
+  const paymentAccounts = Form.useWatch<Array<PaymentAccount> | undefined>([formName], form);
 
   useEffect(() => {
-    if (!invoiceItems?.length) {
+    //reset payments
+    if (!invoiceTotal) {
       form.resetFields([formName]);
-      if (paymentAccounts.length) {
-        setPaymentAccounts([]);
-      }
+      return;
     }
-    //add default payment method
-    if (invoiceItems?.length && !paymentAccounts.length) {
+
+    //Initialize default payment method when invoice changes
+    if (!paymentAccounts?.length) {
       const defaultAccountId = RESERVE_ACCOUNT_ID.petty_cash;
-      setPaymentAccounts([
-        {
-          id: defaultAccountId,
-          name: data?.find((a) => a.id === defaultAccountId)?.name || "",
-        },
-      ]);
-      form.setFieldValue(formName, [{ accountId: defaultAccountId }]);
+      form.setFieldValue(formName, [{ accountId: defaultAccountId, amount: invoiceTotal }]);
+      return;
     }
-  }, [invoiceItems]);
-  const selectableAccounts = useMemo(
-    () => data?.filter((acc) => !paymentAccounts.find((sAcc) => sAcc.id === acc.id)) || [],
-    [data, paymentAccounts],
-  );
+
+    // Update first payment amount when invoiceTotal changes
+    const formPayments = form.getFieldValue(formName);
+    formPayments[0].amount = invoiceTotal;
+    form.setFieldValue(formName, formPayments);
+  }, [invoiceTotal]);
+
+  const selectableAccounts = useMemo(() => {
+    if (!paymentAccounts?.length) {
+      return [];
+    }
+    return data?.filter((acc) => !paymentAccounts.find((sAcc) => sAcc.accountId === acc.id)) || [];
+  }, [data, paymentAccounts]);
+
   const paymentTotal = useMemo(
-    () => paymentAccounts.reduce((sum, acc) => sum + (acc.amount || 0), 0),
+    () => paymentAccounts?.reduce((sum, acc) => sum + (acc.amount || 0), 0) || 0,
     [paymentAccounts],
   );
 
-  const updatePaymentField = (
-    value: string | number | null,
-    field: "id" | "amount",
-    key: ChartOfAccountId,
-  ) => {
-    setPaymentAccounts((prev) =>
-      prev.map((p) => {
-        if (key === p.id) {
-          return {
-            ...p,
-            [field]: value,
-            ...(field === "id" && {
-              name: data?.find((acc) => acc.id === value)?.name || "",
-            }),
-          };
-        } else {
-          return p;
-        }
-      }),
-    );
-  };
   const removePaymentAccount = (accountId: ChartOfAccountId) => {
-    setPaymentAccounts((prev) => prev.filter((p) => p.id !== accountId));
+    const requireAutofill = Boolean(
+      paymentAccounts?.find((acc) => acc.accountId === accountId)?.amount,
+    );
+    if (requireAutofill) {
+      const formPayments = form.getFieldValue(formName) as Array<{
+        accountId: ChartOfAccountId;
+        amount?: number;
+      }>;
+      formPayments[0].amount = invoiceTotal;
+      form.setFieldValue(formName, formPayments);
+    }
   };
   const resetPaymentForm = () => {
-    setPaymentAccounts([]);
-    onResetPayment();
+    onPaymentReset();
   };
   return (
     <Card
@@ -96,7 +87,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
       <Form.List name={formName}>
         {(fields, { add, remove }) => (
           <>
-            {fields.map(({ key, name, ...restField }) => {
+            {fields.map(({ key, name, ...fieldProps }) => {
               const currentAccountId = form.getFieldValue([formName, name, "accountId"]);
               const currentAccount = data?.find((acc) => acc.id === currentAccountId) || null;
               const options = [
@@ -122,41 +113,28 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
                   }}
                 >
                   <Form.Item
-                    {...restField}
+                    {...fieldProps}
                     name={[name, "accountId"]}
                     rules={[{ required: true, message: "Select account" }]}
                     style={{ flex: 1, minWidth: 160 }}
                   >
-                    <Select
-                      showSearch
-                      placeholder="Select account"
-                      options={options}
-                      onChange={(accountId) =>
-                        updatePaymentField(accountId, "id", currentAccountId)
-                      }
-                    />
+                    <Select showSearch placeholder="Select account" options={options} />
                   </Form.Item>
 
                   <Form.Item
-                    {...restField}
+                    {...fieldProps}
                     name={[name, "amount"]}
                     rules={[{ required: true, message: "Enter amount" }]}
                     style={{ width: 140 }}
                   >
-                    <InputNumber
-                      onChange={(amount) =>
-                        updatePaymentField(amount as any, "amount", currentAccountId)
-                      }
-                      placeholder="Amount"
-                      style={{ width: "100%" }}
-                    />
+                    <InputNumber placeholder="Amount" style={{ width: "100%" }} />
                   </Form.Item>
 
                   {fields.length > 1 && (
                     <MinusCircleOutlined
                       onClick={() => {
-                        removePaymentAccount(currentAccountId);
                         remove(name);
+                        removePaymentAccount(currentAccountId);
                       }}
                       style={{ color: "red", fontSize: 18, marginBottom: "24px" }}
                     />
@@ -166,20 +144,12 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
             })}
             {accountStatus === "loading" ? (
               <Spin />
-            ) : paymentAccounts.length !== data?.length ? (
+            ) : paymentAccounts?.length !== data?.length ? (
               <Form.Item>
                 <Button
                   disabled={!invoiceItems || !invoiceItems?.length}
                   type="dashed"
-                  onClick={() => {
-                    add({ accountId: selectableAccounts[0].id });
-                    const updatedAccounts = paymentAccounts.map((acc) => ({ ...acc })); //deep copy
-                    updatedAccounts.push({
-                      id: selectableAccounts[0].id,
-                      name: selectableAccounts[0].name,
-                    });
-                    setPaymentAccounts(updatedAccounts);
-                  }}
+                  onClick={() => add({ accountId: selectableAccounts[0].id })}
                   block
                   icon={<PlusOutlined />}
                 >
@@ -212,24 +182,14 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
           </Button>
         </Col>
         <Col>
-          <Form.Item
-            noStyle
-            //   dependencies={["payments", "specialDiscount"]}
-            shouldUpdate={(prevValues, currentValues) =>
-              prevValues.payments !== currentValues.payments ||
-              prevValues.specialDiscount !== currentValues.specialDiscount
-            }
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={!invoiceTotal || paymentTotal !== invoiceTotal}
+            style={{ minWidth: 80 }}
           >
-            <Button
-              type="primary"
-              htmlType="submit"
-              //   disabled={!invoiceItemsLength || invoiceItemsLength <= 0}
-              disabled={!invoiceTotal || paymentTotal !== invoiceTotal}
-              style={{ minWidth: 80 }}
-            >
-              Save
-            </Button>
-          </Form.Item>
+            Save
+          </Button>
         </Col>
       </Row>
     </Card>
