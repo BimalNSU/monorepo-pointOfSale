@@ -5,21 +5,21 @@ import { useEffect } from "react";
 const { Text } = Typography;
 const { Summary } = Table;
 
-const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) => {
+const InvoiceItemTable = ({ form, invoiceItems, onChangeRow, onDeleteRow, isEditing }) => {
   useEffect(() => {
-    if (dataSource.length) {
-      const quantiesInForm = dataSource.reduce(
-        (pre, curr) => ({
-          ...pre,
-          [curr.key]: { qty: curr.qty, discount: curr.discount ?? undefined },
-        }),
-        {},
+    if (invoiceItems.length) {
+      const formValues = Object.fromEntries(
+        invoiceItems.map((item) => [
+          item.productId,
+          { qty: item.qty, discount: item.discount ?? undefined },
+        ]),
       );
-      salesForm.setFieldsValue({ items: quantiesInForm });
+      form.setFieldsValue({ items: formValues });
     } else {
-      salesForm.resetFields(["items"]);
+      form.resetFields(["items"]);
     }
-  }, [dataSource]);
+  }, [invoiceItems]);
+
   const columns = [
     {
       title: "#",
@@ -36,19 +36,14 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
       render: (_, record) => (
         <Form.Item
           // noStyle
-          name={["items", record.key, "qty"]}
+          name={["items", record.key, "qty"]} // dummy field just for validation
           rules={[
             { required: true, message: "Qty is required" },
-            {
-              type: "number",
-              min: 1,
-              transform: (value) => Number(value),
-              message: "Qty must be a number",
-            },
+            { type: "number", min: 1, message: "Qty must be at least 1" },
           ]}
           style={{ margin: 0 }}
         >
-          <InputNumber onChange={(value) => onChangeRow(value, "qty", record.key)} />
+          <InputNumber onChange={(val) => onChangeRow(val, "qty", record.productId)} />
         </Form.Item>
       ),
     },
@@ -61,7 +56,7 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
     {
       title: "Discount",
       dataIndex: "discount",
-      render: (_, record) => (
+      render: (discount, record) => (
         <Form.Item
           name={["items", record.key, "discount"]}
           rules={[
@@ -74,7 +69,7 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
           ]}
           style={{ margin: 0 }}
         >
-          <InputNumber onChange={(value) => onChangeRow(value, "discount", record.key)} />
+          <InputNumber onChange={(value) => onChangeRow(value, "discount", record.productId)} />
         </Form.Item>
       ),
     },
@@ -90,35 +85,27 @@ const InvoiceItemTable = ({ salesForm, dataSource, onChangeRow, onDeleteRow }) =
     {
       title: "",
       align: "center",
-      render: (_, record) => (
-        <Button
-          type="link"
-          onClick={() => onDeleteRow(record.key)}
-          danger
-          icon={<CloseOutlined />}
-        />
-      ),
+      render: (_, record) =>
+        !isEditing || (isEditing && invoiceItems.length > 1) ? (
+          <Button
+            type="link"
+            onClick={() => onDeleteRow(record.key)}
+            danger
+            icon={<CloseOutlined />}
+          />
+        ) : null,
     },
   ];
 
   return (
     <Table
       size="small"
-      dataSource={dataSource}
+      dataSource={invoiceItems}
       columns={columns}
       pagination={false}
-      // components={{
-      //   body: {
-      //     cell: ({ children, ...restProps }) => (
-      //       <td {...restProps} style={{ padding: 0 }}>
-      //         {children}
-      //       </td>
-      //     ),
-      //   },
-      // }}
       summary={(currentData) => {
         const total = currentData.reduce(
-          (sum, row) => sum + (row.qty || 0) * (row.rate || 0) - (row.discount || 0),
+          (sum, row) => sum + (row.qty || 0) * row.rate - (row.discount || 0),
           0,
         );
         return (

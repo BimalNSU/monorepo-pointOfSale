@@ -13,15 +13,9 @@ import {
 } from "firebase/firestore";
 
 const invoiceFirestoreConverter = firestoreConverter<InvoiceModel>();
-type omitKeys =
-  | "createdAt"
-  | "createdBy"
-  | "updatedAt"
-  | "updatedBy"
-  | "isDeleted"
-  | "deletedAt"
-  | "deletedBy";
-type RData = Omit<InvoiceModel, omitKeys>;
+type omitKeys = "createdAt" | "createdBy" | "updatedAt" | "updatedBy";
+type RData = Omit<InvoiceModel, omitKeys | "isDeleted" | "deletedAt" | "deletedBy">;
+type EditData = Omit<InvoiceModel, omitKeys>;
 
 export class Invoice {
   collectionRef: CollectionReference;
@@ -61,31 +55,11 @@ export class Invoice {
       throw new Error(`Invoice ID #${id} is not found`);
     }
   }
-
-  // //batch update
-  // edit(batch: WriteBatch, id: InvoiceId, data: InvoiceMutableFields, updatedBy: UserId) {
-  //   const now = serverTimestamp();
-  //   const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);
-  //   const asMutPbill = data as InvoiceMutPBill;
-  //   const asMutPayment = data as InvoiceMutPayment;
-  //   if (asMutPbill.pBills) {
-  //     const { pBillId, pBillNameId, amount } = asMutPbill.pBills;
-  //     const amountPath = `pBills.${pBillId}.bills.${pBillNameId}.amount`;
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     batch.update(docRef, {
-  //       [amountPath]: amount,
-  //       updatedBy,
-  //       updatedAt: now,
-  //     });
-  //   } else {
-  //     batch.update(docRef, {
-  //       ...asMutPayment,
-  //       updatedBy,
-  //       updatedAt: now,
-  //     });
-  //   }
-  // }
+  edit(batch: WriteBatch, id: InvoiceId, data: Partial<EditData>, updatedBy: UserId) {
+    const now = serverTimestamp();
+    const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);
+    return batch.update(docRef, { ...data, updatedAt: now, updatedBy });
+  }
   remove(batch: WriteBatch, id: InvoiceId, deletedBy: UserId) {
     const now = serverTimestamp();
     const docRef = doc(this.collectionRef, id).withConverter(invoiceFirestoreConverter);

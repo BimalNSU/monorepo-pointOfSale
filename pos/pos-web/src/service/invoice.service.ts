@@ -4,6 +4,7 @@ import {
   WithId,
   Invoice as InvoiceModel,
   ChartOfAccountId,
+  ProductId,
 } from "@pos/shared-models";
 import { Firestore, increment, writeBatch } from "firebase/firestore";
 import { Invoice } from "@/db-collections/invoice.collection";
@@ -76,11 +77,51 @@ class InvoiceService extends Invoice {
     await batch.commit();
     return await this.get(nInvoice.id);
   }
-  // async update(id: InvoiceId, data: InvoiceMutPayment, updatedBy: UserId) {
-  //   const batch = writeBatch(this.firestore);
-  //   this.edit(batch, id, data, updatedBy);
-  //   await batch.commit();
-  // }
+  async update(id: InvoiceId, updatedData: Data, oldData: InvoiceModel, updatedBy: UserId) {
+    const batch = writeBatch(this.db);
+    const { paymentIds, payments } = updatedData.payments.reduce(
+      (pre, curr) => {
+        pre.paymentIds.push(curr.accountId);
+        pre.payments[curr.accountId] = curr.amount;
+        return pre;
+      },
+      { paymentIds: new Array<ChartOfAccountId>(), payments: Object() },
+    );
+    //update invoice
+    this.edit(
+      batch,
+      id,
+      {
+        items: updatedData.items,
+        specialDiscount: updatedData.specialDiscount || null,
+        paymentAccountIds: paymentIds,
+        payments,
+      },
+      updatedBy,
+    );
+
+    //updatable products' qty
+    const mutatedProductsQty: Record<ProductId, number> = {};
+    oldData.items.forEach((oItem) => {
+      const matchItem = updatedData.items.find((item) => item.productId === oItem.productId);
+      const qtyDiff = (matchItem?.qty || 0) - oItem.qty;
+      if (qtyDiff !== 0) {
+        mutatedProductsQty[oItem.productId] = qtyDiff;
+      }
+    });
+    updatedData.items
+      .filter((item) => !oldData.items.find((oItem) => oItem.productId === item.productId))
+      .forEach((item) => {
+        mutatedProductsQty[item.productId] = item.qty;
+      });
+
+    //update qty in products
+    const product = new Product(this.db);
+    Object.entries(mutatedProductsQty).forEach(([productId, qty]) => {
+      product.edit(batch, productId, { qty: increment(-qty) }, updatedBy);
+    });
+    return await batch.commit();
+  }
   async delete(id: InvoiceId, deletedBy: UserId) {
     try {
       const batch = writeBatch(this.db);

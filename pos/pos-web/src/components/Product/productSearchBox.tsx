@@ -4,7 +4,7 @@ import { AutoComplete, Spin } from "antd";
 import React, { useState } from "react";
 type TypeProduct = Omit<WithId<Product>, "createdAt"> & { createdAt: string };
 type Props = {
-  onSelectMatchedItem: (data?: TypeProduct) => void;
+  onSelectMatchedItem: (data: TypeProduct) => void;
 };
 
 const ProductSearchBox: React.FC<Props> = ({ onSelectMatchedItem }) => {
@@ -25,13 +25,14 @@ const ProductSearchBox: React.FC<Props> = ({ onSelectMatchedItem }) => {
   const onSelectItem = (itemId: ProductId) => {
     if (!matchedItems?.length) return;
     const selectedItem = matchedItems.find((p) => p.id === itemId);
+    if (selectedItem) {
+      //reset search item & it's result
+      setSearchItem(undefined);
+      setMatchedItems(undefined);
 
-    //reset search item & it's result
-    setSearchItem(undefined);
-    setMatchedItems(undefined);
-
-    if (onSelectMatchedItem) {
-      onSelectMatchedItem(selectedItem);
+      if (onSelectMatchedItem) {
+        onSelectMatchedItem(selectedItem);
+      }
     }
   };
   const handleOnPressEnter = (value?: ProductId) => {

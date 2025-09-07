@@ -13,21 +13,26 @@ type PaymentCardProps = {
   form: any;
   formName: string; // Form.List name
   invoiceTotal: number;
-  invoiceItems?: any[];
+  hasInvoiceItems?: boolean;
   onPaymentReset: () => void;
+  initialPaymentAccounts?: { accountId: ChartOfAccountId; name: string; amount: number }[];
 };
 
 const PaymentCard: React.FC<PaymentCardProps> = ({
   form,
   formName,
   invoiceTotal,
-  invoiceItems,
+  hasInvoiceItems,
   onPaymentReset,
+  initialPaymentAccounts,
 }) => {
   const { status: accountStatus, data } = useDepositAccounts();
   const paymentAccounts = Form.useWatch<Array<PaymentAccount> | undefined>([formName], form);
 
   useEffect(() => {
+    // only run for new invoice (add mode)
+    if (initialPaymentAccounts?.length) return; // edit mode: skip
+
     //reset payments
     if (!invoiceTotal) {
       form.resetFields([formName]);
@@ -143,11 +148,13 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
               );
             })}
             {accountStatus === "loading" ? (
-              <Spin />
+              <Row justify="center">
+                <Spin />
+              </Row>
             ) : paymentAccounts?.length !== data?.length ? (
               <Form.Item>
                 <Button
-                  disabled={!invoiceItems || !invoiceItems?.length}
+                  disabled={!hasInvoiceItems}
                   type="dashed"
                   onClick={() => add({ accountId: selectableAccounts[0].id })}
                   block
@@ -174,7 +181,7 @@ const PaymentCard: React.FC<PaymentCardProps> = ({
           <Button
             type="default"
             htmlType="button"
-            disabled={!invoiceItems || !invoiceItems?.length}
+            disabled={!hasInvoiceItems}
             style={{ minWidth: 80 }}
             onClick={resetPaymentForm}
           >
