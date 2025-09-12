@@ -21,7 +21,7 @@ const InvoiceAdd = () => {
 
   const handleSubmit = async (values) => {
     try {
-      const nInvoice = await invoiceService.create(values, userId);
+      const nInvoice = await invoiceService.create({ ...values, id: newInvoiceId }, userId);
       setNewInvoice(nInvoice); //temporary store data for print
       success(`New invoice is created successfully`);
     } catch (err) {
