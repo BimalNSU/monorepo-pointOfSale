@@ -20,7 +20,11 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: originList }));
 
-router.post("/auth/login", AuthMiddleware.login);
+router.post(
+  "/auth/login",
+  AuthMiddleware.isValidReCaptcha,
+  AuthMiddleware.login,
+);
 
 //TODO: test for validation inputs
 router.post(
@@ -28,20 +32,20 @@ router.post(
   AuthMiddleware.isAuthenticated,
   RoleMiddleware.isAdmin,
   validateRequest(createUserSchema),
-  UserMiddleware.create
+  UserMiddleware.create,
 );
 router.put(
   "/admin/users/:id",
   AuthMiddleware.isAuthenticated,
   RoleMiddleware.isAdmin,
   validateRequest(updateUserSchema),
-  UserMiddleware.updatedByAdmin
+  UserMiddleware.updatedByAdmin,
 );
 
 router.put(
   "/sessions",
   AuthMiddleware.isAuthenticated,
-  AuthMiddleware.updateSession
+  AuthMiddleware.updateSession,
 );
 //NOTE: only for test purpose. It will call automatically from bkash merchant portal during payment
 router.post("/bkash/webhook", BkashMiddleware.handleWebhook);
@@ -49,7 +53,7 @@ router.post(
   "/invoice",
   AuthMiddleware.isAuthenticated,
   validateRequest(createInvoiceSchema),
-  InvoiceMiddleware.create
+  InvoiceMiddleware.create,
 );
 
 // router.put("/properties/:id/", userAuthorization, async (req, res) => {

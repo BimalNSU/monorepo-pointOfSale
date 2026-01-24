@@ -8,6 +8,9 @@ import { Session as SessionModel } from "@pos/shared-models";
 import { UAParser } from "ua-parser-js";
 import { CustomAuth } from "../models/common.model";
 import { UpdateSessionInput } from "../schemas/session.schema";
+import axios from "axios";
+import { config } from "dotenv";
+config();
 
 export class AuthMiddleware {
   static async login(req: Request, res: Response, next: NextFunction) {
@@ -48,12 +51,12 @@ export class AuthMiddleware {
       const { password, ...restData } = userData;
       const isValidPassword = await bcrypt.compare(
         req.body.password,
-        password ?? ""
+        password ?? "",
       );
       if (!isValidPassword) {
         // when password doesn't match
         console.warn(
-          `Login attempt failed: password mismatch for user ${loginWith}`
+          `Login attempt failed: password mismatch for user ${loginWith}`,
         );
         return res.status(401).json({ error: "Invalid login credentials." });
       }
@@ -115,10 +118,40 @@ export class AuthMiddleware {
       return "id";
     }
   }
+  static async isValidReCaptcha(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const recaptchaToken = req.headers["x-recaptcha-token"];
+
+      const verify = await axios.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        null,
+        {
+          params: {
+            secret: process.env.RECAPTCHA_SERVER_SITE_KEY,
+            response: recaptchaToken,
+          },
+        },
+      );
+      if (
+        !verify.data.success ||
+        verify.data.score < 0.6 ||
+        verify.data.action !== "login"
+      ) {
+        return res.status(403).json({ error: "Bot suspected" });
+      }
+      return next();
+    } catch (err) {
+      next(err);
+    }
+  }
   static async isAuthenticated(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { authorization, session_id } = req.headers as {
@@ -152,7 +185,7 @@ export class AuthMiddleware {
   static async updateSession(
     req: Request<{}, {}, UpdateSessionInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const { authUserId, session } = res.locals as CustomAuth;
     const reqData = req.body;
