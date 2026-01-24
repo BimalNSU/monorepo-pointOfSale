@@ -27,6 +27,10 @@ import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
 import GLReport from "./pages/common/gl_report/generalLedgerReport";
 import UserDetails from "./pages/adminView/User/userDetails";
+import Shops from "./pages/adminView/shop/shops";
+import ShopAdd from "./pages/adminView/shop/shopAdd";
+import ShopDetails from "./pages/adminView/shop/shopDetails";
+import HomePage from "./pages/homePage";
 
 const App = () => {
   useFirebaseAuthListener(); //Called once to sync with auth
@@ -48,14 +52,15 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/home" exact element={<MainLayoutLandingPage page={"home"} />} />
-        <Route path="/index" exact element={<Index />}></Route>
-        <Route path="/about" exact>
-          {/* <MainLayoutLandingPage page={"about"} /> */}
-        </Route>
-        <Route path="/subscription" exact>
-          {/* <MainLayoutLandingPage page={"subscription"} /> */}
-        </Route>
+        <Route path="/" exact element={<HomePage />} />
+        {/* <Route path="/home" exact element={<MainLayoutLandingPage page={"home"} />} /> */}
+        {/* <Route path="/index" exact element={<Index />}></Route> */}
+        {/* <Route path="/about" exact> */}
+        {/* <MainLayoutLandingPage page={"about"} /> */}
+        {/* </Route> */}
+        {/* <Route path="/subscription" exact> */}
+        {/* <MainLayoutLandingPage page={"subscription"} /> */}
+        {/* </Route> */}
 
         <Route path="/login" exact element={<Login />} />
         {/* <Route
@@ -82,6 +87,19 @@ const App = () => {
                 <Route path="add" element={<UserAdd />} />
                 {/* <Route path=":id" element={<UserEdit />} /> */}
                 <Route path=":id" element={<UserDetails />} />
+              </Route>
+
+              <Route
+                path="shops"
+                element={
+                  <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
+                    <Outlet />
+                  </RequireRole>
+                }
+              >
+                <Route index element={<Shops />} />
+                <Route path="add" element={<ShopAdd />} />
+                <Route path=":id" element={<ShopDetails />} />
               </Route>
 
               <Route
