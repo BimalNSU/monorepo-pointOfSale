@@ -7,6 +7,8 @@ import { getAuth } from "firebase/auth";
 import App from "./App";
 import { initializeApp } from "firebase/app";
 import { FirestoreProvider } from "reactfire";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+
 const env = import.meta.env;
 const firebaseConfig = {
   apiKey: env.VITE_apiKey,
@@ -31,7 +33,16 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AuthProvider sdk={auth}>
         <FirestoreProvider sdk={firestoreInstance}>
           <StorageProvider sdk={storage}>
-            <App />
+            <GoogleReCaptchaProvider
+              reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+              scriptProps={{
+                async: true,
+                defer: true,
+                appendTo: "head",
+              }}
+            >
+              <App />
+            </GoogleReCaptchaProvider>
           </StorageProvider>
         </FirestoreProvider>
       </AuthProvider>

@@ -24,8 +24,8 @@ export const useFirebaseAuth = () => {
     resetStore,
   } = useAuthStore();
 
-  const login = async (data: { loginWith: string; password: string }) => {
-    const res = await apiProvider.login(data);
+  const login = async (data: { loginWith: string; password: string }, reCaptchaToken: string) => {
+    const res = await apiProvider.login(data, reCaptchaToken);
     if (!res) {
       throw new Error(`Unable to connect server`);
     }

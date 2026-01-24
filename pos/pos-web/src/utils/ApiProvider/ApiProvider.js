@@ -35,7 +35,8 @@ const axiosDelete = (url, headers = {}) =>
 // const register = (data, recaptchaToken) =>
 //   post(`/users/`, data, { authorization: `Bearer ${recaptchaToken}` });
 
-const login = (data) => post("/auth/login/", data);
+const login = (data, recaptchaToken) =>
+  post("/auth/login/", data, { "x-recaptcha-token": recaptchaToken });
 
 const changePassword = (token, sessionId, currentPassword, newPassword) =>
   put(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "reactfire";
 import { Form, Input, Button, Checkbox, Typography, Row, Col, Alert } from "antd";
@@ -6,12 +6,14 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./Login.css";
 import logo from "../../../images/logo.png";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 const { Title } = Typography;
 const { Password } = Input;
 
 const Login = () => {
   const auth = useAuth();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [formError, setFormError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,9 +21,11 @@ const Login = () => {
   const { login, session } = useFirebaseAuth();
 
   const onFinish = async (values) => {
+    if (!executeRecaptcha) return;
     setLoading(true);
     try {
-      await login(values);
+      const reCaptchaToken = await executeRecaptcha("login");
+      await login(values, reCaptchaToken);
       const { from } = location.state || { from: { pathname: "/dashboard" } };
       navigate(from, { replace: true });
     } catch (err) {
@@ -69,6 +73,7 @@ const Login = () => {
                   <Input
                     prefix={<UserOutlined className="site-form-item-icon" />}
                     placeholder="Enter User ID / Mobile / Email"
+                    autoComplete="username"
                   />
                 </Form.Item>
 
@@ -85,6 +90,7 @@ const Login = () => {
                   <Password
                     prefix={<LockOutlined className="site-form-item-icon" />}
                     placeholder="Enter password"
+                    autoComplete="current-password"
                   />
                 </Form.Item>
 
