@@ -6,13 +6,11 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "./Login.css";
 import logo from "../../../images/logo.png";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "react-google-recaptcha-v3";
 const { Title } = Typography;
 const { Password } = Input;
 
-const Login = () => {
-  const auth = useAuth();
+const LoginForm = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [formError, setFormError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -112,6 +110,20 @@ const Login = () => {
         </Col>
       </Row>
     </div>
+  );
+};
+const Login = () => {
+  return (
+    <GoogleReCaptchaProvider
+      reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+      scriptProps={{
+        async: true,
+        defer: true,
+        appendTo: "head",
+      }}
+    >
+      <LoginForm />
+    </GoogleReCaptchaProvider>
   );
 };
 
