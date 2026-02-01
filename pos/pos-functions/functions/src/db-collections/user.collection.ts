@@ -1,11 +1,25 @@
 import { db } from "../firebase";
 import { config } from "dotenv";
 import { COLLECTIONS } from "../constants/collections";
-import { UserId, User as UserModel, WithId } from "@pos/shared-models";
-import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
+import {
+  ShopId,
+  ShopRole,
+  UserId,
+  User as UserModel,
+  WithId,
+} from "@pos/shared-models";
+import {
+  CollectionReference,
+  FieldValue,
+  WriteBatch,
+} from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
 config();
 
+interface MutableData extends Omit<UserModel, "shopIds" | "shopRoles"> {
+  shopIds: ShopId[] | FieldValue;
+  shopRoles: Record<ShopId, ShopRole> | FieldValue;
+}
 const userFirstoreConverter = firestoreConverter<UserModel>();
 export class User {
   collectionRef: CollectionReference<UserModel>;
@@ -16,7 +30,7 @@ export class User {
   }
   async create(
     data: UserModel,
-    customUserId: UserId
+    customUserId: UserId,
   ): Promise<WithId<UserModel>> {
     await this.collectionRef
       .doc(customUserId)
@@ -24,7 +38,7 @@ export class User {
       .set(data);
     return { ...data, id: customUserId };
   }
-  update(id: UserId, data: Partial<UserModel>, batch: WriteBatch) {
+  update(id: UserId, data: Partial<MutableData>, batch: WriteBatch) {
     const docRef = this.collectionRef
       .doc(id)
       .withConverter(userFirstoreConverter);
@@ -86,7 +100,7 @@ export class User {
         deletedBy: updatedBy,
         deletedAt: now,
       },
-      { merge: true }
+      { merge: true },
     );
   }
 }

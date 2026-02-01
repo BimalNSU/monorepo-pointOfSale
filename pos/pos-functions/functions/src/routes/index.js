@@ -10,6 +10,8 @@ import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
 import { BkashMiddleware } from "../middlewares/bkash.middleware";
 import { createInvoiceSchema } from "../schemas/invoice.schema";
 import { InvoiceMiddleware } from "../middlewares/invoice.middleware";
+import { createShopAccessSchema } from "../schemas/shopAccess.schema";
+import { ShopMiddleware } from "src/middlewares/shop.middleware";
 
 config();
 
@@ -47,6 +49,21 @@ router.put(
   AuthMiddleware.isAuthenticated,
   AuthMiddleware.updateSession,
 );
+
+router.put(
+  "/shops/:id/employees/:employeeId/role",
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  validateRequest(createShopAccessSchema),
+  ShopMiddleware.addShopAccess,
+);
+router.delete(
+  "/shops/:id/employees/:employeeId",
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  ShopMiddleware.revokeShopAccess,
+);
+
 //NOTE: only for test purpose. It will call automatically from bkash merchant portal during payment
 router.post("/bkash/webhook", BkashMiddleware.handleWebhook);
 router.post(

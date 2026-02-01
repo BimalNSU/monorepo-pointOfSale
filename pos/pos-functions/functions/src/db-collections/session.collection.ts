@@ -6,12 +6,24 @@ import {
   COLLECTIONS,
   Session as SessionModel,
   WithId,
+  ShopId,
+  ShopRole,
 } from "@pos/shared-models";
-import { CollectionReference, WriteBatch } from "firebase-admin/firestore";
+import {
+  CollectionReference,
+  FieldValue,
+  Query,
+  WriteBatch,
+} from "firebase-admin/firestore";
 import { firestoreConverter } from "../utils/converter";
 
 config();
-type MutableData = Partial<Omit<SessionModel, "userId">>;
+type MutableData = Partial<
+  Omit<SessionModel, "userId" | "shopId" | "shopRole"> & {
+    shopId?: ShopId | FieldValue;
+    shopRole?: ShopRole | FieldValue;
+  }
+>;
 const sessionFirestoreConverter = firestoreConverter<SessionModel>();
 export class Session {
   collectionRef: CollectionReference;
@@ -26,7 +38,7 @@ export class Session {
     return sessionRef;
   }
   update(id: SessionId, data: MutableData, batch: WriteBatch) {
-    const now = new Date();
+    const now = FieldValue.serverTimestamp();
     const docRef = this.collectionRef
       .doc(id)
       .withConverter(sessionFirestoreConverter);
@@ -56,11 +68,17 @@ export class Session {
       return { ...doc.data(), id: doc.id } as WithId<SessionModel>;
     });
   }
-  async findByUserId(userId: UserId) {
-    const snapshot = await this.collectionRef
-      .where("userId", "==", userId)
-      .withConverter(sessionFirestoreConverter)
-      .get();
+  async findBy(filters: { userId?: UserId; shopId?: ShopId }) {
+    let query: Query<SessionModel> = this.collectionRef.withConverter(
+      sessionFirestoreConverter,
+    );
+    if (filters.userId) {
+      query = query.where("userId", "==", filters.userId);
+    }
+    if (filters.shopId) {
+      query = query.where("shopId", "==", filters.shopId);
+    }
+    const snapshot = await query.get();
     if (snapshot.empty) {
       return [];
     }
