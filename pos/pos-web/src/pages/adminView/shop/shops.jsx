@@ -9,7 +9,8 @@ import ShopService from "@/service/shop.service";
 import { useFirestore } from "reactfire";
 import { useMemo } from "react";
 import { useShops } from "@/api/useShops";
-
+import { success } from "@/utils/Utils/Utils";
+import styles from "../../../posButton.module.css";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -26,7 +27,12 @@ const Shops = () => {
     confirm({
       title: `Are you sure to delete the shop?`,
       async onOk() {
-        await shopService.delete(record.id, userId);
+        try {
+          await shopService.delete(record.id, userId);
+          success(`Shop ID ${record.id} is deleted successfully`);
+        } catch (e) {
+          console.log(e);
+        }
       },
     });
   };
@@ -108,14 +114,15 @@ const Shops = () => {
       title: "Action",
       align: "center",
       width: "5%",
-      render: (text, record) => (
-        <span>
-          <DeleteOutlined
-            onClick={(e) => {
-              handleDeleteShop(e, record);
-            }}
-          />
-        </span>
+      render: (_, record) => (
+        <Button
+          type="text"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={(e) => {
+            handleDeleteShop(e, record);
+          }}
+        />
       ),
       responsive: ["md", "lg", "xl", "xxl"],
     },
@@ -128,7 +135,7 @@ const Shops = () => {
         // width: 300,
         // margin: "10px",
         body: {
-          paddingTop: 0,
+          paddingTop: 2,
           paddingBottom: 16,
         },
       }}
@@ -143,7 +150,9 @@ const Shops = () => {
                 textDecoration: "none",
               }}
             >
-              <Button icon={<PlusOutlined />} />
+              <Button className={styles.posBtn} icon={<PlusOutlined />}>
+                Add Shop
+              </Button>
             </Link>
           </Row>
         )}

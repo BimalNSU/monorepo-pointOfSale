@@ -31,7 +31,11 @@ export const useUsers = (filter?: Filter) => {
     () =>
       data?.map((u) => {
         const { createdAt, ...rest } = u;
-        return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT) };
+        return {
+          ...rest,
+          fullName: `${u.firstName}${u.lastName ? ` ${u.lastName}` : ""}`,
+          createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT),
+        };
       }),
     [data],
   );

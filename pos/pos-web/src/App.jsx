@@ -22,7 +22,7 @@ const UserDetails = lazy(() => import("./pages/adminView/User/userDetails"));
 
 const Shops = lazy(() => import("./pages/adminView/shop/shops"));
 const ShopAdd = lazy(() => import("./pages/adminView/shop/shopAdd"));
-const ShopDetails = lazy(() => import("./pages/adminView/shop/shopDetails"));
+const ShopSettingsPage = lazy(() => import("./pages/adminView/shop/shopSettingsPage"));
 
 const Products = lazy(() => import("./pages/ManagerView/Product/Products"));
 const ProductAdd = lazy(() => import("./pages/ManagerView/Product/productAdd"));
@@ -122,7 +122,7 @@ const App = () => {
                 >
                   <Route index element={<Shops />} />
                   <Route path="add" element={<ShopAdd />} />
-                  <Route path=":id" element={<ShopDetails />} />
+                  <Route path=":id" element={<ShopSettingsPage />} />
                 </Route>
 
                 <Route

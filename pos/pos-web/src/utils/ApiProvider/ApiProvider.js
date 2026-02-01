@@ -70,6 +70,17 @@ const updateUserByAdmin = (userId, data, token, sessionId) =>
 const updateSession = async (id, data, token) =>
   put(`/sessions`, data, { authorization: token, session_id: id });
 
+const addShopAccess = (shopId, userId, data, token, sessionId) =>
+  put(`/shops/${shopId}/employees/${userId}/role`, data, {
+    authorization: token,
+    session_id: sessionId,
+  });
+const revokeShopAccess = async (shopId, userId, token, sessionId) =>
+  axiosDelete(`/shops/${shopId}/employees/${userId}`, {
+    authorization: token,
+    session_id: sessionId,
+  });
+
 export const apiProvider = {
   login,
   // register,
@@ -79,6 +90,9 @@ export const apiProvider = {
   updateUserStatus,
   changePassword,
   updateSession,
+
+  addShopAccess,
+  revokeShopAccess,
   // addProperty,
   // updateProperty,
   // deleteProperty,
