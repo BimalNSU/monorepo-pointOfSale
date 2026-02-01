@@ -32,7 +32,7 @@ export class AuthService {
   async updateSession(
     sessionId: SessionId,
     sessionData: Pick<SessionModel, "role" | "shopId" | "shopRole">,
-    authUserId: UserId
+    authUserId: UserId,
   ) {
     try {
       const userService = new UserService();
@@ -77,12 +77,12 @@ export class AuthService {
   async deleteAllSession(id: UserId, writeBatch?: WriteBatch) {
     try {
       const sessionObj = new Session();
-      const targetSessions = await sessionObj.findByUserId(id);
+      const targetSessions = await sessionObj.findBy({ userId: id });
       if (targetSessions.length) {
         const batch = writeBatch ?? db.batch();
         sessionObj.deleteAll(
           targetSessions.map((s) => s.id),
-          batch
+          batch,
         );
         if (!writeBatch) {
           await batch.commit();
