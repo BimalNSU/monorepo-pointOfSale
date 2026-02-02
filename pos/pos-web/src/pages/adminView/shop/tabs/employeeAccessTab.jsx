@@ -1,5 +1,4 @@
 import { Row, Col, List, Input, Tag, Card, Select, Button, Modal, Divider } from "antd";
-// import { useShopEmployees } from "../hooks/useShopEmployees";
 import { SHOP_ROLES } from "../../../../constants/posRoles";
 import { useUsers } from "@/api/useUsers";
 import { USER_ROLE } from "@/constants/role";
@@ -14,7 +13,6 @@ const { Option } = Select;
 const EmployeeAccessTab = ({ shopId }) => {
   const { getToken, session } = useFirebaseAuth();
   const shopService = new ShopService();
-  //   const employees = useShopEmployees(shopId);
   const { status, data: employees } = useUsers({
     isDeleted: false,
     role: USER_ROLE.VALUES.Employee,
@@ -29,7 +27,7 @@ const EmployeeAccessTab = ({ shopId }) => {
   useDebounce(
     () => {
       if (!search) {
-        setFiltered(employees);
+        setFiltered(employees || []);
       } else {
         setFiltered(
           employees?.filter((e) => e.fullName.toLowerCase().includes(search.toLowerCase())) || [],
@@ -42,7 +40,7 @@ const EmployeeAccessTab = ({ shopId }) => {
 
   const selectEmployee = (emp) => {
     setSelected(emp);
-    setShopRole(emp.shopRoles ? emp.shopRoles[shopId] : SHOP_ROLES.VALUES.N0_ACCESS);
+    setShopRole(emp.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS);
   };
 
   const saveRole = async () => {
@@ -52,63 +50,56 @@ const EmployeeAccessTab = ({ shopId }) => {
       shopRole === SHOP_ROLES.VALUES.N0_ACCESS
         ? await shopService.revokeShopAccess(shopId, selected.id, token, session.id)
         : await shopService.addShopAccess(shopId, selected.id, shopRole, token, session.id);
-      setSaving(false);
-      setSelected();
-      setShopRole();
-    } catch (err) {
+      setSelected(null);
+      setShopRole(null);
+    } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Row gutter={16}>
+    <Row gutter={[16, 16]}>
       {/* LEFT PANEL */}
-      <Col span={8}>
+      <Col xs={24} md={10}>
         <Card title="Employees">
           <Search
             placeholder="Search employee"
             onChange={(e) => setSearch(e.target.value)}
             allowClear
+            size="large"
           />
 
           <List
             loading={status === "loading"}
             style={{ marginTop: 12 }}
             dataSource={filtered}
-            renderItem={(emp) => (
-              <List.Item
-                onClick={() => selectEmployee(emp)}
-                style={{
-                  cursor: "pointer",
-                  background: selected?.id === emp.id ? "#f5f5f5" : undefined,
-                }}
-              >
-                <List.Item.Meta
-                  title={emp.fullName}
-                  description={
-                    <Tag
-                      color={
-                        SHOP_ROLES.KEYS[
-                          (emp.shopRoles && emp.shopRoles[shopId]) || SHOP_ROLES.VALUES.N0_ACCESS
-                        ].color
-                      }
-                    >
-                      {
-                        SHOP_ROLES.KEYS[
-                          (emp.shopRoles && emp.shopRoles[shopId]) || SHOP_ROLES.VALUES.N0_ACCESS
-                        ].text
-                      }
-                    </Tag>
-                  }
-                />
-              </List.Item>
-            )}
+            renderItem={(emp) => {
+              const role = emp.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS;
+              return (
+                <List.Item
+                  onClick={() => selectEmployee(emp)}
+                  style={{
+                    cursor: "pointer",
+                    padding: "12px 8px",
+                    borderRadius: 6,
+                    background: selected?.id === emp.id ? "#f5f5f5" : undefined,
+                  }}
+                >
+                  <List.Item.Meta
+                    title={emp.fullName}
+                    description={
+                      <Tag color={SHOP_ROLES.KEYS[role].color}>{SHOP_ROLES.KEYS[role].text}</Tag>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
           />
         </Card>
       </Col>
 
       {/* RIGHT PANEL */}
-      <Col span={16}>
+      <Col xs={24} md={14}>
         <Card title="Role Assignment">
           {!selected && (
             <div style={{ textAlign: "center", color: "#999" }}>
@@ -118,19 +109,20 @@ const EmployeeAccessTab = ({ shopId }) => {
 
           {selected && (
             <>
-              <h3>{selected.fullName}</h3>
-              <p>{selected?.email}</p>
+              <h3 style={{ marginBottom: 0 }}>{selected.fullName}</h3>
+              <p style={{ color: "#666" }}>{selected.email}</p>
 
               <Divider />
 
-              <label>Role</label>
-              <Select value={shopRole} size="large" style={{ width: 300 }} onChange={setShopRole}>
+              <label style={{ fontWeight: 500 }}>Role</label>
+              <Select
+                value={shopRole}
+                size="large"
+                style={{ width: "100%", maxWidth: 400 }}
+                onChange={setShopRole}
+              >
                 {Object.entries(SHOP_ROLES.KEYS).map(([id, { text }]) => (
-                  <Option
-                    key={Number(id)}
-                    value={Number(id)}
-                    // disabled={id === role}
-                  >
+                  <Option key={id} value={Number(id)}>
                     {text}
                   </Option>
                 ))}
@@ -138,23 +130,15 @@ const EmployeeAccessTab = ({ shopId }) => {
 
               <Divider />
 
-              {/* <h4>Permissions</h4>
-              {ROLE_PERMISSIONS[role].map((p) => (
-                <Tag key={p} color="green">
-                  {p}
-                </Tag>
-              ))} */}
-
-              <Divider />
-
               <Button
                 type="primary"
+                block
+                loading={saving}
                 disabled={
-                  selected.shopRoles
+                  selected.shopRoles?.[shopId]
                     ? shopRole === selected.shopRoles[shopId]
                     : shopRole === SHOP_ROLES.VALUES.N0_ACCESS
                 }
-                loading={saving}
                 onClick={() =>
                   Modal.confirm({
                     title: "Confirm role change",
@@ -166,12 +150,11 @@ const EmployeeAccessTab = ({ shopId }) => {
                         <p>
                           {
                             SHOP_ROLES.KEYS[
-                              selected.shopRoles
-                                ? selected.shopRoles[shopId]
-                                : SHOP_ROLES.VALUES.N0_ACCESS
+                              selected.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS
                             ].text
-                          }{" "}
-                          → {SHOP_ROLES.KEYS[shopRole].text}
+                          }
+                          {" → "}
+                          {SHOP_ROLES.KEYS[shopRole].text}
                         </p>
                       </>
                     ),
@@ -188,4 +171,5 @@ const EmployeeAccessTab = ({ shopId }) => {
     </Row>
   );
 };
+
 export default EmployeeAccessTab;
