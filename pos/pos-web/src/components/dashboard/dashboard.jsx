@@ -66,7 +66,9 @@ const Dashboard = () => {
           shopRole={shopRoles[shop.id]}
           isSelected={session.shopId === shop.id}
           // manager={shop.manager}
-          onClick={() => handleSelectedShop(shop.id, shopRoles?.[shop.id])}
+          onClick={() =>
+            session.shopId !== shop.id && handleSelectedShop(shop.id, shopRoles?.[shop.id])
+          }
         />
       ))}
     </div>
