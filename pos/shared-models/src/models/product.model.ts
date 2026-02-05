@@ -19,8 +19,11 @@ export interface Product extends BaseModel {
   name: string;
   description: string | null;
   qty: number;
+  unit?: string;
   salesRate: number;
   purchaseRate: number | null;
+
+  barcode: string;
 
   //new fields
   // brand: string | null;
