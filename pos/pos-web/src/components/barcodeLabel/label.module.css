@@ -1,0 +1,25 @@
+.label {
+  width: 50mm;
+  height: 30mm;
+  padding: 2mm;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  border: 1px solid #000;
+}
+
+.productName {
+  font-size: 9px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.productCode {
+  font-size: 8px;
+}
+
+.price {
+  font-size: 10px;
+  font-weight: bold;
+}

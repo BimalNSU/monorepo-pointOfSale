@@ -1,13 +1,14 @@
-import { Card, Modal, Table, Typography } from "antd";
+import { Button, Card, Modal, Space, Table, Typography } from "antd";
 import { useProducts } from "@/api/useProducts";
 import { USER_ROLE } from "@/constants/role";
 import { Link } from "react-router-dom";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PrinterOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import ProductService from "@/service/product.service";
 import { useFirestore } from "reactfire";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import PrintBarcodeLabel from "@/components/barcodeLabel/printBarcodeLabel";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -15,6 +16,7 @@ const Products = () => {
   const { userId, session } = useFirebaseAuth();
   const db = useFirestore();
   const productService = new ProductService(db);
+  const [selectedProduct, setSelectedProduct] = useState();
   const { status, data } = useProducts();
 
   const products = useMemo(() => data?.map((p) => ({ ...p, key: p.id })) ?? [], [data]);
@@ -27,6 +29,9 @@ const Products = () => {
         await productService.delete(record.id, userId);
       },
     });
+  };
+  const openLabelModal = (selectedProduct) => {
+    setSelectedProduct(selectedProduct);
   };
   const renderValueCell = (text, record) => (
     <Link
@@ -135,14 +140,17 @@ const Products = () => {
     columns.push({
       title: "Action",
       align: "center",
-      render: (text, record) => (
-        <span>
-          <DeleteOutlined
-            onClick={(e) => {
-              handleDeleteProduct(e, record);
-            }}
-          />
-        </span>
+      render: (_, record) => (
+        <Space size={10}>
+          <Button size="small" icon={<PrinterOutlined />} onClick={() => openLabelModal(record)} />
+          <span>
+            <DeleteOutlined
+              onClick={(e) => {
+                handleDeleteProduct(e, record);
+              }}
+            />
+          </span>
+        </Space>
       ),
       responsive: ["md", "lg", "xl", "xxl"],
     });
@@ -167,6 +175,9 @@ const Products = () => {
         // }}
         // onChange={onChange}
       />
+      {selectedProduct ? (
+        <PrintBarcodeLabel product={selectedProduct} reset={() => setSelectedProduct(null)} />
+      ) : null}
     </Card>
   );
 };
