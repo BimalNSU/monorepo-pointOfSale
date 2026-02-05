@@ -25,6 +25,7 @@ const ProductForm = ({ data, newProductFormat, form }) => {
         unit: data.unit || null,
         salesRate: data.salesRate,
         purchaseRate: data.purchaseRate || null,
+        barcode: data.barcode || null,
       };
       form.setFieldsValue(formData);
     }
