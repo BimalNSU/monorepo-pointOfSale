@@ -175,9 +175,7 @@ const Products = () => {
         // }}
         // onChange={onChange}
       />
-      {selectedProduct ? (
-        <PrintBarcodeLabel product={selectedProduct} reset={() => setSelectedProduct(null)} />
-      ) : null}
+      <PrintBarcodeLabel product={selectedProduct} reset={() => setSelectedProduct(null)} />
     </Card>
   );
 };
