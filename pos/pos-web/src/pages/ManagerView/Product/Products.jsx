@@ -1,6 +1,6 @@
 import { Button, Card, Modal, Space, Table, Typography } from "antd";
 import { useProducts } from "@/api/useProducts";
-import { USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
 import { Link } from "react-router-dom";
 import { DeleteOutlined, PrinterOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";
@@ -72,18 +72,27 @@ const Products = () => {
             <br />
             <Text strong>Sales Rate:</Text> {convertToBD(record.salesRate)}
           </Link>
-          {USER_ROLE.VALUES.Admin === session.role && (
+          {USER_ROLE.VALUES.Admin === session.role ||
+          (session.role === USER_ROLE.VALUES.Employee &&
+            session.shopRole === SHOP_ROLE.VALUES.Manager) ? (
             <div>
               <Text strong>Action:</Text>{" "}
-              <span>
-                <DeleteOutlined
-                  onClick={(e) => {
-                    handleDeleteProduct(e, record);
-                  }}
+              <Space size={10}>
+                <Button
+                  size="small"
+                  icon={<PrinterOutlined />}
+                  onClick={() => openLabelModal(record)}
                 />
-              </span>
+                <span>
+                  <DeleteOutlined
+                    onClick={(e) => {
+                      handleDeleteProduct(e, record);
+                    }}
+                  />
+                </span>
+              </Space>
             </div>
-          )}
+          ) : null}
         </div>
       ),
       responsive: ["xs"],
@@ -136,7 +145,10 @@ const Products = () => {
       responsive: ["md", "lg", "xl", "xxl"],
     },
   ];
-  if (session.role === USER_ROLE.VALUES.Admin) {
+  if (
+    session.role === USER_ROLE.VALUES.Admin ||
+    (session.role === USER_ROLE.VALUES.Employee && session.shopRole === SHOP_ROLE.VALUES.Manager)
+  ) {
     columns.push({
       title: "Action",
       align: "center",
