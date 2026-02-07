@@ -28,20 +28,44 @@ const PrintBarcodeLabel: React.FC<Props> = ({ product, reset }) => {
           }
           body {
             margin: 0;
-           
           }
-          .label {
+          .print-label {
             width: 50mm;
             height: 30mm;
             padding: 2mm;
             box-sizing: border-box;
-            text-align: center;       /* centers text (product name, code, price) */
+            margin-left: 8px;
 
-            display: flex;            /* centers all children including SVG */
+            font-family: Arial, sans-serif;
+            text-align: center;
+
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             page-break-after: always;
+          }
+           .print-product-name {
+            font-size: 9px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .print-product-code {
+            font-size: 8px;
+          }
+          .print-price  {
+            font-size: 10px;
+            font-weight: bold;
+          }
+          .print-company {
+            font-size: 7px;
+            opacity: 0.9;
+          }
+          print-label svg {
+            display: block;
+            margin: 0 auto;
           }
         </style>
       </head>

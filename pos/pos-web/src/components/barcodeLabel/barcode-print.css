@@ -1,0 +1,43 @@
+.print-label {
+  width: 50mm;
+  height: 30mm;
+  padding: 2mm;
+  box-sizing: border-box;
+  border: 1px solid #000;
+  margin-left: 8px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Arial, sans-serif;
+  text-align: center;
+
+  page-break-after: always;
+}
+
+.print-product-name {
+  font-size: 9px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.print-product-code {
+  font-size: 8px;
+}
+
+.print-price {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.print-company {
+  font-size: 7px;
+  margin-top: auto;
+}
+
+.print-label svg {
+  height: 18mm;
+}
