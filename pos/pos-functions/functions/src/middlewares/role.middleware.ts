@@ -3,10 +3,10 @@ import {
   Session,
   ShopId,
   ShopRole,
+  USER_ROLE,
   UserRole as UserRoleType,
   WithId,
 } from "@pos/shared-models";
-import { USER_ROLE } from "../constants/common";
 
 export class RoleMiddleware {
   static isAdmin(req: Request, res: Response, next: NextFunction) {

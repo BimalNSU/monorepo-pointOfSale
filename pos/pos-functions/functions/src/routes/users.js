@@ -24,23 +24,10 @@ app.use(express.json());
 app.use(cors({ origin: originList }));
 
 router.put(
-  "/change-password",
-  AuthMiddleware.isAuthenticated,
-  validateRequest(updateUserPasswordSchema),
-  UserMiddleware.updatePassword
-);
-router.patch(
   "/:id",
   AuthMiddleware.isAuthenticated,
   validateRequest(updateOwnUserSchema),
-  UserMiddleware.update
-);
-router.patch(
-  "/:id/status",
-  AuthMiddleware.isAuthenticated,
-  RoleMiddleware.isAdmin,
-  validateRequest(updateUserStatusSchema),
-  UserMiddleware.updateStatus
+  UserMiddleware.update,
 );
 
 export default router;

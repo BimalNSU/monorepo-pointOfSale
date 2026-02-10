@@ -6,12 +6,20 @@ import recaptchaAuthorization from "../middlewares/recaptcha-authorization.middl
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { RoleMiddleware } from "../middlewares/role.middleware";
 import { validateRequest } from "../middlewares/validateRequest.middleware";
-import { createUserSchema, updateUserSchema } from "../schemas/user.schema";
+import {
+  createUserSchema,
+  updateOwnUserSchema,
+  updatePasswordByAdminSchema,
+  updateUserPasswordSchema,
+  updateUserSchema,
+  updateUserStatusSchema,
+} from "../schemas/user.schema";
 import { BkashMiddleware } from "../middlewares/bkash.middleware";
 import { createInvoiceSchema } from "../schemas/invoice.schema";
 import { InvoiceMiddleware } from "../middlewares/invoice.middleware";
 import { createShopAccessSchema } from "../schemas/shopAccess.schema";
-import { ShopMiddleware } from "src/middlewares/shop.middleware";
+import { ShopMiddleware } from "../middlewares/shop.middleware";
+import { updateSessionSchema } from "../schemas/session.schema";
 
 config();
 
@@ -28,25 +36,23 @@ router.post(
   AuthMiddleware.login,
 );
 
-//TODO: test for validation inputs
-router.post(
-  "/admin/users/",
-  AuthMiddleware.isAuthenticated,
-  RoleMiddleware.isAdmin,
-  validateRequest(createUserSchema),
-  UserMiddleware.create,
-);
 router.put(
-  "/admin/users/:id",
+  "/me",
   AuthMiddleware.isAuthenticated,
-  RoleMiddleware.isAdmin,
-  validateRequest(updateUserSchema),
-  UserMiddleware.updatedByAdmin,
+  validateRequest(updateOwnUserSchema),
+  UserMiddleware.update,
+);
+router.patch(
+  "/me/password",
+  AuthMiddleware.isAuthenticated,
+  validateRequest(updateUserPasswordSchema),
+  UserMiddleware.updatePassword,
 );
 
 router.put(
   "/sessions",
   AuthMiddleware.isAuthenticated,
+  validateRequest(updateSessionSchema),
   AuthMiddleware.updateSession,
 );
 

@@ -3,6 +3,7 @@ import express, { Application } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { config } from "dotenv";
+import adminRouter from "./routes/admin";
 import usersRouter from "./routes/users";
 import indexRouter from "./routes/index";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -20,6 +21,7 @@ const originList = JSON.parse(process.env.CORS_ORIGINS as string);
 app.use(cors({ origin: originList }));
 
 app.use("/", indexRouter);
+app.use("/admin", adminRouter);
 app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler

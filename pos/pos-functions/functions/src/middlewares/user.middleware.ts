@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { UserId } from "@pos/shared-models";
-import bcrypt from "@node-rs/bcrypt";
 import { CustomAuth } from "../models/common.model";
 import {
   CreateUserInput,
   UpdateOwnUserInput,
+  updatePasswordByAdminInput,
   UpdateUserInput,
   UpdateUserPasswordInput,
   UpdateUserStatusInput,
@@ -15,7 +15,7 @@ export class UserMiddleware {
   static async create(
     req: Request<{}, {}, CreateUserInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const { authUserId } = res.locals as CustomAuth;
     const userData = req.body;
@@ -31,7 +31,7 @@ export class UserMiddleware {
   static async updatedByAdmin(
     req: Request<{ id: UserId }, {}, UpdateUserInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const { authUserId } = res.locals as CustomAuth;
     const { id: userId } = req.params;
@@ -48,7 +48,7 @@ export class UserMiddleware {
   static async update(
     req: Request<{ id: UserId }, {}, UpdateOwnUserInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const { authUserId } = res.locals as CustomAuth;
     const { id: userId } = req.params;
@@ -73,7 +73,7 @@ export class UserMiddleware {
   static async updateStatus(
     req: Request<{ id: UserId }, {}, UpdateUserStatusInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     const { authUserId } = res.locals as CustomAuth;
     const { id: userId } = req.params;
@@ -91,22 +91,36 @@ export class UserMiddleware {
   static async updatePassword(
     req: Request<{}, {}, UpdateUserPasswordInput>,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
-    const { authUserId } = res.locals as CustomAuth;
-    const { currentPassword, newPassword } = req.body;
-    const userService = new UserService();
-    const user = await userService.findOne(authUserId);
+    const { authUserId, session } = res.locals as CustomAuth;
     try {
-      const isMatched = await bcrypt.compare(
-        currentPassword,
-        user.password ?? ""
+      await new UserService().updatePassword(
+        authUserId,
+        req.body,
+        authUserId,
+        session.id,
       );
-      if (!isMatched) {
-        return res.status(401).json("Wrong password.");
-      }
-      const newHash = await bcrypt.hash(newPassword, 10);
-      await userService.update(authUserId, { password: newHash }, authUserId);
+      return res
+        .status(200)
+        .json({ message: "Password changed successfully." });
+    } catch (err) {
+      return next(err); // will be handled by centralized errorHandler
+    }
+  }
+  static async updatePasswordByAdmin(
+    req: Request<{ id: UserId }, {}, updatePasswordByAdminInput>,
+    res: Response,
+    next: NextFunction,
+  ) {
+    const { id: userId } = req.params;
+    const { authUserId } = res.locals as CustomAuth;
+    try {
+      await new UserService().updatePasswordByAdmin(
+        userId,
+        req.body,
+        authUserId,
+      );
       return res
         .status(200)
         .json({ message: "Password changed successfully." });

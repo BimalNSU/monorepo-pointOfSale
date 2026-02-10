@@ -1,5 +1,8 @@
-import { USER_ROLE } from "../constants/common";
-import { Gender, UserRole as UserRoleType } from "@pos/shared-models";
+import {
+  Gender,
+  USER_ROLE,
+  UserRole as UserRoleType,
+} from "@pos/shared-models";
 import { z } from "zod";
 
 export const createUserSchema = z.object({
@@ -27,7 +30,7 @@ export const createUserSchema = z.object({
     .optional()
     .nullable()
     .transform((val) =>
-      typeof val === "string" ? new Date(val) : val ?? null
+      typeof val === "string" ? new Date(val) : val ?? null,
     ),
   gender: z
     .number()
@@ -50,12 +53,12 @@ export const createUserSchema = z.object({
       (val) =>
         [
           USER_ROLE.VALUES.Admin,
-          USER_ROLE.VALUES.Manager,
-          USER_ROLE.VALUES.Salesman,
+          USER_ROLE.VALUES.Employee,
+          USER_ROLE.VALUES.Vendor,
         ].includes(val),
       {
         message: "Role must be one of 1, 2, or 3",
-      }
+      },
     )
     .transform((val) => val as UserRoleType), // Safe fallback
 });
@@ -83,7 +86,7 @@ export const updateUserStatusSchema = z
     {
       message: "Only one of 'isActive' or 'isDeleted' must be provided.",
       path: ["isActive"], // or leave empty to apply globally
-    }
+    },
   );
 export type UpdateUserStatusInput = z.infer<typeof updateUserStatusSchema>;
 
@@ -104,3 +107,10 @@ export const updateUserPasswordSchema = z.object({
   newPassword: z.string(),
 });
 export type UpdateUserPasswordInput = z.infer<typeof updateUserPasswordSchema>;
+
+export const updatePasswordByAdminSchema = z.object({
+  newPassword: z.string(),
+});
+export type updatePasswordByAdminInput = z.infer<
+  typeof updatePasswordByAdminSchema
+>;

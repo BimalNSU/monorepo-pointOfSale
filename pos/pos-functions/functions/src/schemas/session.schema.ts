@@ -1,5 +1,4 @@
-import { SHOP_ROLE, USER_ROLE } from "../constants/common";
-import { ShopRole, UserRole } from "@pos/shared-models";
+import { SHOP_ROLE, ShopRole, USER_ROLE, UserRole } from "@pos/shared-models";
 import { z } from "zod";
 
 export const updateSessionSchema = z.object({
@@ -9,12 +8,12 @@ export const updateSessionSchema = z.object({
       (val) =>
         [
           USER_ROLE.VALUES.Admin,
-          USER_ROLE.VALUES.Manager,
-          USER_ROLE.VALUES.Salesman,
+          USER_ROLE.VALUES.Employee,
+          USER_ROLE.VALUES.Vendor,
         ].includes(val),
       {
         message: "Role must be one of 1, 2, or 3",
-      }
+      },
     )
     .transform((val) => val as UserRole), // Safe fallback
   shopId: z.string().optional(),
@@ -26,10 +25,11 @@ export const updateSessionSchema = z.object({
           SHOP_ROLE.VALUES.Manager,
           SHOP_ROLE.VALUES.Cashier,
           SHOP_ROLE.VALUES.Salesman,
+          SHOP_ROLE.VALUES.STOCK,
         ].includes(val),
       {
-        message: "Role must be one of 1, 2, or 3",
-      }
+        message: "Role must be one of 1, 2, 3 or 4",
+      },
     )
     .optional()
     .transform((val) => val as ShopRole), // Safe fallback
