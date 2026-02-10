@@ -1,4 +1,4 @@
-import { DocumentReference } from "firebase/firestore";
+import { DocumentReference, FieldValue } from "firebase/firestore";
 
 export type UserId = string;
 export type MemberId = string;
@@ -73,11 +73,11 @@ export type ChartOfAccountId = string;
 export type AccountTypeId = string;
 export type AccountBalanceId = string;
 export interface BaseModel {
-  createdAt: Date;
+  createdAt: Date | FieldValue;
   createdBy: UserId;
   isDeleted: boolean;
   deletedAt: Date | null;
   deletedBy: UserId | null;
-  updatedAt: Date;
+  updatedAt: Date | FieldValue;
   updatedBy: UserId;
 }
