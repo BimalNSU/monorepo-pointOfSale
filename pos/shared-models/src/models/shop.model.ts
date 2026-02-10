@@ -5,5 +5,5 @@ export interface Shop extends BaseModel {
   name: string;
   address: string | null;
   code: string; // will be use in transaction ID, invoiceID etc.
-  officials: Record<UserId, ShopRole> | null;
+  employees: Record<UserId, ShopRole> | null;
 }
