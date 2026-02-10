@@ -25,8 +25,9 @@ export class User {
     const docRef = doc(this.db, COLLECTIONS.users, id).withConverter(userConverter);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
+      const { password, ...rest } = docSnap.data();
       return {
-        ...docSnap.data(),
+        ...rest,
         id,
       };
     } else {
@@ -34,7 +35,9 @@ export class User {
     }
   }
   async getListByIds(userIds: UserId[]) {
-    return await Promise.all<WithId<UserModel>>(userIds.map(async (id) => await this.get(id)));
+    return await Promise.all<WithId<Omit<UserModel, "password">>>(
+      userIds.map(async (id) => await this.get(id)),
+    );
   }
   edit(batch: WriteBatch, id: UserId, data: Partial<EditData>, updatedBy: UserId) {
     const now = serverTimestamp();

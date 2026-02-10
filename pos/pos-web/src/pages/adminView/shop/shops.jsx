@@ -1,6 +1,5 @@
 import { Button, Card, Modal, Row, Table, Typography } from "antd";
-import { useProducts } from "@/api/useProducts";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { Link } from "react-router-dom";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";

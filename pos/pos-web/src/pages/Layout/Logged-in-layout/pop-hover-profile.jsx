@@ -27,7 +27,7 @@ const PopHoverProfile = ({ viewContentMbl }) => {
       <Divider style={{ margin: 1 }} />
       <Space direction="horizontal">
         <UserOutlined />
-        <Link to="/profile/view" style={{ textDecoration: "none" }}>
+        <Link to="/profile" style={{ textDecoration: "none" }}>
           Profile
         </Link>
       </Space>

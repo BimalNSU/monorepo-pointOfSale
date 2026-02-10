@@ -1,17 +1,17 @@
 import { Button, Col, DatePicker, Form, Input, Radio, Row, Select, Typography } from "antd";
-import * as validator from "../../../../utils/Validation/Validation";
+import * as validator from "../../utils/Validation/Validation";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { DOB_dateFormat } from "@/constants/dateFormat";
 import { MARITAL_TYPE, RELIGION_TYPE } from "@/constants/common";
 import { useEffect } from "react";
 import dayjs from "dayjs";
-import styles from "../../../..//posButton.module.css";
-const { Title } = Typography;
+import styles from "../../posButton.module.css";
+const { Text } = Typography;
 const bloodGroupsData = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 
 const UserForm = ({ mode, userData, onSubmit, onCancel }) => {
-  const { session } = useFirebaseAuth();
+  const { userId: authUserID, session } = useFirebaseAuth();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const UserForm = ({ mode, userData, onSubmit, onCancel }) => {
       bloodGroup: formData.bloodGroup || null,
       maritalStatus: formData.maritalStatus || null,
       religion: formData.religion || null,
-      role: formData.role,
+      role: formData.role || userData.role,
     };
     onSubmit(processData, form);
   };
@@ -67,15 +67,23 @@ const UserForm = ({ mode, userData, onSubmit, onCancel }) => {
             <Form.Item
               name="role"
               label="Role"
-              rules={[{ required: true, message: `Please select user's role!` }]}
+              rules={
+                userData.id !== authUserID
+                  ? [{ required: true, message: `Please select user's role!` }]
+                  : null
+              }
             >
-              <Select
-                style={{ width: 120 }}
-                options={Object.entries(USER_ROLE.KEYS).map(([key, text]) => ({
-                  value: Number(key),
-                  label: text,
-                }))}
-              />
+              {userData.id === authUserID ? (
+                <Text>{USER_ROLE.KEYS[userData.role]}</Text>
+              ) : (
+                <Select
+                  style={{ width: 120 }}
+                  options={Object.entries(USER_ROLE.KEYS).map(([key, text]) => ({
+                    value: Number(key),
+                    label: text,
+                  }))}
+                />
+              )}
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={24} lg={12} xl={12}>

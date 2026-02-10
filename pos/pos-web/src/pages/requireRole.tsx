@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { ShopRole, UserRole } from "@pos/shared-models";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 
 const RequireRole = ({
   children,

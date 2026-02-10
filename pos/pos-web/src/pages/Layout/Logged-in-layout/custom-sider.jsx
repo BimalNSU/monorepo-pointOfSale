@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import { AppVersion } from "@/pages/AppVersion";
 import logo from "../../../images/logo.png";
 import bkash_logo from "../../../images/bkash-logo-transparent.png";
-import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 const { Sider } = Layout;
 

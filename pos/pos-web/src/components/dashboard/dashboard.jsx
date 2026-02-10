@@ -3,7 +3,7 @@ import { Row, Col, Card, Spin, Result, Button, Avatar } from "antd";
 import { useShopsBy } from "@/api/useShopsBy";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
-import { SHOP_ROLE } from "@/constants/role";
+import { SHOP_ROLE } from "@pos/shared-models";
 import { GlobalOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
 import ShopCard from "./subComponents/shopCard";

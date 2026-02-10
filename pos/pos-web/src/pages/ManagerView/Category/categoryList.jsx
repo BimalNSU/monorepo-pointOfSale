@@ -1,6 +1,6 @@
 import { Table, Typography } from "antd";
 import { useCategories } from "@/api/categoryList";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { Link } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
 
@@ -28,7 +28,7 @@ const CategoryList = () => {
             <br />
             <Text strong>Name:</Text> {record.name}
           </Link>
-          {[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Manager].includes(authRole) && (
+          {USER_ROLE.VALUES.Admin === authRole && (
             <div>
               <Text strong>Action:</Text>{" "}
               <span>

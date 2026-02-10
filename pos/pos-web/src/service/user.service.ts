@@ -29,6 +29,30 @@ class UserService {
     }
     return res;
   }
+  async update(
+    id: UserId,
+    updateData: EditData,
+    idToken: string,
+    sessionId: SessionId,
+  ): Promise<AxiosResponse> {
+    const res = await apiProvider.updateUser(id, updateData, idToken, sessionId);
+    if (!res) {
+      throw new Error(`Unable to connect server`);
+    }
+    return res;
+  }
+  async updatePassword(
+    id: UserId,
+    updateData: { currentPassword: string; newPassword: string },
+    idToken: string,
+    sessionId: SessionId,
+  ): Promise<AxiosResponse> {
+    const res = await apiProvider.updateOwnPassword(updateData, idToken, sessionId);
+    if (!res) {
+      throw new Error(`Unable to connect server`);
+    }
+    return res;
+  }
   async updateByAdmin(
     id: UserId,
     updateData: EditData,
@@ -36,6 +60,18 @@ class UserService {
     sessionId: SessionId,
   ): Promise<AxiosResponse> {
     const res = await apiProvider.updateUserByAdmin(id, updateData, idToken, sessionId);
+    if (!res) {
+      throw new Error(`Unable to connect server`);
+    }
+    return res;
+  }
+  async updatePasswordByAdmin(
+    id: UserId,
+    newPassword: string,
+    idToken: string,
+    sessionId: SessionId,
+  ): Promise<AxiosResponse> {
+    const res = await apiProvider.updatePasswordByAdmin(id, { newPassword }, idToken, sessionId);
     if (!res) {
       throw new Error(`Unable to connect server`);
     }

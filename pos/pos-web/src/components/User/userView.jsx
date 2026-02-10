@@ -1,6 +1,6 @@
 import { GENDER_TYPE, MARITAL_TYPE, RELIGION_TYPE } from "@/constants/common";
 import { DATE_FORMAT } from "@/constants/dateFormat";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { Descriptions } from "antd";
 import dayjs from "dayjs";
 

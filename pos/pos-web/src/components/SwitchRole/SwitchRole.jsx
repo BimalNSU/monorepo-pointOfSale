@@ -1,7 +1,7 @@
 import { Space, Row, Col, Typography, Badge } from "antd";
 import { useCustomAuth } from "@/utils/hooks/customAuth";
 import { CheckCircleOutlined, UserOutlined } from "@ant-design/icons";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 const { Text } = Typography;
 
 const SwitchRole = () => {

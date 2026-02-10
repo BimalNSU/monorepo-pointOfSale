@@ -13,7 +13,7 @@ import {
   Typography,
 } from "antd";
 import { useUsers } from "@/api/useUsers";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DeleteOutlined,
@@ -22,6 +22,8 @@ import {
   MoreOutlined,
   UserOutlined,
   ExclamationCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import UserService from "@/service/user.service";
 import { useFirestore } from "reactfire";
@@ -101,12 +103,13 @@ const Users = () => {
   const renderActionItems = (record) => [
     {
       key: "1",
-      label: (
-        <a onClick={(e) => handleRoleStatus(e, record)}>
-          {record.isActive ? "De-activate" : "Activate"}
-        </a>
+      label: <span style={{ fontSize: 14 }}>{record.isActive ? "Deactivate" : "Activate"}</span>,
+      icon: record.isActive ? (
+        <CloseCircleOutlined style={{ fontSize: 20 }} />
+      ) : (
+        <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 20 }} />
       ),
-      icon: <DeleteOutlined />,
+      onClick: (e) => handleRoleStatus(e, record),
       danger: record.isActive,
     },
     {
@@ -156,6 +159,8 @@ const Users = () => {
               <Col>
                 <div
                   onClick={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()} // For mobile touch
+                  // onMouseEnter={(e) => e.stopPropagation()} // For desktop hover
                   style={{
                     padding: 8,
                     marginRight: -8,
@@ -164,14 +169,21 @@ const Users = () => {
                   }}
                 >
                   <Dropdown menu={{ items: renderActionItems(record) }} trigger={["click"]}>
-                    <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} />
+                    {/* <MoreOutlined style={{ fontSize: 18, cursor: "pointer" }} /> */}
+                    <span
+                      onClick={(e) => e.stopPropagation()}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      style={{ cursor: "pointer", display: "inline-flex", alignItems: "center" }}
+                    >
+                      <MoreOutlined style={{ fontSize: 18 }} />
+                    </span>
                   </Dropdown>
                 </div>
               </Col>
             )}
           </Row>
 
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 10 }} onClick={(e) => e.stopPropagation()}>
             <Text strong>Mobile:</Text>
             <a href={`tel:${record.mobile}`} style={{ color: "#1677ff" }}>
               {record.mobile}
@@ -183,7 +195,7 @@ const Users = () => {
               <Text strong>Role:</Text> {USER_ROLE.KEYS[record.role]}
             </Col>
             <Col>
-              <Text strong>Status:</Text>
+              <Text strong>{`Status: `}</Text>
               {record.isActive ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>}
             </Col>
           </Row>

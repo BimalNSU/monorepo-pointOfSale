@@ -6,7 +6,7 @@ import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import CustomSidebar from "./custom-sider";
 // import PopHoverNotifications from "@/components/Notification/PopHoverNotification/PopHoverNotifications";
 import PopHoverProfile from "./pop-hover-profile";
-import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import DisplayShop from "@/components/shop/displayShop";
 // import Notificationlist from "@/components/Notification/NotificationList";
 // import OwnerApp from "../../SalesmanView/OwnerApp/OwnerApp";

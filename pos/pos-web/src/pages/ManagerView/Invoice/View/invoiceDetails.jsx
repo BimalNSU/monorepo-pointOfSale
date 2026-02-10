@@ -6,7 +6,7 @@ import { useState } from "react";
 import InvoiceEdit from "../invoiceEdit";
 import { EditOutlined } from "@ant-design/icons";
 import InvoiceView from "./invoiceView";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 
 const { Title, Text } = Typography;

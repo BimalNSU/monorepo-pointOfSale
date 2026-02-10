@@ -8,7 +8,7 @@ import { INVOICE_STATUS } from "@/constants/paymentStatus";
 import { convertToBD } from "@/constants/currency";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import InvoiceService from "@/service/invoice.service";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 import { useInvoicesPaginated } from "@/api/useInvoicesPaginated";
 
 const { Text } = Typography;

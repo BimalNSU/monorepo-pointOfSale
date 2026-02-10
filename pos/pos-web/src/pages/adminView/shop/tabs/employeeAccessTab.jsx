@@ -1,7 +1,6 @@
 import { Row, Col, List, Input, Tag, Card, Select, Button, Modal, Divider } from "antd";
-import { SHOP_ROLES } from "../../../../constants/posRoles";
 import { useUsers } from "@/api/useUsers";
-import { USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import { useState } from "react";
 import { useDebounce } from "react-use";
 import ShopService from "@/service/shop.service";
@@ -40,14 +39,14 @@ const EmployeeAccessTab = ({ shopId }) => {
 
   const selectEmployee = (emp) => {
     setSelected(emp);
-    setShopRole(emp.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS);
+    setShopRole(emp.shopRoles?.[shopId] ?? SHOP_ROLE.VALUES.N0_ACCESS);
   };
 
   const saveRole = async () => {
     setSaving(true);
     try {
       const token = await getToken();
-      shopRole === SHOP_ROLES.VALUES.N0_ACCESS
+      shopRole === SHOP_ROLE.VALUES.N0_ACCESS
         ? await shopService.revokeShopAccess(shopId, selected.id, token, session.id)
         : await shopService.addShopAccess(shopId, selected.id, shopRole, token, session.id);
       setSelected(null);
@@ -74,7 +73,7 @@ const EmployeeAccessTab = ({ shopId }) => {
             style={{ marginTop: 12 }}
             dataSource={filtered}
             renderItem={(emp) => {
-              const role = emp.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS;
+              const role = emp.shopRoles?.[shopId] ?? SHOP_ROLE.VALUES.N0_ACCESS;
               return (
                 <List.Item
                   onClick={() => selectEmployee(emp)}
@@ -88,7 +87,7 @@ const EmployeeAccessTab = ({ shopId }) => {
                   <List.Item.Meta
                     title={emp.fullName}
                     description={
-                      <Tag color={SHOP_ROLES.KEYS[role].color}>{SHOP_ROLES.KEYS[role].text}</Tag>
+                      <Tag color={SHOP_ROLE.KEYS[role].color}>{SHOP_ROLE.KEYS[role].text}</Tag>
                     }
                   />
                 </List.Item>
@@ -121,7 +120,7 @@ const EmployeeAccessTab = ({ shopId }) => {
                 style={{ width: "100%", maxWidth: 400 }}
                 onChange={setShopRole}
               >
-                {Object.entries(SHOP_ROLES.KEYS).map(([id, { text }]) => (
+                {Object.entries(SHOP_ROLE.KEYS).map(([id, { text }]) => (
                   <Option key={id} value={Number(id)}>
                     {text}
                   </Option>
@@ -137,7 +136,7 @@ const EmployeeAccessTab = ({ shopId }) => {
                 disabled={
                   selected.shopRoles?.[shopId]
                     ? shopRole === selected.shopRoles[shopId]
-                    : shopRole === SHOP_ROLES.VALUES.N0_ACCESS
+                    : shopRole === SHOP_ROLE.VALUES.N0_ACCESS
                 }
                 onClick={() =>
                   Modal.confirm({
@@ -149,12 +148,12 @@ const EmployeeAccessTab = ({ shopId }) => {
                         </p>
                         <p>
                           {
-                            SHOP_ROLES.KEYS[
-                              selected.shopRoles?.[shopId] ?? SHOP_ROLES.VALUES.N0_ACCESS
+                            SHOP_ROLE.KEYS[
+                              selected.shopRoles?.[shopId] ?? SHOP_ROLE.VALUES.N0_ACCESS
                             ].text
                           }
                           {" → "}
-                          {SHOP_ROLES.KEYS[shopRole].text}
+                          {SHOP_ROLE.KEYS[shopRole].text}
                         </p>
                       </>
                     ),

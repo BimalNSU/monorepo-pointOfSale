@@ -1,24 +1,25 @@
 import { useUser } from "@/api/useUser";
 import UserService from "@/service/user.service";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-import { Button, Card, Col, message, Modal, Row, Typography } from "antd";
+import { Button, Card, Col, message, Modal, notification, Row, Typography } from "antd";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
-import UserForm from "./subComponents/userForm";
-import UserView from "./subComponents/userView";
-import UserPassword from "./subComponents/userPassword";
+import UserForm from "@/components/User/userForm";
+import UserView from "../../../components/User/userView";
+import UserPassword from "@/components/User/userPassword";
 import Loading from "@/components/loading";
 import dayjs from "dayjs";
 import { DATE_FORMAT } from "@/constants/dateFormat";
 import CustomCard from "@/components/customCard/customCard";
 import { EditOutlined } from "@ant-design/icons";
 import UserProfilePicture from "@/components/profileImage/userProfilePicture";
-import UserActiveSwitch from "./subComponents/userActiveSwitch";
+import UserActiveSwitch from "../../../components/User/userActiveSwitch";
+import { USER_ROLE } from "@pos/shared-models";
 const { confirm } = Modal;
 const { Title, Text } = Typography;
 
-const UserDetails = () => {
+const UserProfile = () => {
   const { userId: authUserId, session, getToken } = useFirebaseAuth();
   const { id: userId } = useParams();
   const db = useFirestore();
@@ -38,7 +39,7 @@ const UserDetails = () => {
           const idToken = await getToken();
           const res = await userService.updateByAdmin(userId, updatedUser, idToken, session.id);
           if (res.status === 200) {
-            message.success("User updated successfully");
+            notification.success({ message: "User updated successfully", duration: 2 });
             form.resetFields();
             setIsEditing(false);
           } else {
@@ -48,12 +49,25 @@ const UserDetails = () => {
                 errors,
               })),
             );
+            notification.error({ message: "Fail to update", duration: 2 });
           }
         } catch (e) {
-          message.error(e.message ?? "Fail to update");
+          notification.error({ message: e.message ?? "Fail to update", duration: 2 });
         }
       },
     });
+  };
+  const handleUpdatePassword = async (values) => {
+    const idToken = await getToken();
+    const res = await userService.updatePasswordByAdmin(
+      userId,
+      values.newPassword,
+      idToken,
+      session.id,
+    );
+    if (res.status !== 200) {
+      throw new Error("Fail to change password");
+    }
   };
   const handleUserActive = async (isActive) => {
     try {
@@ -121,7 +135,10 @@ const UserDetails = () => {
                 <UserProfilePicture storagePath={user.profileImage} onSubmit={updateProfileImage} />
               </Col>
             </Row>
-            <UserPassword userId={userId} />
+            <UserPassword
+              onUpdate={handleUpdatePassword}
+              isAdmin={session.role === USER_ROLE.VALUES.Admin}
+            />
           </Card>
         </Col>
         <Col xs={32} sm={24} md={24} lg={16} xl={16}>
@@ -153,4 +170,4 @@ const UserDetails = () => {
     </div>
   );
 };
-export default UserDetails;
+export default UserProfile;

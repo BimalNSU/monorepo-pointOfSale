@@ -7,7 +7,7 @@ import { useFirebaseAuthListener } from "./utils/hooks/useFirebaseAuthListener";
 import AuthLoader from "./pages/Layout/authLoader";
 import LoggedInLayout from "./pages/Layout/Logged-in-layout/LoggedInLayout";
 import RequireRole from "./pages/requireRole";
-import { SHOP_ROLE, USER_ROLE } from "./constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
 import { lazy, Suspense } from "react";
@@ -16,9 +16,11 @@ const Login = lazy(() => import("@/pages/Auth/Login/Login"));
 const HomePage = lazy(() => import("./pages/homePage"));
 const Dashboard = lazy(() => import("./components/dashboard/dashboard"));
 
+const SelfProfile = lazy(() => import("./pages/Layout/UserView/UserProfile/View/SelfProfile"));
+
 const Users = lazy(() => import("./pages/adminView/User/users"));
 const UserAdd = lazy(() => import("./pages/adminView/User/userAdd"));
-const UserDetails = lazy(() => import("./pages/adminView/User/userDetails"));
+const UserProfile = lazy(() => import("./pages/adminView/User/userProfile"));
 
 const Shops = lazy(() => import("./pages/adminView/shop/shops"));
 const ShopAdd = lazy(() => import("./pages/adminView/shop/shopAdd"));
@@ -97,6 +99,7 @@ const App = () => {
             <Route element={<AuthLoader />}>
               <Route element={<LoggedInLayout />}>
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="profile" element={<SelfProfile />} />
 
                 <Route
                   path="users"
@@ -108,8 +111,7 @@ const App = () => {
                 >
                   <Route index element={<Users />} />
                   <Route path="add" element={<UserAdd />} />
-                  {/* <Route path=":id" element={<UserEdit />} /> */}
-                  <Route path=":id" element={<UserDetails />} />
+                  <Route path=":id" element={<UserProfile />} />
                 </Route>
 
                 <Route

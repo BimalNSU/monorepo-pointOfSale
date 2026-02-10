@@ -1,6 +1,6 @@
 import { Button, Card, Modal, Space, Table, Typography } from "antd";
 import { useProducts } from "@/api/useProducts";
-import { SHOP_ROLE, USER_ROLE } from "@/constants/role";
+import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import { Link } from "react-router-dom";
 import { DeleteOutlined, PrinterOutlined } from "@ant-design/icons";
 import { convertToBD } from "@/constants/currency";

@@ -21,6 +21,32 @@ const HomePage = () => {
     document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const menuItems = [
+    {
+      key: "logo",
+      // icon: <MailOutlined />,
+      label: <span style={{ fontWeight: 600 }}>Organic Design</span>,
+    },
+    {
+      key: "right",
+      type: "group",
+      // icon: <MailOutlined />,
+      children: [
+        {
+          key: "home",
+          label: (
+            <a href="#home" onClick={scrollToHome}>
+              Home
+            </a>
+          ),
+        },
+        {
+          key: "login",
+          label: <Link to="/login">Login</Link>,
+        },
+      ],
+    },
+  ];
   return (
     <Layout>
       {/* Navbar */}
@@ -30,21 +56,8 @@ const HomePage = () => {
           mode="horizontal"
           selectable={false}
           style={{ display: "flex", justifyContent: "space-between" }}
-        >
-          <Menu.Item key="logo" style={{ fontWeight: 600 }}>
-            Organic Design
-          </Menu.Item>
-          <div style={{ display: "flex" }}>
-            <Menu.Item key="home">
-              <a href="#home" onClick={scrollToHome}>
-                Home
-              </a>
-            </Menu.Item>
-            <Menu.Item key="login">
-              <Link to="/login">Login</Link>
-            </Menu.Item>
-          </div>
-        </Menu>
+          items={menuItems}
+        />
       </Header>
 
       <Content>
@@ -128,9 +141,9 @@ const HomePage = () => {
                 width="600"
                 height="450"
                 style={{ border: 0 }}
-                allowfullscreen=""
+                allowFullScreen=""
                 loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
+                referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </Col>
           </Row>

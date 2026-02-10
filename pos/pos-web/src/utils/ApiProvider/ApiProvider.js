@@ -38,18 +38,14 @@ const axiosDelete = (url, headers = {}) =>
 const login = (data, recaptchaToken) =>
   post("/auth/login/", data, { "x-recaptcha-token": recaptchaToken });
 
-const changePassword = (token, sessionId, currentPassword, newPassword) =>
-  put(
-    `users/change-password`,
-    { currentPassword, newPassword },
-    { authorization: token, session_id: sessionId },
-  );
+const updateOwnPassword = (data, token, sessionId) =>
+  patch(`me/password`, data, { authorization: token, session_id: sessionId });
 const updateUser = (userId, data, token, sessionId) =>
-  patch(`/users/${userId}`, data, { authorization: token, session_id: sessionId });
+  put(`/users/${userId}`, data, { authorization: token, session_id: sessionId });
 
 //#region: admin endpoints
 const updateUserStatus = (userId, data, token, sessionId) =>
-  patch(`/users/${userId}/status`, data, { authorization: token, session_id: sessionId });
+  patch(`admin/users/${userId}/status`, data, { authorization: token, session_id: sessionId });
 
 const addUserByAdmin = async (data, accessToken, sessionId) =>
   await post(`/admin/users/`, data, {
@@ -58,6 +54,9 @@ const addUserByAdmin = async (data, accessToken, sessionId) =>
   });
 const updateUserByAdmin = (userId, data, token, sessionId) =>
   put(`/admin/users/${userId}`, data, { authorization: token, session_id: sessionId });
+
+const updatePasswordByAdmin = (userId, data, token, sessionId) =>
+  patch(`/admin/users/${userId}/password`, data, { authorization: token, session_id: sessionId });
 //#endregion
 
 // const addProperty = async (data, token) => post(`/properties/`, data, { authorization: token });
@@ -85,10 +84,13 @@ export const apiProvider = {
   login,
   // register,
   updateUser,
+  updateOwnPassword,
+
   addUserByAdmin,
   updateUserByAdmin,
+  updatePasswordByAdmin,
   updateUserStatus,
-  changePassword,
+
   updateSession,
 
   addShopAccess,
