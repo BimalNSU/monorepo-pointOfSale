@@ -51,6 +51,12 @@ class ShopService {
       throw new Error("Failed to create");
     }
   }
+  async restore(id: ShopId, updatedBy: UserId) {
+    const batch = writeBatch(this.db);
+    const shopObj = new Shop(this.db);
+    shopObj.restore(batch, id, updatedBy);
+    await batch.commit();
+  }
   async edit(id: ShopId, data: Partial<Data>, updatedBy: UserId) {
     try {
       const batch = writeBatch(this.db);

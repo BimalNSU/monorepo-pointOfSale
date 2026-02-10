@@ -78,4 +78,15 @@ export class Shop {
       updatedAt: now,
     });
   }
+  restore(batch: WriteBatch, id: ShopId, updatedBy: UserId) {
+    const now = serverTimestamp();
+    const docRef = doc(this.collectionRef, id).withConverter(shopFirestoreConverter);
+    batch.update(docRef, {
+      isDeleted: false,
+      deletedAt: null,
+      deletedBy: null,
+      updatedBy,
+      updatedAt: now,
+    });
+  }
 }
