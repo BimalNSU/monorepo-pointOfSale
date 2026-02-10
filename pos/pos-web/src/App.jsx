@@ -93,8 +93,6 @@ const App = () => {
           exact
           element={!session?.id ? <Login /> : <Navigate to="/dashboard" />}
         /> */}
-          {/* {userId && session?.id && <Route path="/*" element={<PrivateRoute />} />} */}
-
           {userId && session?.id && (
             <Route element={<AuthLoader />}>
               <Route element={<LoggedInLayout />}>
