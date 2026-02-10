@@ -65,6 +65,7 @@ export const createUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export const updateUserSchema = createUserSchema
+  .omit({ password: true })
   .partial()
   // .extend({ isActive: z.boolean().optional() })
   .refine((data) => Object.keys(data).length > 0, {

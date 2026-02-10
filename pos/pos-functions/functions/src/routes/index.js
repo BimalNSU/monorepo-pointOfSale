@@ -56,6 +56,13 @@ router.put(
   AuthMiddleware.updateSession,
 );
 
+router.delete(
+  "/shops/:id",
+  AuthMiddleware.isAuthenticated,
+  RoleMiddleware.isAdmin,
+  ShopMiddleware.removeShop,
+);
+
 router.put(
   "/shops/:id/employees/:employeeId/role",
   AuthMiddleware.isAuthenticated,

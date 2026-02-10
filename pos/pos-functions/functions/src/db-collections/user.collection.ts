@@ -42,7 +42,7 @@ export class User {
     const docRef = this.collectionRef
       .doc(id)
       .withConverter(userFirstoreConverter);
-    return batch.set(docRef, data, { merge: true });
+    return batch.update(docRef, data);
   }
   async get(id: UserId) {
     const userDocRef = this.collectionRef
