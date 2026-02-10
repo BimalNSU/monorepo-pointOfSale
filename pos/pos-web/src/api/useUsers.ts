@@ -34,7 +34,7 @@ export const useUsers = (filter?: Filter) => {
         return {
           ...rest,
           fullName: `${u.firstName}${u.lastName ? ` ${u.lastName}` : ""}`,
-          createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT),
+          createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
         };
       }),
     [data],

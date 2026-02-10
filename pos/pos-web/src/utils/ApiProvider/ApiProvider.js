@@ -79,6 +79,11 @@ const revokeShopAccess = async (shopId, userId, token, sessionId) =>
     authorization: token,
     session_id: sessionId,
   });
+const removeShop = (shopId, token, sessionId) =>
+  axiosDelete(`/shops/${shopId}`, {
+    authorization: token,
+    session_id: sessionId,
+  });
 
 export const apiProvider = {
   login,
@@ -95,6 +100,7 @@ export const apiProvider = {
 
   addShopAccess,
   revokeShopAccess,
+  removeShop,
   // addProperty,
   // updateProperty,
   // deleteProperty,

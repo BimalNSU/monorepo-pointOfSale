@@ -39,7 +39,7 @@ class ShopService {
           name: data.name,
           address: data.address ?? null,
           code: data.code,
-          officials: null,
+          employees: null,
         },
         createdBy,
       );
@@ -62,7 +62,7 @@ class ShopService {
           name: data.name,
           address: data.address || null,
           code: data.code,
-          officials: data.officials ?? null,
+          employees: data.employees ?? null,
         },
         updatedBy,
       );
@@ -71,43 +71,12 @@ class ShopService {
       console.log(err);
     }
   }
-  //TODO: test whether working or not
-  async delete(id: ShopId, updatedBy: UserId) {
-    const now = serverTimestamp();
-    try {
-      const shopObj = new Shop(this.db);
-      const shop = await shopObj.get(id);
-      const batch = writeBatch(this.db);
-      shopObj.remove(batch, id, updatedBy);
-      const accessedUserIds = Object.keys(shop.officials ?? {});
-      if (accessedUserIds.length) {
-        //remove current shop access
-        const userObj = new User(this.db);
-        const accessedUsers = await userObj.getListByIds(accessedUserIds);
-        accessedUsers.forEach((u) =>
-          userObj.edit(
-            batch,
-            u.id,
-            Object({ shopIds: arrayRemove(id), [`shopRoles.${id}`]: deleteField() }),
-            updatedBy,
-          ),
-        );
-
-        //remove shopId from all users' session
-        const sessionObj = new Session(this.db);
-        const targetSessions = await sessionObj.findBy(id);
-        targetSessions.forEach((s) =>
-          sessionObj.edit(batch, s.docRef, {
-            shopId: deleteField(),
-            shopRole: deleteField(),
-            updatedAt: now,
-          }),
-        );
-      }
-      await batch.commit();
-    } catch (err) {
-      console.log(err);
+  async softDelete(shopId: ShopId, token: string, sessionId: string) {
+    const res = await apiProvider.removeShop(shopId, token, sessionId);
+    if (!res) {
+      throw new Error(`Unable to connect server`);
     }
+    return res;
   }
   async addShopAccess(
     shopId: ShopId,

@@ -14,7 +14,7 @@ const { Text } = Typography;
 const { confirm } = Modal;
 
 const Shops = () => {
-  const { userId, session } = useFirebaseAuth();
+  const { userId, getToken, session } = useFirebaseAuth();
   const db = useFirestore();
   const shopService = new ShopService(db);
   const { status, data } = useShops();
@@ -27,7 +27,8 @@ const Shops = () => {
       title: `Are you sure to delete the shop?`,
       async onOk() {
         try {
-          await shopService.delete(record.id, userId);
+          const idToken = await getToken();
+          await shopService.softDelete(record.id, idToken, session.id);
           success(`Shop ID ${record.id} is deleted successfully`);
         } catch (e) {
           console.log(e);

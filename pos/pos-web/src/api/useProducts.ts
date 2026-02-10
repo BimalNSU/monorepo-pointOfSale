@@ -21,7 +21,7 @@ export const useProducts = () => {
     () =>
       products?.map((p) => {
         const { createdAt, ...rest } = p;
-        return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT) };
+        return { ...rest, createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT) };
       }) ?? [],
     [products],
   );
