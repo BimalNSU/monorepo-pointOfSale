@@ -17,7 +17,7 @@ const PopHoverProfile = ({ viewContentMbl }) => {
     }
   };
   const content = (
-    <Space direction="vertical">
+    <Space orientation="vertical">
       <span>User ID: {userId}</span>
       {/* <p>
           <Link to="/reset/password">Change Password</Link>
@@ -25,13 +25,13 @@ const PopHoverProfile = ({ viewContentMbl }) => {
       <Divider style={{ margin: 1 }} />
       <SwitchShop shopRoles={shopRoles} />
       <Divider style={{ margin: 1 }} />
-      <Space direction="horizontal">
+      <Space orientation="horizontal">
         <UserOutlined />
         <Link to="/profile" style={{ textDecoration: "none" }}>
           Profile
         </Link>
       </Space>
-      <Space direction="horizontal">
+      <Space orientation="horizontal">
         <SettingOutlined />
         <Link to="/settings" style={{ textDecoration: "none" }}>
           Settings
@@ -61,7 +61,7 @@ const PopHoverProfile = ({ viewContentMbl }) => {
           </Col>
           {!viewContentMbl ? (
             <Col>
-              <Space direction="vertical" size={0}>
+              <Space orientation="vertical" size={0}>
                 <Text>{`${firstName}${lastName ? ` ${lastName}` : ""}`}</Text>
               </Space>
             </Col>

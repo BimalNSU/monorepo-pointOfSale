@@ -303,7 +303,7 @@ const Invoices = () => {
               </Text>
             </Col>
             <Col>
-              <Space direction="horizontal">
+              <Space orientation="horizontal">
                 <Button
                   icon={<LeftOutlined />}
                   size="small"

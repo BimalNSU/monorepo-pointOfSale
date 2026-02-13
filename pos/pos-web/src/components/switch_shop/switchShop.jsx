@@ -5,7 +5,7 @@ const SwitchShop = ({ shopRoles }) => {
   return (
     <Row>
       <Col>
-        <Space direction="vertical">
+        <Space orientation="vertical">
           {Object.entries(shopRoles ?? {}).map(([shopId, shopRole]) => (
             <SwitchableShop key={shopId} shopId={shopId} shopRole={shopRole} />
           ))}

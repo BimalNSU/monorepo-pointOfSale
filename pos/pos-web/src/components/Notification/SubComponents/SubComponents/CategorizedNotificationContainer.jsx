@@ -118,7 +118,7 @@ const NotificationContiner = ({ userId, title, notificationsData, onClickedHideN
         </Col> */}
             <Col offset={1}>
               {/* <Col xs={8} sm={8} md={8} lg={8} xl={8}> */}
-              <Space direction="vertical" size={1}>
+              <Space orientation="vertical" size={1}>
                 <a>
                   <Text
                     type={notification.isRead ? "secondary" : null}
@@ -137,7 +137,7 @@ const NotificationContiner = ({ userId, title, notificationsData, onClickedHideN
                   </Title>
                 </a>
                 {!notification.isRead ? (
-                  <Space direction="horizontal">
+                  <Space orientation="horizontal">
                     {getActions(notification).map((action, i) => (
                       <Button key={i} type={!i ? "primary" : "default"} onClick={action.callback}>
                         {action.label}

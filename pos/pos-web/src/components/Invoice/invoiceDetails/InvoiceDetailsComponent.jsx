@@ -181,7 +181,7 @@ const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
           <Col>
             <Row gutter={16}>
               <Col>
-                <Space direction="vertical">
+                <Space orientation="vertical">
                   <Text>
                     <b>Invoice No:</b>
                   </Text>
@@ -200,7 +200,7 @@ const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
                 </Space>
               </Col>
               <Col>
-                <Space direction="vertical">
+                <Space orientation="vertical">
                   <Text> {invoiceData.id}</Text>
                   <Text>{`${invoiceData.targetUserName}`}</Text>
                   <Text> {invoiceData.month}</Text>
@@ -213,7 +213,7 @@ const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
           <Col>
             <Row gutter={16} justify="space-between">
               <Col>
-                <Space direction="vertical">
+                <Space orientation="vertical">
                   <Text>
                     <b>Previous Due Amount:</b>
                   </Text>
@@ -232,7 +232,7 @@ const InvoiceDetailsComponent = ({ invoiceData, authUserId, authRole }) => {
                 </Space>
               </Col>
               <Col>
-                <Space direction="vertical">
+                <Space orientation="vertical">
                   <Text> {convertToBD(previousDue)}</Text>
                   <Text> {convertToBD(invoiceData.discountTotal)}</Text>
                   <Text> {convertToBD(invoiceData.currentTotal)}</Text>

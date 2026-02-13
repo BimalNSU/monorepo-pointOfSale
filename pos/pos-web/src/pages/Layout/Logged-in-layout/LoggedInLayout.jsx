@@ -195,14 +195,13 @@ const LoggedInLayout = () => {
             // background: "#001529",
             // color: "#fff",
             color: "black",
-            position: "sticky",
+            // position: "sticky",
             bottom: 0,
             lineHeight: 1,
             gap: 1,
           }}
         >
-          {/* ©{new Date().getFullYear()} Created by CDPRC */}
-          ©2024 Created by Organic Design
+          © {new Date().getFullYear()} Organic Design. All rights reserved.
         </Footer>
       </Layout>
     </Layout>

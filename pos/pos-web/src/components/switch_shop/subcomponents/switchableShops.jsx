@@ -76,7 +76,7 @@ const SwitchableShop = ({ shopId, shopRole }) => {
       <Col>{shopData.shopImage ? <FetchFile storagePath={shopData.shopImage} /> : null}</Col>
       <Col>
         {/* <Col xs={8} sm={8} md={8} lg={8} xl={8}> */}
-        <Space direction="vertical" size={1}>
+        <Space orientation="vertical" size={1}>
           <Text>{shopData.name}</Text>
         </Space>
       </Col>

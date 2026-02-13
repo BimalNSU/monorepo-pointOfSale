@@ -15,7 +15,7 @@ import { useCustomAuth } from "@/utils/hooks/customAuth";
 import CustomSidebar from "./custom-sider";
 // import PopHoverNotifications from "@/components/Notification/PopHoverNotification/PopHoverNotifications";
 import PopHoverProfile from "./pop-hover-profile";
-import { USER_ROLE } from "@/constants/role";
+import { USER_ROLE } from "@pos/shared-models";
 // import Notificationlist from "@/components/Notification/NotificationList";
 // import OwnerApp from "../../SalesmanView/OwnerApp/OwnerApp";
 // import TenantApp from "../../TenantView/TenantApp/TenantApp";
