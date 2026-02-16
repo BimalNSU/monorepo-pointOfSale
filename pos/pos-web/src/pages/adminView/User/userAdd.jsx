@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirestore, useStorage } from "reactfire";
 import {
+  Button,
   Card,
   Col,
   DatePicker,
@@ -21,6 +22,7 @@ import ImageUploadWithPreview from "@/components/FIleUpload/ImageUploadWithPrevi
 import * as validator from "../../../utils/Validation/Validation";
 import { DOB_dateFormat } from "@/constants/dateFormat";
 import { USER_ROLE } from "@pos/shared-models";
+import { MARITAL_TYPE, RELIGION_TYPE } from "@/constants/common";
 const { Option } = Select;
 const { Title, Text } = Typography;
 const { Password } = Input;
@@ -72,7 +74,7 @@ const UserAdd = () => {
   return (
     <Card
       title="Add User"
-      bordered={false}
+      variant="borderless"
       style={{
         // width: 300,
         margin: "10px",
@@ -100,13 +102,16 @@ const UserAdd = () => {
           </Col>
         </Row>
         <Row gutter={[16, 10]} justify="space-between">
-          {authRole === USER_ROLE.VALUES.Admin && (
+          {session.role === USER_ROLE.VALUES.Admin && (
             <>
               <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                 <Form.Item name="role" label="Role" rules={[{ required: true }]}>
                   <Select
                     style={{ width: 120 }}
-                    options={Object.values(ROLE).map((r) => ({ value: r.type, label: r.text }))}
+                    options={Object.entries(USER_ROLE.KEYS).map(([roleId, text]) => ({
+                      value: roleId,
+                      label: text,
+                    }))}
                   />
                 </Form.Item>
               </Col>
@@ -189,7 +194,10 @@ const UserAdd = () => {
                 },
               ]}
             >
-              <Input disabled={authRole === USER_ROLE.VALUES.Admin ? false : true} type={"text"} />
+              <Input
+                disabled={session.role === USER_ROLE.VALUES.Admin ? false : true}
+                type={"text"}
+              />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={24} lg={12} xl={12}>
@@ -209,7 +217,7 @@ const UserAdd = () => {
             >
               <Input
                 disabled={
-                  authRole === USER_ROLE.VALUES.Admin ||
+                  session.role === USER_ROLE.VALUES.Admin ||
                   !userData?.email ||
                   (userData?.email && !userData.isEmailVerified)
                     ? false
@@ -349,7 +357,7 @@ const UserAdd = () => {
           <Col>
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                {!userData ? "Add" : "Update"}
+                Add
               </Button>
             </Form.Item>
           </Col>

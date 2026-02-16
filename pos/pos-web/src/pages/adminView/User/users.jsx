@@ -291,7 +291,7 @@ const Users = () => {
     },
   ];
   return (
-    <Card title="User List" bordered={false} className={customAntdStyles.mobileCardBody}>
+    <Card title="User List" variant={false} className={customAntdStyles.mobileCardBody}>
       <Table
         title={() => (
           <Row gutter={[16, 1]} justify="end">
