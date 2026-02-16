@@ -40,7 +40,7 @@ export const useDocumentFormat = (id: DocumentCounterId) => {
         setDoc(docRef, { dateStr: now.format(dateFormat), count: 0 }, { merge: true });
       }
     }
-  }, [counterData]);
+  }, [counterData, status]);
 
   const documentId = useMemo(() => {
     if (!counterData) {
