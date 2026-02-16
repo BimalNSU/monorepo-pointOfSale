@@ -16,5 +16,7 @@ export const COLLECTIONS = {
   accountTypes: "accountTypes",
   accountBalances: "accountBalances",
 
+  customers: "customers",
+
   // -- sub collections --
 };

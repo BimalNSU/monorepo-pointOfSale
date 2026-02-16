@@ -72,11 +72,12 @@ export type TransactionId = string;
 export type ChartOfAccountId = string;
 export type AccountTypeId = string;
 export type AccountBalanceId = string;
+export type CustomerId = string;
 export interface BaseModel {
   createdAt: Date | FieldValue;
   createdBy: UserId;
   isDeleted: boolean;
-  deletedAt: Date | null;
+  deletedAt: Date | null | FieldValue;
   deletedBy: UserId | null;
   updatedAt: Date | FieldValue;
   updatedBy: UserId;
