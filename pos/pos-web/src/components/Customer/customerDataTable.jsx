@@ -6,6 +6,7 @@ import {
   Grid,
   Input,
   Modal,
+  notification,
   Row,
   Space,
   Table,
@@ -273,11 +274,12 @@ const CustomerDataTable = ({ status, data }) => {
       title: `Delete ${selectedRowKeys.length} customers?`,
       async onOk() {
         try {
-          await Promise.all(
-            selectedRowKeys.map((id) => customerService.softDelete(id, authUserId)),
-          );
+          await customerService.softDeletes(selectedRowKeys, authUserId);
+          notification.success({ title: "Selected customers deleted successfully", duration: 2 });
           setSelectedRowKeys([]);
-        } catch (err) {}
+        } catch (err) {
+          notification.error({ title: "Fail to delete", duration: 2 });
+        }
       },
     });
   };
@@ -345,7 +347,12 @@ const CustomerDataTable = ({ status, data }) => {
               ) : (
                 <Space>
                   {session.role === USER_ROLE.VALUES.Admin && (
-                    <Button danger icon={<DeleteOutlined />} onClick={handleBulkDelete}>
+                    <Button
+                      color="danger"
+                      variant="solid"
+                      icon={<DeleteOutlined />}
+                      onClick={handleBulkDelete}
+                    >
                       Delete ({selectedRowKeys.length})
                     </Button>
                   )}

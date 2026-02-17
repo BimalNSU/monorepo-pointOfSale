@@ -12,12 +12,10 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 const customerFirestoreConverter = firestoreConverter<CustomerModel>();
-type omitKeys = "createdAt" | "createdBy" | "updatedAt" | "isDeleted" | "deletedAt" | "deletedBy";
-type AddData = Omit<
-  CustomerModel,
-  "createdAt" | "updatedAt" | "isDeleted" | "deletedAt" | "deletedBy"
->;
-type EditData = Omit<CustomerModel, omitKeys>;
+type omitKeys = "createdAt" | "updatedAt" | "deletedAt";
+type AddData = Omit<CustomerModel, omitKeys | "isDeleted" | "deletedBy">;
+type EditData = Omit<CustomerModel, omitKeys | "createdBy">;
+
 export class Customer {
   db: Firestore;
   collectionRef: CollectionReference;
@@ -69,12 +67,13 @@ export class Customer {
       docRef,
       {
         ...data,
+        ...(data.isDeleted && { deletedAt: now }),
         updatedAt: now,
       },
       { merge: true },
     );
   }
-  softDelete(batch: WriteBatch, id: CustomerId, deletedBy: UserId) {
+  delete(batch: WriteBatch, id: CustomerId, deletedBy: UserId) {
     const now = serverTimestamp();
     const docRef = doc(this.db, COLLECTIONS.customers, id).withConverter(
       customerFirestoreConverter,

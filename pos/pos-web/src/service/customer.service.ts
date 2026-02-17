@@ -60,17 +60,24 @@ class CustomerService {
     });
     return await batch.commit();
   }
-
   async softDelete(id: CustomerId, deletedBy: UserId) {
     const customerObj = new Customer(this.db);
     const batch = writeBatch(this.db);
-    customerObj.softDelete(batch, id, deletedBy);
+    customerObj.edit(batch, id, { isDeleted: true, updatedBy: deletedBy, deletedBy });
     return await batch.commit();
   }
-  async restore(id: CustomerId, updatedBy: UserId) {
+  async softDeletes(ids: CustomerId[], deletedBy: UserId) {
     const customerObj = new Customer(this.db);
     const batch = writeBatch(this.db);
-    customerObj.restore(batch, id, updatedBy);
+    ids.forEach((id) =>
+      customerObj.edit(batch, id, { isDeleted: true, updatedBy: deletedBy, deletedBy }),
+    );
+    return await batch.commit();
+  }
+  async restore(ids: CustomerId[], updatedBy: UserId) {
+    const customerObj = new Customer(this.db);
+    const batch = writeBatch(this.db);
+    ids.forEach((id) => customerObj.restore(batch, id, updatedBy));
     return await batch.commit();
   }
 }
