@@ -3,6 +3,7 @@ import {
   AppstoreOutlined,
   CloseOutlined,
   DashboardOutlined,
+  DeleteFilled,
   FileSearchOutlined,
   FileTextOutlined,
   ProductOutlined,
@@ -58,12 +59,42 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         },
       );
     }
+    if (session.role === USER_ROLE.VALUES.Admin) {
+      nLeftSiderItems.push({
+        key: "4",
+        label: "Customer",
+        icon: <UserOutlined />,
+        children: [
+          {
+            key: "4.1",
+            label: <Link to="/customers">List</Link>,
+            icon: <UserOutlined />,
+          },
+          {
+            key: "4.2",
+            label: <Link to="/customers/deleted">Trash</Link>,
+            icon: <DeleteFilled style={{ color: "#ff4d4f" }} />,
+          },
+        ],
+      });
+    }
+    if ([SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)) {
+      nLeftSiderItems.push({
+        key: "4",
+        label: (
+          <span>
+            <Link to="/customers">Customers</Link>
+          </span>
+        ),
+        icon: <UserOutlined />,
+      });
+    }
     if (
       session.shopId &&
       [SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole)
     ) {
       nLeftSiderItems.push({
-        key: "4",
+        key: "5",
         label: (
           <span>
             <Link to="/sales">Sales</Link>
@@ -77,17 +108,17 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
       (session.shopId && session.shopRole === SHOP_ROLE.VALUES.Manager)
     ) {
       nLeftSiderItems.push({
-        key: "5",
+        key: "6",
         label: "Product",
         icon: <AppstoreOutlined />,
         children: [
           {
-            key: "5.1",
+            key: "6.1",
             label: <Link to="/products/add">Add Product</Link>,
             icon: <ProductOutlined />,
           },
           {
-            key: "5.2",
+            key: "6.2",
             label: <Link to="/products">Products</Link>,
             icon: <AppstoreOutlined />,
           },
@@ -100,17 +131,17 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
         [SHOP_ROLE.VALUES.Manager, SHOP_ROLE.VALUES.Salesman].includes(session.shopRole))
     ) {
       nLeftSiderItems.push({
-        key: "6",
+        key: "7",
         label: "Invoices",
         icon: <FileTextOutlined />,
         children: [
           {
-            key: "6.1",
+            key: "7.1",
             label: <Link to="/invoices">History</Link>,
             icon: <ProductOutlined />,
           },
           {
-            key: "6.2",
+            key: "7.2",
             label: <Link to="/reports">Report</Link>,
             icon: <AppstoreOutlined />,
           },
@@ -118,25 +149,25 @@ const CustomSidebar = ({ isScreenMd, toggleDrawer, drawerVisible }) => {
       });
     }
     nLeftSiderItems.push({
-      key: "7",
+      key: "8",
       label: <Link to="/btransactions">Transactions</Link>,
       icon: <img src={bkash_logo} alt="bKash" style={{ height: 24 }} />,
     });
     if (session.role === USER_ROLE.VALUES.Admin) {
       nLeftSiderItems.push({
-        key: "8",
+        key: "9",
         label: <Link to="/gl-report">GL Report</Link>,
         icon: <FileSearchOutlined />,
       });
     }
     nLeftSiderItems.push(
       {
-        key: "9",
+        key: "10",
         label: <Link to="/barcode">"Test Barcode"</Link>,
         icon: <FileTextOutlined />,
       },
       {
-        key: "10",
+        key: "11",
         label: <Link to="/print-barcode">Print Barcode</Link>,
         icon: <FileTextOutlined />,
       },

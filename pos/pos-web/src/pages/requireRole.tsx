@@ -15,12 +15,10 @@ const RequireRole = ({
   const { session } = useFirebaseAuth();
   const hasAccess =
     session &&
-    allowedRoles.find(
-      (role) =>
-        role === session.role &&
-        (role === USER_ROLE.VALUES.Admin ||
-          (session.shopRole && allowedShopRoles.includes(session.shopRole))),
-    );
+    allowedRoles.includes(session.role) &&
+    (session.role === USER_ROLE.VALUES.Admin ||
+      !allowedShopRoles.length ||
+      (session.shopRole && allowedShopRoles.includes(session.shopRole)));
 
   if (!hasAccess) {
     return <Navigate to="/dashboard" replace />;

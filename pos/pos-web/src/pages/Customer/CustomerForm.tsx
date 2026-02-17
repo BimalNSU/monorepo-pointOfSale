@@ -19,6 +19,7 @@ import { useFirestore } from "reactfire";
 import { Customer, WithId } from "@pos/shared-models";
 import * as validator from "../../utils/Validation/Validation";
 const { Title, Text } = Typography;
+const { TextArea } = Input;
 interface Props {
   initialValues?: WithId<Customer>;
   customerId: string;
@@ -124,17 +125,52 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
         <Divider>Basic Information</Divider>
 
         <Row gutter={[16, 10]}>
-          <Col xs={24} lg={12}>
-            <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+          <Col xs={24} lg={24}>
+            <Form.Item
+              name="firstName"
+              label="Name"
+              rules={[
+                { required: true, message: `Please enter customer's name!` },
+                {
+                  whitespace: true,
+                  message: validator.BLANK_SPACE_MESSAGE,
+                },
+                {
+                  min: validator.MIN_CHARACTER,
+                  message: `Customer Name ${validator.MIN_CHARACTER_MESSAGE}`,
+                },
+                {
+                  max: validator.MAX_CHARACTER,
+                  message: `Customer Name ${validator.MAX_CHARACTER_MESSAGE}`,
+                },
+                {
+                  pattern: new RegExp(/[a-zA-Z]/),
+                  message: validator.SPECIAL_CHARACTER_MESSAGE,
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
           </Col>
 
-          <Col xs={24} lg={12}>
-            <Form.Item name="lastName" label="Last Name">
+          {/* <Col xs={24} lg={12}>
+            <Form.Item
+              name="lastName"
+              label="Last Name"
+              rules={[
+                {
+                  whitespace: true,
+                  message: validator.BLANK_SPACE_MESSAGE,
+                },
+                {
+                  pattern: new RegExp(/[a-zA-Z]/),
+                  message: validator.SPECIAL_CHARACTER_MESSAGE,
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-          </Col>
+          </Col> */}
 
           <Col xs={24} lg={12}>
             <Form.Item
@@ -224,24 +260,79 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                           if (type === "pant") {
                             return (
                               <>
-                                <Form.Item name={[name, "info", "waist"]} label="Waist">
+                                <Form.Item
+                                  name={[name, "info", "fit"]}
+                                  label="Fit"
+                                  rules={[{ required: true, message: "Please select a fit" }]}
+                                >
+                                  <Select
+                                    placeholder="Select Pant Fit"
+                                    options={[
+                                      { label: "Slim", value: "slim" },
+                                      { label: "Regular", value: "regular" },
+                                      { label: "Bootcut", value: "bootcut" },
+                                      { label: "Baggy", value: "baggy" },
+                                    ]}
+                                  />
+                                </Form.Item>
+                                <Form.Item
+                                  name={[name, "info", "waist"]}
+                                  label="Waist"
+                                  rules={[{ required: true, message: "Please enter waist" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
                                 </Form.Item>
 
-                                <Form.Item name={[name, "info", "side_length"]} label="Side Length">
+                                <Form.Item
+                                  name={[name, "info", "side_length"]}
+                                  label="Side Length"
+                                  rules={[{ required: true, message: "Please enter side length" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
                                 </Form.Item>
 
-                                <Form.Item name={[name, "info", "front_rise"]} label="Front Rise">
+                                <Form.Item
+                                  name={[name, "info", "front_rise"]}
+                                  label="Front Rise"
+                                  rules={[{ required: true, message: "Please enter front rise" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
                                 </Form.Item>
 
-                                <Form.Item name={[name, "info", "thight"]} label="Thigh">
+                                <Form.Item
+                                  name={[name, "info", "thigh"]}
+                                  label="Thigh"
+                                  rules={[{ required: true, message: "Please enter thigh" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
                                 </Form.Item>
 
-                                <Form.Item name={[name, "info", "leg_opening"]} label="Leg Opening">
+                                <Form.Item
+                                  name={[name, "info", "leg_opening"]}
+                                  label="Leg Opening"
+                                  rules={[{ required: true, message: "Please enter leg-opening" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
+                                </Form.Item>
+
+                                <Form.Item
+                                  name={[name, "info", "remark"]}
+                                  label="Remark"
+                                  rules={[
+                                    {
+                                      whitespace: true,
+                                      message: validator.BLANK_SPACE_MESSAGE,
+                                    },
+                                    {
+                                      pattern: new RegExp(/[a-zA-Z]/),
+                                      message: validator.SPECIAL_CHARACTER_MESSAGE,
+                                    },
+                                  ]}
+                                >
+                                  <TextArea
+                                    autoSize={{ minRows: 2 }}
+                                    placeholder="Optional remark"
+                                  />
                                 </Form.Item>
                               </>
                             );
@@ -250,12 +341,36 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                           if (type === "shirt" || type === "polo_shirt") {
                             return (
                               <>
-                                <Form.Item name={[name, "info", "chest"]} label="Chest">
+                                <Form.Item
+                                  name={[name, "info", "chest"]}
+                                  label="Chest"
+                                  rules={[{ required: true, message: "Please enter chest" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
                                 </Form.Item>
 
-                                <Form.Item name={[name, "info", "long"]} label="Length">
+                                <Form.Item
+                                  name={[name, "info", "long"]}
+                                  label="Length"
+                                  rules={[{ required: true, message: "Please enter long" }]}
+                                >
                                   <InputNumber style={{ width: "100%" }} />
+                                </Form.Item>
+                                <Form.Item
+                                  name={[name, "info", "remark"]}
+                                  label="Remark"
+                                  rules={[
+                                    {
+                                      whitespace: true,
+                                      message: validator.BLANK_SPACE_MESSAGE,
+                                    },
+                                    {
+                                      pattern: new RegExp(/[a-zA-Z]/),
+                                      message: validator.SPECIAL_CHARACTER_MESSAGE,
+                                    },
+                                  ]}
+                                >
+                                  <TextArea rows={2} placeholder="Optional remark" />
                                 </Form.Item>
                               </>
                             );
@@ -289,7 +404,35 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
             </>
           )}
         </Form.List>
-
+        <Row gutter={[16, 10]}>
+          <Col xs={24} lg={12}>
+            <Form.Item
+              name="addedBy"
+              label="Added By"
+              rules={[
+                { required: true, message: `Please enter 'added by' name!` },
+                {
+                  whitespace: true,
+                  message: validator.BLANK_SPACE_MESSAGE,
+                },
+                {
+                  min: validator.MIN_CHARACTER,
+                  message: `Added By ${validator.MIN_CHARACTER_MESSAGE}`,
+                },
+                {
+                  max: validator.MAX_CHARACTER,
+                  message: `Added By ${validator.MAX_CHARACTER_MESSAGE}`,
+                },
+                {
+                  pattern: new RegExp(/[a-zA-Z]/),
+                  message: validator.SPECIAL_CHARACTER_MESSAGE,
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
         {/* Action Buttons */}
         <Form.Item style={{ marginTop: 20 }}>
           <Space style={{ width: "100%", justifyContent: "flex-end" }}>

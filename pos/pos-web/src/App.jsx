@@ -19,6 +19,7 @@ const CustomerLayout = lazy(() => import("./pages/Layout/Customer-layout/custome
 const CustomerAdd = lazy(() => import("./pages/Customer/CustomerAdd"));
 const CustomerProfile = lazy(() => import("./pages/Customer/customerProfile"));
 const Customers = lazy(() => import("./pages/Customer/customers"));
+const DeletedCustomers = lazy(() => import("./pages/Customer/deletedCustomers"));
 
 const PublishedProducts = lazy(() => import("./pages/Layout/Customer-layout/publishedProducts"));
 const OfficeAddress = lazy(() => import("./pages/Layout/Customer-layout/addressSection"));
@@ -172,6 +173,16 @@ const App = () => {
                   <Route index element={<Customers />} />
                   <Route path="add" element={<CustomerAdd />} />
                   <Route path=":id" element={<CustomerProfile />} />
+
+                  {/* Override for admin only */}
+                  <Route
+                    path="deleted"
+                    element={
+                      <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
+                        <DeletedCustomers />
+                      </RequireRole>
+                    }
+                  />
                 </Route>
 
                 {/* Products */}

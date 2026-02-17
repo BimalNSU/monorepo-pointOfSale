@@ -19,6 +19,19 @@ class CustomerService {
   constructor(db: Firestore) {
     this.db = db;
   }
+  private normalizeCloths(cloths: CustomerModel["cloths"] | undefined) {
+    if (!cloths) return [];
+    return cloths.map((c) => {
+      const { info, ...rest } = c;
+      return {
+        ...rest,
+        info: {
+          ...info,
+          remark: c.info.remark ?? null, // set remark to null if undefined
+        },
+      };
+    });
+  }
   async add(data: AddData, createdBy: UserId) {
     const customerObj = new Customer(this.db);
     const batch = writeBatch(this.db);
@@ -28,7 +41,7 @@ class CustomerService {
         ...rest,
         lastName: lastName || null,
         email: email || null,
-        cloths: cloths || [],
+        cloths: this.normalizeCloths(cloths),
         createdBy,
         updatedBy: createdBy,
       },
@@ -40,7 +53,11 @@ class CustomerService {
   async update(id: CustomerId, updateData: EditData, updatedBy: UserId) {
     const batch = writeBatch(this.db);
     const customerObj = new Customer(this.db);
-    customerObj.edit(batch, id, { ...updateData, updatedBy });
+    customerObj.edit(batch, id, {
+      ...updateData,
+      cloths: this.normalizeCloths(updateData.cloths),
+      updatedBy,
+    });
     return await batch.commit();
   }
 

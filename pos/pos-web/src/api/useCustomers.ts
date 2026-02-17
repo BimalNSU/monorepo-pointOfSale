@@ -30,7 +30,7 @@ export const useCustomers = (filter?: Filter) => {
         const { createdAt, ...rest } = u;
         return {
           ...rest,
-          fullName: `${u.firstName}${u.lastName ? ` ${u.lastName}` : ""}`,
+          // fullName: `${u.firstName}${u.lastName ? ` ${u.lastName}` : ""}`,
           createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
         };
       }),
