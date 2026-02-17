@@ -86,7 +86,7 @@ const ProductAdd = () => {
   return (
     <Card
       title="Add Product"
-      bordered={false}
+      variant="borderless"
       style={{
         // width: 300,
         margin: "10px",
@@ -129,7 +129,7 @@ const ProductAdd = () => {
         {/* Image Upload Section */}
         <Card
           title="Product Images"
-          bordered={false}
+          variant="borderless"
           style={{ marginBottom: 24 }}
           styles={{
             header: { borderBottom: 0, paddingBottom: 0, paddingLeft: 11 },

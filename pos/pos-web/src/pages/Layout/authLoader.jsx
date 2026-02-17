@@ -3,26 +3,33 @@ import { useUser } from "@/api/useUser";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { Spin } from "antd";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const AuthLoader = () => {
-  const { userId, updateAuth, session } = useFirebaseAuth();
-  const { status, data: dbSession } = useSession(session.id);
-  const { status: fetchUser, data: dbUser } = useUser(userId);
+  const { session, userId, updateAuth } = useFirebaseAuth();
+  const { data: dbSession, status: sessionStatus } = useSession(session?.id);
+  const { data: dbUser, status: userStatus } = useUser(userId);
 
   useEffect(() => {
-    if (status === "success" && fetchUser === "success") {
+    if (dbSession && dbUser && sessionStatus === "success" && userStatus === "success") {
       updateAuth(dbUser, dbSession);
     }
-  }, [dbUser, dbSession]);
+  }, [dbSession, dbUser, sessionStatus, userStatus]);
 
-  if (status === "loading" || fetchUser === "loading") {
+  if (!session?.id || sessionStatus === "loading" || userStatus === "loading") {
     return (
-      <div className={`spin`}>
+      <div
+        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
+      >
         <Spin size="large" />
       </div>
     );
   }
+
+  if (!dbUser || !dbSession) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <Outlet />;
 };
 export default AuthLoader;

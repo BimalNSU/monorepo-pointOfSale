@@ -29,12 +29,13 @@ import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import styles from "../../posButton.module.css";
 import customAntdStyles from "../../customAntd.module.css";
 import { useDebounce } from "react-use";
+import { USER_ROLE } from "@pos/shared-models";
 const { Text } = Typography;
 const { confirm } = Modal;
 
 const Customers = () => {
   const navigate = useNavigate();
-  const { userId: authUserId } = useFirebaseAuth();
+  const { userId: authUserId, session } = useFirebaseAuth();
   const db = useFirestore();
   const customerService = new CustomerService(db);
   const { status, data } = useCustomers();
@@ -156,7 +157,7 @@ const Customers = () => {
                 </div>
               </Space>
             </Col>
-            {record.id !== authUserId && (
+            {session.role === USER_ROLE.VALUES.Admin && (
               <Col>
                 <div
                   onClick={(e) => e.stopPropagation()}
@@ -272,7 +273,9 @@ const Customers = () => {
       },
       responsive: ["md", "lg", "xl", "xxl"],
     },
-    {
+  ];
+  if (session.role === USER_ROLE.VALUES.Admin) {
+    columns.push({
       title: "Action",
       dataIndex: "action",
       align: "center",
@@ -280,31 +283,30 @@ const Customers = () => {
 
       fixed: "right",
       // width: "25%",
-      render: (_, record) =>
-        record.id !== authUserId && (
-          <Space size="middle">
-            <div
-              style={{
-                padding: "3px",
-                position: "relative",
-                backgroundColor: "#fff",
-                border: "1px solid #d9d9d9",
-                borderRadius: "2px",
-              }}
-            >
-              <Dropdown menu={{ items: renderActionItems(record) }}>
-                <a style={{ color: "black", textDecoration: "none" }}>
-                  Select <DownOutlined />
-                </a>
-              </Dropdown>
-            </div>
-          </Space>
-        ),
+      render: (_, record) => (
+        <Space size="middle">
+          <div
+            style={{
+              padding: "3px",
+              position: "relative",
+              backgroundColor: "#fff",
+              border: "1px solid #d9d9d9",
+              borderRadius: "2px",
+            }}
+          >
+            <Dropdown menu={{ items: renderActionItems(record) }}>
+              <a style={{ color: "black", textDecoration: "none" }}>
+                Select <DownOutlined />
+              </a>
+            </Dropdown>
+          </div>
+        </Space>
+      ),
       responsive: ["md", "lg", "xl", "xxl"],
-    },
-  ];
+    });
+  }
   return (
-    <Card title="Customer List" variant={false} className={customAntdStyles.mobileCardBody}>
+    <Card title="Customer List" variant="borderless" className={customAntdStyles.mobileCardBody}>
       <Table
         title={() => (
           <Row gutter={[16, 10]} justify="space-between">

@@ -264,7 +264,7 @@ const InvoiceDetailsComponentNew = ({ invoiceData, authUserId, authRole }) => {
             rowClassName={styles["editable-row"]}
             dataSource={invoiceTableData}
             pagination={false}
-            bordered
+            variant
             summary={(pageData) => {
               //   // let totalAmount = 0;
               //   // pageData.forEach(({ amount }) => {

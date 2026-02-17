@@ -260,7 +260,7 @@ const Shops = () => {
     },
   ];
   return (
-    <Card title="Shop List" bordered={false} className={customAntdStyles.mobileCardBody}>
+    <Card title="Shop List" variant="borderless" className={customAntdStyles.mobileCardBody}>
       <Table
         title={() => (
           <Row gutter={[16, 1]} justify="end">

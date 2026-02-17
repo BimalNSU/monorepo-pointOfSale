@@ -281,7 +281,7 @@ const Invoices = () => {
   // const t = dayjs(currentDateTime, "YYYY/MM/DD").diff(dayjs("2022/01/22", "YYYY/MM/DD").add(5, 'months'))
 
   return (
-    <Card title="Invoice List" bordered={false} size="small">
+    <Card title="Invoice List" variant="borderless" size="small">
       <Row justify="space-between" style={{ marginBottom: "5px" }}>
         <Col>
           {selectedInvoiceIds?.length ? (

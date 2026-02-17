@@ -12,6 +12,7 @@ import { INVOICE_STATUS } from "@/constants/paymentStatus";
 import { DocumentCounter } from "@/db-collections/documentCounter.collection";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { Product } from "@/db-collections/product.collection";
+import ProductService from "./product.service";
 
 type omitKeys =
   | "createdAt"
@@ -70,10 +71,33 @@ class InvoiceService extends Invoice {
     new DocumentCounter(this.db).incrementCounter(batch, DOCUMENT_FORMAT.VALUES.Invoice);
 
     //update qty in products
-    const product = new Product(this.db);
-    data.items.forEach(
-      (item) => product.edit(batch, item.productId, { qty: increment(-item.qty) }, createdBy), //decreasing qty
-    );
+    const productService = new ProductService(this.db);
+    const productObj = new Product(this.db);
+    const products = await productObj.getListByIds(data.items.map((i) => i.productId));
+    // data.items.forEach(
+    //   (item) => productObj.edit(batch, item.productId, { qty: increment(-item.qty) }, createdBy), //decreasing qty
+    // );
+    data.items.forEach((item) => {
+      const currProduct = products.find((p) => p.id === item.productId)!;
+      productObj.edit(
+        batch,
+        item.productId,
+        {
+          qty: increment(-item.qty),
+          sales: increment(item.qty),
+          score: productService.calculateVisibilityScore({
+            qty: currProduct.qty - item.qty,
+            addToCart: currProduct.addToCart,
+            sales: currProduct.sales,
+            wishlist: currProduct.wishlist,
+            reviewRating: currProduct.reviewRating,
+            reviewCount: currProduct.reviewCount,
+            createdAt: currProduct.createdAt as Date,
+          }),
+        },
+        createdBy,
+      );
+    });
     await batch.commit();
     return await this.get(nInvoice.id);
   }
@@ -116,9 +140,29 @@ class InvoiceService extends Invoice {
       });
 
     //update qty in products
-    const product = new Product(this.db);
-    Object.entries(mutatedProductsQty).forEach(([productId, qty]) => {
-      product.edit(batch, productId, { qty: increment(-qty) }, updatedBy);
+    const productService = new ProductService(this.db);
+    const productObj = new Product(this.db);
+    const products = await productObj.getListByIds(Object.keys(mutatedProductsQty));
+    Object.entries(mutatedProductsQty).forEach(([productId, qtyDiff]) => {
+      const currProduct = products.find((p) => p.id === productId)!;
+      productObj.edit(
+        batch,
+        productId,
+        {
+          qty: increment(-qtyDiff),
+          sales: increment(qtyDiff),
+          score: productService.calculateVisibilityScore({
+            qty: currProduct.qty - qtyDiff,
+            addToCart: currProduct.addToCart,
+            sales: (currProduct.qty || 0) + qtyDiff,
+            wishlist: currProduct.wishlist,
+            reviewRating: currProduct.reviewRating,
+            reviewCount: currProduct.reviewCount,
+            createdAt: currProduct.createdAt as Date,
+          }),
+        },
+        updatedBy,
+      );
     });
     return await batch.commit();
   }

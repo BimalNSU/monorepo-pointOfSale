@@ -108,7 +108,7 @@ const InvoiceReport = () => {
   return (
     <Card
       title="Invoice Report"
-      bordered={false}
+      variant="borderless"
       style={{
         margin: "10px",
       }}

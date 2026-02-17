@@ -20,7 +20,7 @@ const InvoiceTotalDiscount = ({
         <Text>Direct changes make reset individuals' discount fields. Will procced?</Text>
       </Col>
       <Col span={24}>
-        <Space direction="horizontal">
+        <Space orientation="horizontal">
           <Button onClick={() => handlePromptYesBtn()}>Yes</Button>
           <Button onClick={() => setShowPrompt(false)}>No</Button>
         </Space>

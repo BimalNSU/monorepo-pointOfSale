@@ -1,4 +1,4 @@
-import { Route, BrowserRouter, Routes, Outlet } from "react-router-dom";
+import { Route, BrowserRouter, Routes, Outlet, Navigate } from "react-router-dom";
 import "./assets/common/style.css";
 import "firebase/storage";
 // import MainLayoutLandingPage from "@/pages/LandingPage/Layout/MainLayoutLandingPage";
@@ -11,9 +11,21 @@ import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import useAuthStore from "./stores/auth.store";
 import { Spin } from "antd";
 import { lazy, Suspense } from "react";
+import ProductDetails2 from "./components/Product/productDetails2";
+import RequireAuth from "./pages/Layout/requireAuth";
+
+const CustomerLayout = lazy(() => import("./pages/Layout/Customer-layout/customerLayout"));
+
+const CustomerAdd = lazy(() => import("./pages/Customer/CustomerAdd"));
+const CustomerProfile = lazy(() => import("./pages/Customer/customerProfile"));
+const Customers = lazy(() => import("./pages/Customer/customers"));
+
+const PublishedProducts = lazy(() => import("./pages/Layout/Customer-layout/publishedProducts"));
+const OfficeAddress = lazy(() => import("./pages/Layout/Customer-layout/addressSection"));
+const ShopPage = lazy(() => import("./pages/shopPage"));
 
 const Login = lazy(() => import("@/pages/Auth/Login/Login"));
-const HomePage = lazy(() => import("./pages/homePage"));
+// const HomePage = lazy(() => import("./pages/homePage"));
 const Dashboard = lazy(() => import("./components/dashboard/dashboard"));
 
 const SelfProfile = lazy(() => import("./pages/Layout/UserView/UserProfile/View/SelfProfile"));
@@ -43,33 +55,39 @@ const PrintBarcode = lazy(() => import("./pages/ManagerView/printBarcode"));
 
 const NotFound = lazy(() => import("./pages/notFound"));
 
+// Customer Auth for actions like Add to Cart
+const CustomerAuth = ({ children }) => {
+  const { session } = useAuthStore();
+  if (!session?.id || session.role !== "Customer") {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 const App = () => {
-  useFirebaseAuthListener(); //Called once to sync with auth
-  const { userId, session, isLoggingOut } = useAuthStore();
+  useFirebaseAuthListener();
+  const { session, isLoggingOut } = useAuthStore();
+
   if (isLoggingOut) {
     return (
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh", // full viewport height
-        }}
+        style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
       >
         <Spin />
       </div>
     );
   }
+
   return (
     <BrowserRouter>
       <Suspense
         fallback={
           <div
             style={{
-              height: "100vh",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              height: "100vh",
             }}
           >
             <Spin size="large" />
@@ -77,30 +95,45 @@ const App = () => {
         }
       >
         <Routes>
-          <Route path="/" exact element={<HomePage />} />
-          {/* <Route path="/home" exact element={<MainLayoutLandingPage page={"home"} />} /> */}
-          {/* <Route path="/index" exact element={<Index />}></Route> */}
-          {/* <Route path="/about" exact> */}
-          {/* <MainLayoutLandingPage page={"about"} /> */}
-          {/* </Route> */}
-          {/* <Route path="/subscription" exact> */}
-          {/* <MainLayoutLandingPage page={"subscription"} /> */}
-          {/* </Route> */}
+          {/* ---------------- PUBLIC CUSTOMER ROUTES ---------------- */}
+          <Route element={<CustomerLayout />}>
+            <Route index element={<PublishedProducts />} />
+            <Route path="contact-us" element={<OfficeAddress />} />
+            <Route path="product/:id" element={<ProductDetails2 />} />
+          </Route>
 
-          <Route path="/login" exact element={<Login />} />
-          {/* <Route
-          path="/login"
-          exact
-          element={!session?.id ? <Login /> : <Navigate to="/dashboard" />}
-        /> */}
-          {userId && session?.id && (
+          {/* ---------------- PUBLIC ROUTES ---------------- */}
+          <Route path="/shop" element={<ShopPage />} />
+          <Route
+            path="/login"
+            element={!session?.id ? <Login /> : <Navigate to="/dashboard" replace />}
+          />
+
+          {/* ---------------- EMPLOYEE/ADMIN PORTAL ---------------- */}
+          <Route element={<RequireAuth />}>
             <Route element={<AuthLoader />}>
               <Route element={<LoggedInLayout />}>
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="profile" element={<SelfProfile />} />
-
+                {/* Dashboard & Profile */}
                 <Route
-                  path="users"
+                  path="/dashboard"
+                  element={
+                    <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}>
+                      <Dashboard />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}>
+                      <SelfProfile />
+                    </RequireRole>
+                  }
+                />
+
+                {/* Users */}
+                <Route
+                  path="/users"
                   element={
                     <RequireRole allowedRoles={[USER_ROLE.VALUES.Admin]}>
                       <Outlet />
@@ -126,7 +159,24 @@ const App = () => {
                 </Route>
 
                 <Route
-                  path="products"
+                  path="customers"
+                  element={
+                    <RequireRole
+                      allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
+                      allowedShopRoles={[SHOP_ROLE.VALUES.Manager]}
+                    >
+                      <Outlet />
+                    </RequireRole>
+                  }
+                >
+                  <Route index element={<Customers />} />
+                  <Route path="add" element={<CustomerAdd />} />
+                  <Route path=":id" element={<CustomerProfile />} />
+                </Route>
+
+                {/* Products */}
+                <Route
+                  path="/products"
                   element={
                     <RequireRole
                       allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
@@ -215,12 +265,26 @@ const App = () => {
                 <Route path="print-barcode" element={<PrintBarcode />} />
               </Route>
             </Route>
-          )}
-          {/* Handle the case where no route matches */}
+          </Route>
+
+          {/* ---------------- CUSTOMER PROTECTED ACTIONS ---------------- */}
+          {/* Example: Add to Cart */}
+          <Route
+            path="/cart/add/:productId"
+            element={
+              <CustomerAuth>
+                {/* Your Add to Cart Component */}
+                <div>Add to Cart Page / Component Here</div>
+              </CustomerAuth>
+            }
+          />
+
+          {/* ---------------- 404 ---------------- */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
   );
 };
+
 export default App;

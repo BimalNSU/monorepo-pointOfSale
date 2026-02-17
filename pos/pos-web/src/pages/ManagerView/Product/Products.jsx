@@ -59,8 +59,6 @@ const Products = () => {
           >
             <Text strong>No#:</Text> {record.id}
             <br />
-            <Text strong>Date:</Text> {record.createdAt}
-            <br />
             <Text strong>Name:</Text> {record.name}
             <br />
             <Text strong>Description:</Text> {record.description ?? "N/A"}
@@ -69,6 +67,8 @@ const Products = () => {
             <br />
             <Text strong>Purchase Rate:</Text>{" "}
             {record.purchaseRate ? convertToBD(record.purchaseRate) : record.purchaseRate}
+            <br />
+            <Text strong>Discount:</Text> {record.discount ?? 0}
             <br />
             <Text strong>Sales Rate:</Text> {convertToBD(record.salesRate)}
           </Link>
@@ -104,12 +104,6 @@ const Products = () => {
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
-      title: "Date",
-      dataIndex: "createdAt",
-      render: renderValueCell,
-      responsive: ["md", "lg", "xl", "xxl"],
-    },
-    {
       title: "Name",
       dataIndex: "name",
       render: renderValueCell,
@@ -124,12 +118,20 @@ const Products = () => {
     {
       title: "Qty",
       dataIndex: "qty",
+      align: "right",
       render: renderValueCell,
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
       title: "Purchase Rate",
       dataIndex: "purchaseRate",
+      align: "right",
+      render: (text, record) => (text ? renderValueCell(convertToBD(text), record) : text),
+      responsive: ["md", "lg", "xl", "xxl"],
+    },
+    {
+      title: "Discount",
+      dataIndex: "discount",
       align: "right",
       render: (text, record) => (text ? renderValueCell(convertToBD(text), record) : text),
       responsive: ["md", "lg", "xl", "xxl"],
@@ -170,7 +172,7 @@ const Products = () => {
   return (
     <Card
       title="Product List"
-      bordered={false}
+      variant="borderless"
       style={{
         // width: 300,
         margin: "10px",
