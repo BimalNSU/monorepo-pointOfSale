@@ -401,7 +401,6 @@ const CustomerDataTable = ({ status, data }) => {
                         Delete ({selectedRowKeys.length})
                       </Button>
                     )}
-
                     <Button icon={<ExportOutlined />} onClick={handleBulkExport}>
                       Export
                     </Button>
@@ -413,7 +412,6 @@ const CustomerDataTable = ({ status, data }) => {
         size="small"
         loading={status === "loading"}
         columns={columns}
-        // dataSource={customers}
         dataSource={paginatedCustomers}
         pagination={false}
         rowSelection={rowSelection}
@@ -434,7 +432,7 @@ const CustomerDataTable = ({ status, data }) => {
         <Select
           size="middle"
           value={pageSize}
-          onChange={(value) => onPageSizeChange(value)}
+          onChange={(value) => updateParams({ limit: value })}
           // style={{
           //   width: isMobile ? "45%" : 140,
           //   minWidth: 120,
