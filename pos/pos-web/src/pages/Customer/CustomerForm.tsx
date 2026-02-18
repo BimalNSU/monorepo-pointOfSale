@@ -224,7 +224,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
         >
           {(fields, { add, remove }) => (
             <>
-              <Row gutter={[16, 16]}>
+              <Row gutter={[12, 12]}>
                 {fields.map(({ key, name }) => (
                   <Col xs={24} lg={12} key={key}>
                     <Card size="small">
@@ -272,7 +272,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Waist"
                                   rules={[{ required: true, message: "Please enter waist" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -280,7 +280,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Side Length"
                                   rules={[{ required: true, message: "Please enter side length" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -288,7 +288,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Front Rise"
                                   rules={[{ required: true, message: "Please enter front rise" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -296,7 +296,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Thigh"
                                   rules={[{ required: true, message: "Please enter thigh" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -304,7 +304,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Leg Opening"
                                   rules={[{ required: true, message: "Please enter leg-opening" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -338,7 +338,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Chest"
                                   rules={[{ required: true, message: "Please enter chest" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
 
                                 <Form.Item
@@ -346,7 +346,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                                   label="Length"
                                   rules={[{ required: true, message: "Please enter long" }]}
                                 >
-                                  <InputNumber style={{ width: "100%" }} />
+                                  <InputNumber style={{ minWidth: "100%" }} />
                                 </Form.Item>
                                 <Form.Item
                                   name={[name, "info", "remark"]}
