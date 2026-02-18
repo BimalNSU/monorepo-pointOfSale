@@ -7,12 +7,14 @@ import {
   Input,
   Modal,
   notification,
+  Pagination,
   Row,
+  Select,
   Space,
   Table,
   Typography,
 } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DeleteOutlined,
   DownOutlined,
@@ -23,15 +25,20 @@ import {
 } from "@ant-design/icons";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
 const { Text } = Typography;
 const { confirm } = Modal;
+const { Search } = Input;
 
 const CustomerDataTable = ({ status, data }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get("page")) || 1;
+  const pageSize = Number(searchParams.get("limit")) || 10;
+  const search = searchParams.get("search") || "";
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
   const isMobile = !screens.md;
@@ -41,21 +48,20 @@ const CustomerDataTable = ({ status, data }) => {
   const customerService = new CustomerService(db);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  const [search, setSearch] = useState("");
-  const [customers, setCustomers] = useState([]);
+  const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   useDebounce(
     () => {
       if (!data?.length) {
-        setCustomers([]);
+        setFilteredCustomers([]);
         return;
       }
       if (!search) {
-        setCustomers(data.map((u) => ({ ...u, key: u.id })));
+        setFilteredCustomers(data.map((u) => ({ ...u, key: u.id })));
         return;
       }
       const pattern = new RegExp(`(${search || ""})`, "i");
-      setCustomers(
+      setFilteredCustomers(
         data
           .map((u) => ({ ...u, key: u.id }))
           .filter(
@@ -64,9 +70,13 @@ const CustomerDataTable = ({ status, data }) => {
           ),
       );
     },
-    300,
+    500,
     [data, search],
   );
+  const paginatedCustomers = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredCustomers.slice(start, start + pageSize);
+  }, [filteredCustomers, page, pageSize]);
   const handleRemoveCustomer = async (e, record) => {
     confirm({
       title: `Are you sure, want to delete this customer?`,
@@ -285,7 +295,7 @@ const CustomerDataTable = ({ status, data }) => {
   };
 
   const handleBulkExport = () => {
-    const selectedCustomers = customers.filter((c) => selectedRowKeys.includes(c.id));
+    const selectedCustomers = paginatedCustomers.filter((c) => selectedRowKeys.includes(c.id));
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -304,74 +314,152 @@ const CustomerDataTable = ({ status, data }) => {
     link.click();
   };
 
+  const updateParams = (newParams) => {
+    setSearchParams({
+      page: newParams.page ?? page,
+      limit: newParams.limit ?? pageSize,
+      ...(newParams.search && { search: newParams.search ?? search }),
+    });
+  };
   return (
-    <Table
-      title={() => (
-        <Row gutter={[16, 10]} justify="space-between">
-          <Col>
-            <Input
-              placeholder="Search by name, mobile or email"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              allowClear
-            />
-          </Col>
-          <Col>
-            {selectedRowKeys.length > 0 &&
-              (isMobile ? (
-                <Dropdown
-                  menu={{
-                    items: [
-                      ...(session.role === USER_ROLE.VALUES.Admin
-                        ? [
-                            {
-                              key: "delete",
-                              label: "Delete Selected",
-                              icon: <DeleteOutlined />,
-                              danger: true,
-                              onClick: handleBulkDelete,
-                            },
-                          ]
-                        : []),
-                      {
-                        key: "export",
-                        label: "Export Selected",
-                        icon: <ExportOutlined />,
-                        onClick: handleBulkExport,
-                      },
-                    ],
-                  }}
-                >
-                  <Button icon={<MoreOutlined />} />
-                </Dropdown>
-              ) : (
-                <Space>
-                  {session.role === USER_ROLE.VALUES.Admin && (
-                    <Button
-                      color="danger"
-                      variant="solid"
-                      icon={<DeleteOutlined />}
-                      onClick={handleBulkDelete}
-                    >
-                      Delete ({selectedRowKeys.length})
-                    </Button>
-                  )}
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "end",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+          margin: "3px 8px 0 0",
+        }}
+      >
+        <Pagination
+          current={page}
+          pageSize={pageSize}
+          total={filteredCustomers.length}
+          onChange={(p) => updateParams({ page: p })}
+          size="small"
+          showSizeChanger={false}
+        />
+      </div>
+      <Table
+        title={() => (
+          <Row gutter={[16, 10]} justify="space-between">
+            <Col>
+              <Input
+                placeholder="Search by name, mobile or email"
+                value={search}
+                // onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => updateParams({ page: 1, search: e.target.value })}
+                allowClear
+              />
+              {/* <Search
+                placeholder="Search customer"
+                defaultValue={search}
+                onSearch={(value) => updateParams({ page: 1, search: value })}
+                style={{ width: 250, marginBottom: 16 }}
+              /> */}
+            </Col>
+            <Col>
+              {selectedRowKeys.length > 0 &&
+                (isMobile ? (
+                  <Dropdown
+                    menu={{
+                      items: [
+                        ...(session.role === USER_ROLE.VALUES.Admin
+                          ? [
+                              {
+                                key: "delete",
+                                label: "Delete Selected",
+                                icon: <DeleteOutlined />,
+                                danger: true,
+                                onClick: handleBulkDelete,
+                              },
+                            ]
+                          : []),
+                        {
+                          key: "export",
+                          label: "Export Selected",
+                          icon: <ExportOutlined />,
+                          onClick: handleBulkExport,
+                        },
+                      ],
+                    }}
+                  >
+                    <Button icon={<MoreOutlined />} />
+                  </Dropdown>
+                ) : (
+                  <Space>
+                    {session.role === USER_ROLE.VALUES.Admin && (
+                      <Button
+                        color="danger"
+                        variant="solid"
+                        icon={<DeleteOutlined />}
+                        onClick={handleBulkDelete}
+                      >
+                        Delete ({selectedRowKeys.length})
+                      </Button>
+                    )}
 
-                  <Button icon={<ExportOutlined />} onClick={handleBulkExport}>
-                    Export
-                  </Button>
-                </Space>
-              ))}
-          </Col>
-        </Row>
-      )}
-      size="small"
-      loading={status === "loading"}
-      columns={columns}
-      dataSource={customers}
-      rowSelection={rowSelection}
-      rowKey="id"
-    />
+                    <Button icon={<ExportOutlined />} onClick={handleBulkExport}>
+                      Export
+                    </Button>
+                  </Space>
+                ))}
+            </Col>
+          </Row>
+        )}
+        size="small"
+        loading={status === "loading"}
+        columns={columns}
+        // dataSource={customers}
+        dataSource={paginatedCustomers}
+        pagination={false}
+        rowSelection={rowSelection}
+        rowKey="id"
+      />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+          margin: "8px 8px 0 8px",
+        }}
+      >
+        {/* Page Size */}
+        <Select
+          size="middle"
+          value={pageSize}
+          onChange={(value) => onPageSizeChange(value)}
+          // style={{
+          //   width: isMobile ? "45%" : 140,
+          //   minWidth: 120,
+          // }}
+          options={[
+            { value: 10, label: "10 / page" },
+            { value: 20, label: "20 / page" },
+            { value: 50, label: "50 / page" },
+          ]}
+        />
+        <Pagination
+          current={page}
+          pageSize={pageSize}
+          total={filteredCustomers.length}
+          onChange={(p) => updateParams({ page: p })}
+          size="small"
+          showSizeChanger={false}
+          // simple={isMobile}
+          // style={{
+          //   width: isMobile ? "50%" : "auto",
+          //   textAlign: isMobile ? "right" : "right",
+          // }}
+        />
+      </div>
+    </>
   );
 };
 export default CustomerDataTable;
