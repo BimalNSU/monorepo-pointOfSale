@@ -40,9 +40,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
 
   useEffect(() => {
     if (initialValues) {
-      form.resetFields();
       const { id, ...rest } = initialValues;
-
       form.setFieldsValue({
         ...rest,
         cloths: rest.cloths || [],
@@ -50,9 +48,6 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
     }
   }, [initialValues, form]);
 
-  // -----------------------------
-  // Get already selected cloth types
-  // -----------------------------
   const getSelectedClothTypes = () => {
     const cloths = form.getFieldValue("cloths") || [];
     return cloths.map((c: any) => c?.type).filter(Boolean);
@@ -78,7 +73,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
           duration: 2,
         });
       }
-
+      form.resetFields();
       onSuccess?.();
     } catch (error) {
       notification.error({
@@ -92,10 +87,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
   };
 
   const handleCancel = () => {
-    form.setFieldsValue({
-      ...initialValues,
-      cloths: initialValues?.cloths || [],
-    });
+    form.resetFields();
     onSuccess?.();
   };
 
@@ -144,8 +136,8 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                   message: `Customer Name ${validator.MAX_CHARACTER_MESSAGE}`,
                 },
                 {
-                  pattern: new RegExp(/[a-zA-Z]/),
-                  message: validator.SPECIAL_CHARACTER_MESSAGE,
+                  pattern: /^[A-Za-z\s]+$/,
+                  message: "Name can only contain letters and spaces",
                 },
               ]}
             >
@@ -163,7 +155,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                   message: validator.BLANK_SPACE_MESSAGE,
                 },
                 {
-                  pattern: new RegExp(/[a-zA-Z]/),
+                  pattern: /^[A-Za-z\s]+$/,
                   message: validator.SPECIAL_CHARACTER_MESSAGE,
                 },
               ]}
@@ -424,7 +416,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
                   message: `Added By ${validator.MAX_CHARACTER_MESSAGE}`,
                 },
                 {
-                  pattern: new RegExp(/[a-zA-Z]/),
+                  pattern: /^[A-Za-z\s]+$/,
                   message: validator.SPECIAL_CHARACTER_MESSAGE,
                 },
               ]}
