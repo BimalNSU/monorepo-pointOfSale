@@ -14,7 +14,7 @@ import {
   Table,
   Typography,
 } from "antd";
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   DeleteOutlined,
   DownOutlined,
@@ -31,7 +31,6 @@ import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
 const { Text } = Typography;
 const { confirm } = Modal;
-const { Search } = Input;
 
 const CustomerDataTable = ({ status, data }) => {
   const navigate = useNavigate();
@@ -60,15 +59,19 @@ const CustomerDataTable = ({ status, data }) => {
         setFilteredCustomers(data.map((u) => ({ ...u, key: u.id })));
         return;
       }
-      const pattern = new RegExp(`(${search || ""})`, "i");
-      setFilteredCustomers(
-        data
-          .map((u) => ({ ...u, key: u.id }))
-          .filter(
-            (c) =>
-              pattern.test(c.firstName) || pattern.test(c.mobile) || pattern.test(c.email || ""),
-          ),
-      );
+      const lowerSearch = search.toLowerCase();
+      const result = [];
+      for (const c of data) {
+        if (
+          c.id.includes(lowerSearch) ||
+          c.firstName.toLowerCase().includes(lowerSearch) ||
+          c.mobile.includes(lowerSearch) ||
+          c.email?.toLowerCase().includes(lowerSearch)
+        ) {
+          result.push({ ...c, key: c.id });
+        }
+      }
+      setFilteredCustomers(result);
     },
     500,
     [data, search],
@@ -77,6 +80,12 @@ const CustomerDataTable = ({ status, data }) => {
     const start = (page - 1) * pageSize;
     return filteredCustomers.slice(start, start + pageSize);
   }, [filteredCustomers, page, pageSize]);
+  const searchRegex = useMemo(() => {
+    if (!search) return null;
+    const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(safeSearch, "gi");
+  }, [search]);
+
   const handleRemoveCustomer = async (e, record) => {
     confirm({
       title: `Are you sure, want to delete this customer?`,
@@ -108,6 +117,44 @@ const CustomerDataTable = ({ status, data }) => {
       {record.isDeleted ? <Text type="danger">{text}</Text> : text}
     </Link>
   );
+  const highlightText = (text) => {
+    if (!search || !text) {
+      return text;
+    }
+
+    const elements = [];
+    let lastIndex = 0;
+
+    String(text).replace(searchRegex, (match, offset) => {
+      // Push text before match
+      if (offset > lastIndex) {
+        elements.push(text.slice(lastIndex, offset));
+      }
+
+      // Push highlighted match
+      elements.push(
+        <span
+          key={offset}
+          style={{
+            backgroundColor: "#ffc069",
+            padding: "0 2px",
+            borderRadius: "2px",
+          }}
+        >
+          {match}
+        </span>,
+      );
+
+      lastIndex = offset + match.length;
+      return match;
+    });
+
+    // Push remaining text
+    if (lastIndex < text.length) {
+      elements.push(text.slice(lastIndex));
+    }
+    return elements;
+  };
 
   const renderActionItems = (record) => {
     const arr = [];
@@ -157,7 +204,7 @@ const CustomerDataTable = ({ status, data }) => {
               <Space>
                 <Avatar icon={<UserOutlined />} />
                 <div>
-                  <div style={{ fontWeight: 500 }}>{record.firstName}</div>
+                  <div style={{ fontWeight: 500 }}>{highlightText(record.firstName)}</div>
                   <div style={{ fontSize: 12, color: "#888" }}>
                     #{record.id} · {record.createdAt}
                   </div>
@@ -197,14 +244,14 @@ const CustomerDataTable = ({ status, data }) => {
               Mobile:
             </Text>
             <a href={`tel:${record.mobile}`} style={{ color: "#1677ff" }}>
-              {record.mobile}
+              {highlightText(record.mobile)}
             </a>
           </div>
           <div style={{ marginTop: 10 }}>
             <Text strong style={{ marginRight: "3px" }}>
               Email:
             </Text>
-            <span>{record.email ?? "N/A"}</span>
+            <span>{record.email ? highlightText(record.email) : "N/A"}</span>
           </div>
         </div>
       ),
@@ -219,25 +266,25 @@ const CustomerDataTable = ({ status, data }) => {
     {
       title: "#",
       dataIndex: "id",
-      render: renderValueCell,
+      render: (text, record) => renderValueCell(highlightText(text), record),
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
       title: "Name",
       dataIndex: "firstName",
-      render: renderValueCell,
+      render: (text, record) => renderValueCell(highlightText(text), record),
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
       title: "Mobile",
       dataIndex: "mobile",
-      render: renderValueCell,
+      render: (text, record) => renderValueCell(highlightText(text), record),
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
       title: "Email",
       dataIndex: "email",
-      render: renderValueCell,
+      render: (text, record) => renderValueCell(highlightText(text), record),
       responsive: ["md", "lg", "xl", "xxl"],
     },
   ];
