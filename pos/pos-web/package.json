@@ -1,7 +1,7 @@
 {
   "name": "pos-web",
   "private": true,
-  "version": "1.2.8",
+  "version": "1.2.9",
   "type": "module",
   "scripts": {
     "dev": "vite --mode demo --port 3000",
@@ -28,7 +28,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^13.5.0",
-    "antd": "^5.22.6",
+    "antd": "^6.3.0",
     "assert": "^2.1.0",
     "axios": "^1.7.9",
     "browserify-zlib": "^0.2.0",
@@ -40,6 +40,7 @@
     "html2canvas": "^1.4.1",
     "jsbarcode": "^3.11.6",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.563.0",
     "random-string-alphanumeric-generator": "^0.12.2",
     "rc-queue-anim": "^2.0.0",
     "rc-scroll-anim": "^2.7.6",
