@@ -27,7 +27,7 @@ const ShopPage = lazy(() => import("./pages/shopPage"));
 
 const Login = lazy(() => import("@/pages/Auth/Login/Login"));
 // const HomePage = lazy(() => import("./pages/homePage"));
-const Dashboard = lazy(() => import("./components/dashboard/dashboard"));
+const Dashboard = lazy(() => import("./pages/common/dashboard"));
 
 const SelfProfile = lazy(() => import("./pages/Layout/UserView/UserProfile/View/SelfProfile"));
 
