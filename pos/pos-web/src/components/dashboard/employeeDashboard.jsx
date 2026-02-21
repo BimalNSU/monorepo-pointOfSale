@@ -12,7 +12,7 @@ import { error } from "@/utils/Utils/Utils";
 
 const { Meta } = Card;
 
-const Dashboard = () => {
+const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const { shopRoles, session, getToken } = useFirebaseAuth();
   const shopIds = useMemo(() => {
@@ -74,4 +74,4 @@ const Dashboard = () => {
     </div>
   );
 };
-export default Dashboard;
+export default EmployeeDashboard;
