@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button, Card, Descriptions, Divider, Space, Row, Col, Result } from "antd";
+import { Button, Card, Descriptions, Divider, Space, Row, Col, Result, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCustomer } from "@/api/useCustomer";
 import CustomerForm from "./CustomerForm";
 import Loading from "@/components/loading";
 import { ClothType, PantFitType } from "@/constants/customer_cloth";
-
+const { Paragraph } = Typography;
 const CustomerProfile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -42,7 +42,7 @@ const CustomerProfile = () => {
     {
       key: "2",
       label: "Mobile",
-      children: <span>{data.mobile}</span>,
+      children: <Paragraph copyable>{data.mobile}</Paragraph>,
     },
     {
       key: "3",

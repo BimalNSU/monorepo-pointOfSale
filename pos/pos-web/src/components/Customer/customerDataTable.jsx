@@ -206,7 +206,7 @@ const CustomerDataTable = ({ status, data }) => {
                 <div>
                   <div style={{ fontWeight: 500 }}>{highlightText(record.firstName)}</div>
                   <div style={{ fontSize: 12, color: "#888" }}>
-                    #{record.id} · {record.createdAt}
+                    #{highlightText(record.id)} · {record.createdAt}
                   </div>
                 </div>
               </Space>
