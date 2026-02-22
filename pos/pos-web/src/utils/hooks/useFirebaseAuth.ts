@@ -72,7 +72,7 @@ export const useFirebaseAuth = () => {
   const getToken = async () => {
     return user ? user.getIdToken() : null;
   };
-  const updateAuth = async (dbUser: User, dbSession: WithId<SessionModel>) => {
+  const updateAuth = async (dbUser?: User, dbSession?: WithId<SessionModel>) => {
     if (!dbUser || !dbSession) {
       return await clearAuth();
     }

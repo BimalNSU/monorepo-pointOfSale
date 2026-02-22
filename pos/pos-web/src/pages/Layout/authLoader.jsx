@@ -11,7 +11,7 @@ const AuthLoader = () => {
   const { data: dbUser, status: userStatus } = useUser(userId);
 
   useEffect(() => {
-    if (dbSession && dbUser && sessionStatus === "success" && userStatus === "success") {
+    if (sessionStatus === "success" && userStatus === "success") {
       updateAuth(dbUser, dbSession);
     }
   }, [dbSession, dbUser, sessionStatus, userStatus]);
