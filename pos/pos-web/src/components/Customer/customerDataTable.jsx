@@ -29,6 +29,8 @@ import { useMemo, useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
+import dayjs from "dayjs";
+import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -56,7 +58,12 @@ const CustomerDataTable = ({ status, data }) => {
         return;
       }
       if (!search) {
-        setFilteredCustomers(data.map((u) => ({ ...u, key: u.id })));
+        setFilteredCustomers(
+          data.map((u) => {
+            const { createdAt, ...rest } = u;
+            return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: u.id };
+          }),
+        );
         return;
       }
       const lowerSearch = search.toLowerCase();
@@ -68,7 +75,8 @@ const CustomerDataTable = ({ status, data }) => {
           c.mobile.includes(lowerSearch) ||
           c.email?.toLowerCase().includes(lowerSearch)
         ) {
-          result.push({ ...c, key: c.id });
+          const { createdAt, ...rest } = c;
+          result.push({ ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: c.id });
         }
       }
       setFilteredCustomers(result);

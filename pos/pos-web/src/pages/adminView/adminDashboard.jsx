@@ -1,15 +1,17 @@
-import { Card, Col, Row, Statistic, List, Avatar, Select, Space } from "antd";
+import { Card, Col, Row, Statistic, Select, Space } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
 import isBetween from "dayjs/plugin/isBetween";
 import CustomerMeasurementChart from "./customerMeasurementChart";
 import { useCustomers } from "@/api/useCustomers";
 import Loading from "@/components/loading";
 import ResponsiveDateFilter from "./responsiveDateFilter";
-
-dayjs.extend(isoWeek);
+import updateLocale from "dayjs/plugin/updateLocale";
+dayjs.extend(updateLocale);
+dayjs.updateLocale("en", {
+  weekStart: 6,
+});
 dayjs.extend(isBetween);
 const AdminDashboard = () => {
   const { status, data } = useCustomers({ isDeleted: false });
@@ -30,11 +32,11 @@ const AdminDashboard = () => {
 
       switch (dateFilter) {
         case "this_week":
-          return created.isBetween(now.startOf("isoWeek"), now.endOf("isoWeek"), null, "[]");
+          return created.isBetween(now.startOf("week"), now.endOf("week"), null, "[]");
 
         case "last_week":
-          const lastWeekStart = now.subtract(1, "week").startOf("isoWeek");
-          const lastWeekEnd = now.subtract(1, "week").endOf("isoWeek");
+          const lastWeekStart = now.subtract(1, "week").startOf("week");
+          const lastWeekEnd = now.subtract(1, "week").endOf("week");
 
           return created.isBetween(lastWeekStart, lastWeekEnd, null, "[]");
 

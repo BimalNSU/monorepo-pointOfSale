@@ -20,21 +20,8 @@ export const useCustomers = (filter?: Filter) => {
     customerFirestoreConverter,
   );
   const queryInCustomer = query(customerCollectionRef, ...conditions);
-
   const { status, data } = useFirestoreCollectionData(queryInCustomer, {
     idField: "id",
   });
-  const customers = useMemo(
-    () =>
-      data?.map((u) => {
-        const { createdAt, ...rest } = u;
-        return {
-          ...rest,
-          // fullName: `${u.firstName}${u.lastName ? ` ${u.lastName}` : ""}`,
-          createdAt: dayjs(createdAt as Date).format(DATE_TIME_FORMAT),
-        };
-      }),
-    [data],
-  );
-  return { status, data: customers };
+  return { status, data };
 };

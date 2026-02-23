@@ -29,6 +29,8 @@ import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
 import { useCustomers } from "@/api/useCustomers";
+import dayjs from "dayjs";
+import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const { Text } = Typography;
 const { confirm } = Modal;
 
@@ -54,18 +56,27 @@ const DeletedCustomers = () => {
         return;
       }
       if (!search) {
-        setCustomers(data.map((u) => ({ ...u, key: u.id })));
+        setCustomers(
+          data.map((u) => {
+            const { createdAt, ...rest } = u;
+            return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: u.id };
+          }),
+        );
         return;
       }
-      const pattern = new RegExp(`(${search || ""})`, "i");
-      setCustomers(
-        data
-          .map((u) => ({ ...u, key: u.id }))
-          .filter(
-            (c) =>
-              pattern.test(c.firstName) || pattern.test(c.mobile) || pattern.test(c.email || ""),
-          ),
-      );
+      const lowerSearch = search.toLowerCase();
+      const result = [];
+      for (const c of data) {
+        if (
+          c.firstName.toLowerCase().includes(lowerSearch) ||
+          c.mobile.includes(lowerSearch) ||
+          c.email?.toLowerCase().includes(lowerSearch)
+        ) {
+          const { createdAt, ...rest } = c;
+          result.push({ ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: c.id });
+        }
+      }
+      setCustomers(result);
     },
     300,
     [data, search],
