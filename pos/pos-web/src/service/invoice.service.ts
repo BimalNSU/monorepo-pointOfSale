@@ -88,7 +88,7 @@ class InvoiceService extends Invoice {
           score: productService.calculateVisibilityScore({
             qty: currProduct.qty - item.qty,
             addToCart: currProduct.addToCart,
-            sales: currProduct.sales,
+            sales: (currProduct.sales as number) + item.qty,
             wishlist: currProduct.wishlist,
             reviewRating: currProduct.reviewRating,
             reviewCount: currProduct.reviewCount,
