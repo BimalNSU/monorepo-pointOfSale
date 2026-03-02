@@ -35,13 +35,14 @@ class CustomerService {
   async add(data: AddData, createdBy: UserId) {
     const customerObj = new Customer(this.db);
     const batch = writeBatch(this.db);
-    const { lastName, email, cloths, ...rest } = data;
+    const { lastName, email, cloths, addedBy, ...rest } = data;
     customerObj.add(
       {
         ...rest,
         lastName: lastName || null,
         email: email || null,
         cloths: this.normalizeCloths(cloths),
+        addedBy: addedBy.trim(),
         createdBy,
         updatedBy: createdBy,
       },
@@ -55,6 +56,7 @@ class CustomerService {
     const customerObj = new Customer(this.db);
     customerObj.edit(batch, id, {
       ...updateData,
+      ...(updateData.addedBy && { addedBy: updateData.addedBy.trim() }),
       cloths: this.normalizeCloths(updateData.cloths),
       updatedBy,
     });

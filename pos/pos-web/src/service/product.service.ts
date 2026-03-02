@@ -247,7 +247,7 @@ class ProductService {
 
     // --- Final Clamp (0–10) ---
     const visibilityScore = Math.min(Math.max(score * 10, 0), 10);
-    return visibilityScore;
+    return Math.round(visibilityScore * 100) / 100; //convert to two decimal number
     // return Number(visibilityScore.toFixed(2));
   }
 
