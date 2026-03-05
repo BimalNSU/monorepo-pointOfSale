@@ -1,7 +1,7 @@
 {
   "name": "pos-web",
   "private": true,
-  "version": "1.2.11",
+  "version": "1.2.12",
   "type": "module",
   "scripts": {
     "dev": "vite --mode demo --port 3000",
@@ -39,6 +39,7 @@
     "firebase": "^11.1.0",
     "html2canvas": "^1.4.1",
     "jsbarcode": "^3.11.6",
+    "libphonenumber-js": "^1.12.38",
     "lodash": "^4.17.21",
     "lucide-react": "^0.563.0",
     "random-string-alphanumeric-generator": "^0.12.2",
@@ -53,6 +54,7 @@
     "react-google-recaptcha": "^2.1.0",
     "react-google-recaptcha-v3": "^1.11.0",
     "react-hook-form": "^7.54.2",
+    "react-phone-number-input": "^3.4.16",
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1",
     "react-scroll": "^1.9.3",
