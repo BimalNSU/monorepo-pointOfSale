@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -18,6 +18,8 @@ import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
 import { Customer, WithId } from "@pos/shared-models";
 import * as validator from "../../utils/Validation/Validation";
+import { E164Number } from "libphonenumber-js/types.cjs";
+import { MobileNumberInputAntd, validatePhoneNumber } from "./MobileInputNumber";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 interface Props {
@@ -32,6 +34,19 @@ const CLOTH_OPTIONS = [
   { label: "Polo Shirt", value: "polo_shirt" },
 ];
 
+const formatE164 = (number: string) => {
+  // remove non-digits
+  const digits = number.replace(/\D/g, "");
+  // add +880 if starts with 0
+  if (digits.startsWith("0")) {
+    return "+88" + digits;
+  }
+  // already has country code?
+  if (digits.startsWith("880")) {
+    return "+" + digits;
+  }
+  return "+" + digits; // fallback
+};
 const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess }) => {
   const [form] = Form.useForm();
   const db = useFirestore();
@@ -40,9 +55,10 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
 
   useEffect(() => {
     if (initialValues) {
-      const { id, ...rest } = initialValues;
+      const { id, mobile, ...rest } = initialValues;
       form.setFieldsValue({
         ...rest,
+        mobile: formatE164(mobile), // convert to +8801XXXXXX
         cloths: rest.cloths || [],
       });
     }
@@ -59,7 +75,6 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
         notification.error({ message: "Unauthorized user" });
         return;
       }
-
       if (initialValues) {
         await customerService.update(customerId, values, authUserId);
         notification.success({
@@ -146,40 +161,33 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
           </Col>
 
           {/* <Col xs={24} lg={12}>
-            <Form.Item
-              name="lastName"
-              label="Last Name"
-              rules={[
-                {
-                  whitespace: true,
-                  message: validator.BLANK_SPACE_MESSAGE,
-                },
-                {
-                  pattern: /^[A-Za-z\s]+$/,
-                  message: validator.SPECIAL_CHARACTER_MESSAGE,
-                },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-          </Col> */}
+              <Form.Item
+                name="lastName"
+                label="Last Name"
+                rules={[
+                  {
+                    whitespace: true,
+                    message: validator.BLANK_SPACE_MESSAGE,
+                  },
+                  {
+                    pattern: /^[A-Za-z\s]+$/,
+                    message: validator.SPECIAL_CHARACTER_MESSAGE,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col> */}
 
           <Col xs={24} lg={12}>
             <Form.Item
-              name="mobile"
               label="Mobile"
-              rules={[
-                {
-                  required: true,
-                  message: `Please enter customer's Mobile No!`,
-                },
-                {
-                  pattern: new RegExp(/^01[3-9]\d{8}$/),
-                  message: `Please enter customer's valid mobile number`,
-                },
-              ]}
+              name="mobile"
+              rules={[{ validator: validatePhoneNumber }]}
+              valuePropName="value"
+              getValueFromEvent={(val) => val ?? ""}
             >
-              <Input />
+              <MobileNumberInputAntd />
             </Form.Item>
           </Col>
 
