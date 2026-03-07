@@ -18,7 +18,6 @@ import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
 import { Customer, WithId } from "@pos/shared-models";
 import * as validator from "../../utils/Validation/Validation";
-import { E164Number } from "libphonenumber-js/types.cjs";
 import { MobileNumberInputAntd, validatePhoneNumber } from "./MobileInputNumber";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -184,8 +183,8 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
               label="Mobile"
               name="mobile"
               rules={[{ validator: validatePhoneNumber }]}
-              valuePropName="value"
-              getValueFromEvent={(val) => val ?? ""}
+              // valuePropName="value"
+              // getValueFromEvent={(val) => val ?? ""}
             >
               <MobileNumberInputAntd />
             </Form.Item>

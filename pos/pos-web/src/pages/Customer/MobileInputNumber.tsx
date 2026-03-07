@@ -14,7 +14,7 @@ export const validatePhoneNumber = (_: any, value: string) => {
 };
 
 interface MobileNumberInputProps {
-  value?: string; // Form will pass string
+  value?: string;
   onChange?: (value?: string) => void; // Form passes string
 }
 
@@ -26,6 +26,7 @@ export const MobileNumberInputAntd: React.FC<MobileNumberInputProps> = ({ value,
 
   return (
     <PhoneInput
+      // style={{ width: "100%", display: "flex", gap: "8px" }}
       placeholder="Enter phone number"
       defaultCountry="BD"
       international
