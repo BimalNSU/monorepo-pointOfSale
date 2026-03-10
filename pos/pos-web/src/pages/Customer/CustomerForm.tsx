@@ -122,7 +122,7 @@ const CustomerForm: React.FC<Props> = ({ initialValues, customerId, onSuccess })
       <Form
         form={form}
         layout="horizontal"
-        labelCol={{ flex: "120px" }}
+        labelCol={{ flex: "110px" }}
         wrapperCol={{ flex: 1 }}
         labelAlign="left"
         labelWrap
