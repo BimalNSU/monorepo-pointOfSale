@@ -325,7 +325,7 @@ const UserAdd = () => {
               name="password"
               label="Password"
               rules={[
-                { required: true, message: "message: `Please enter user's password!" },
+                { required: true, message: `Please enter user's password!` },
                 { whitespace: true, message: validator.BLANK_SPACE_MESSAGE },
               ]}
             >
