@@ -20,12 +20,12 @@ type UpdateData = Pick<UserModel, "firstName" | "lastName" | "shopRoles"> & {
   isLoggingIn?: boolean;
 };
 interface AuthState {
-  userId: UserId | null;
-  firstName: string | null;
+  userId?: UserId | null;
+  firstName?: string | null;
   lastName?: string | null;
   shopRoles?: Record<ShopId, ShopRole> | null;
   session?: SessionType;
-  user: User | null;
+  user?: User | null;
   updateStore: (data: Partial<UpdateData>) => void;
   resetStore: (isLoggingOut?: boolean) => void;
   isLoggingIn?: boolean;
@@ -44,24 +44,24 @@ const initialState = {
 
 const useAuthStore = create<AuthState>()(
   persist(
-    devtools(
-      (set, get) => ({
-        ...initialState,
-        updateStore: (data) => {
-          const currentState = get();
-          set({
-            ...data,
-            ...(currentState.isLoggingOut && { isLoggingOut: undefined }),
-          }); // partial update
-        },
-        resetStore: (isLoggingOut?: boolean) => {
-          set({ ...initialState, ...(isLoggingOut && { isLoggingOut }) });
-          // localStorage.clear(); // hard reset
-        },
-      }),
-      { name: "auth2" }, // 👈 store name for DevTools
-    ),
-    { name: "auth22" },
+    // devtools(
+    (set, get) => ({
+      ...initialState,
+      updateStore: (data) => {
+        const currentState = get();
+        set({
+          ...data,
+          ...(currentState.isLoggingOut && { isLoggingOut: undefined }),
+        }); // partial update
+      },
+      resetStore: (isLoggingOut?: boolean) => {
+        set({ ...initialState, ...(isLoggingOut && { isLoggingOut }) });
+        // localStorage.clear(); // hard reset
+      },
+    }),
+    //   { name: "auth2" }, //store name for DevTools
+    // ),
+    { name: "auth" },
   ),
 );
 export default useAuthStore;
