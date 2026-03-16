@@ -88,7 +88,7 @@ const AdminDashboard = () => {
 
   return (
     <Row gutter={[16, 16]}>
-      <Col xs={24} lg={12}>
+      <Col xs={24} lg={8}>
         <Card
           title="Customer Statistics"
           extra={
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
           </div>
         </Card>
       </Col>
-      <Col xs={24} lg={12}>
+      <Col xs={24} lg={16}>
         <CustomerMeasurementChart customers={filteredCustomers} />
       </Col>
     </Row>
