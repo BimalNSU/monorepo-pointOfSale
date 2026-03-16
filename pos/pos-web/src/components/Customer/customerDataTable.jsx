@@ -25,7 +25,7 @@ import {
 } from "@ant-design/icons";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
@@ -46,11 +46,13 @@ const CustomerDataTable = ({ status, data }) => {
 
   const { userId: authUserId, session } = useFirebaseAuth();
   const db = useFirestore();
-  const customerService = new CustomerService(db);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [filteredCustomers, setFilteredCustomers] = useState([]);
 
+  const customerService = useMemo(() => {
+    return new CustomerService(db);
+  }, [db]);
   useDebounce(
     () => {
       if (!data?.length) {
@@ -84,6 +86,9 @@ const CustomerDataTable = ({ status, data }) => {
     500,
     [data, search],
   );
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [filteredCustomers]);
   const paginatedCustomers = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filteredCustomers.slice(start, start + pageSize);
@@ -96,11 +101,13 @@ const CustomerDataTable = ({ status, data }) => {
 
   const handleRemoveCustomer = async (e, record) => {
     confirm({
-      title: `Are you sure, want to delete this customer?`,
+      title: `Are you sure you want to delete this customer?`,
       async onOk() {
         try {
           await customerService.softDelete(record.id, authUserId);
-        } catch (err) {}
+        } catch (err) {
+          notification.error({ title: "Delete failed" });
+        }
       },
     });
   };
@@ -110,7 +117,9 @@ const CustomerDataTable = ({ status, data }) => {
       async onOk() {
         try {
           await customerService.restore(record.id, authUserId);
-        } catch (err) {}
+        } catch (err) {
+          notification.error({ title: "Restore failed" });
+        }
       },
     });
   };
@@ -125,44 +134,49 @@ const CustomerDataTable = ({ status, data }) => {
       {record.isDeleted ? <Text type="danger">{text}</Text> : text}
     </Link>
   );
-  const highlightText = (text) => {
-    if (!search || !text) {
-      return text;
-    }
 
-    const elements = [];
-    let lastIndex = 0;
-
-    String(text).replace(searchRegex, (match, offset) => {
-      // Push text before match
-      if (offset > lastIndex) {
-        elements.push(text.slice(lastIndex, offset));
+  //prevents re-creation every render.
+  const highlightText = useCallback(
+    (text) => {
+      if (!search || !text) {
+        return text;
       }
 
-      // Push highlighted match
-      elements.push(
-        <span
-          key={offset}
-          style={{
-            backgroundColor: "#ffc069",
-            padding: "0 2px",
-            borderRadius: "2px",
-          }}
-        >
-          {match}
-        </span>,
-      );
+      const elements = [];
+      let lastIndex = 0;
 
-      lastIndex = offset + match.length;
-      return match;
-    });
+      String(text).replace(searchRegex, (match, offset) => {
+        // Push text before match
+        if (offset > lastIndex) {
+          elements.push(text.slice(lastIndex, offset));
+        }
 
-    // Push remaining text
-    if (lastIndex < text.length) {
-      elements.push(text.slice(lastIndex));
-    }
-    return elements;
-  };
+        // Push highlighted match
+        elements.push(
+          <span
+            key={offset}
+            style={{
+              backgroundColor: "#ffc069",
+              padding: "0 2px",
+              borderRadius: "2px",
+            }}
+          >
+            {match}
+          </span>,
+        );
+
+        lastIndex = offset + match.length;
+        return match;
+      });
+
+      // Push remaining text
+      if (lastIndex < text.length) {
+        elements.push(text.slice(lastIndex));
+      }
+      return elements;
+    },
+    [searchRegex],
+  );
 
   const renderActionItems = (record) => {
     const arr = [];
@@ -329,6 +343,7 @@ const CustomerDataTable = ({ status, data }) => {
   }
   const rowSelection = {
     selectedRowKeys,
+    preserveSelectedRowKeys: true,
     onChange: (newSelectedRowKeys) => {
       setSelectedRowKeys(newSelectedRowKeys);
     },
@@ -350,7 +365,7 @@ const CustomerDataTable = ({ status, data }) => {
   };
 
   const handleBulkExport = () => {
-    const selectedCustomers = paginatedCustomers.filter((c) => selectedRowKeys.includes(c.id));
+    const selectedCustomers = filteredCustomers.filter((c) => selectedRowKeys.includes(c.id));
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -370,11 +385,22 @@ const CustomerDataTable = ({ status, data }) => {
   };
 
   const updateParams = (newParams) => {
-    setSearchParams({
-      page: newParams.page ?? page,
-      limit: newParams.limit ?? pageSize,
-      ...(newParams.search && { search: newParams.search ?? search }),
-    });
+    const params = new URLSearchParams(searchParams);
+
+    if (newParams.page !== undefined) {
+      params.set("page", String(newParams.page));
+    }
+    if (newParams.limit !== undefined) {
+      params.set("limit", String(newParams.limit));
+    }
+    if (newParams.search !== undefined) {
+      if (newParams.search === "") {
+        params.delete("search"); // remove empty search
+      } else {
+        params.set("search", newParams.search);
+      }
+    }
+    setSearchParams(params);
   };
   return (
     <>
@@ -487,7 +513,7 @@ const CustomerDataTable = ({ status, data }) => {
         <Select
           size="middle"
           value={pageSize}
-          onChange={(value) => updateParams({ limit: value })}
+          onChange={(value) => updateParams({ page: 1, limit: value })}
           // style={{
           //   width: isMobile ? "45%" : 140,
           //   minWidth: 120,
