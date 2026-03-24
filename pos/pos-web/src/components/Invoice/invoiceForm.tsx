@@ -27,14 +27,13 @@ interface FormProps {
   >;
 }
 interface TableInvoiceItem extends Omit<InvoiceItem, "description" | "discount"> {
-  discount?: number;
+  discount?: number | null;
 }
 
 const InvoiceForm: React.FC<FormProps> = ({ onSubmit, onReset, initialInvoiceData }) => {
   const [invoiceItems, setInvoiceItems] = useState<TableInvoiceItem[]>(
     initialInvoiceData?.items.map((item) => {
-      const { discount, ...rest } = item;
-      return { ...rest, key: item.productId };
+      return { ...item, key: item.productId };
     }) || [],
   );
   const [salesForm] = Form.useForm();
