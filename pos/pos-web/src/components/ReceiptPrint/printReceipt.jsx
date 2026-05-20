@@ -135,8 +135,8 @@ const PrintReceipt = ({ invoice, directPrint, onAfterPrint }) => {
               <td>Payment Methods</td>
               <td></td>
             </tr>
-            {invoice.payments.map((p) => (
-              <tr>
+            {invoice.paymentViews.map((p) => (
+              <tr key={p.accountId}>
                 <td>{p.name}:</td>
                 <td>{convertToBD(p.amount)}</td>
               </tr>

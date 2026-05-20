@@ -112,7 +112,7 @@ const InvoiceView = ({ invoice }) => {
               >
                 <table>
                   <tbody>
-                    {invoice.payments.map((p) => (
+                    {invoice.paymentViews.map((p) => (
                       <tr key={p.accountId}>
                         <td>{p.name}</td>
                         <td>{`: ${convertToBD(p.amount)} TK.`}</td>

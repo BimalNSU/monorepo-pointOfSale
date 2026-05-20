@@ -58,10 +58,9 @@ export const useInvoice = (id: InvoiceId) => {
   }, [accountStatus, invoiceStatus]);
   const data = useMemo(() => {
     if (invoice && paymentAccounts?.length) {
-      const { payments, ...rest } = invoice;
       return {
-        ...rest,
-        payments: Object.entries(payments).map(([accountId, amount]) => {
+        ...invoice,
+        paymentViews: Object.entries(invoice.payments).map(([accountId, amount]) => {
           const matchedAccount = paymentAccounts.find((pAcc) => pAcc.id === accountId);
           return { accountId, amount, name: matchedAccount?.name || "" };
         }),

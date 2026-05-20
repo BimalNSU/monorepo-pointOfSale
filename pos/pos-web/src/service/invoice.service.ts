@@ -13,6 +13,7 @@ import { DocumentCounter } from "@/db-collections/documentCounter.collection";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import { Product } from "@/db-collections/product.collection";
 import ProductService from "./product.service";
+import { ChartOfAccount } from "@/db-collections/chartOfAccount.collection";
 
 type omitKeys =
   | "createdAt"
@@ -99,7 +100,15 @@ class InvoiceService extends Invoice {
       );
     });
     await batch.commit();
-    return await this.get(nInvoice.id);
+    const newInvoice = await this.get(nInvoice.id);
+    const accounts = await new ChartOfAccount(this.db).getByIds(newInvoice.paymentAccountIds);
+    return {
+      ...newInvoice,
+      paymentViews: Object.entries(payments).map(([accountId, amount]) => {
+        const matchedAccount = accounts.find((pAcc) => pAcc.id === accountId);
+        return { accountId, amount, name: matchedAccount?.name || "" };
+      }),
+    };
   }
   async update(id: InvoiceId, updatedData: Data, oldData: InvoiceModel, updatedBy: UserId) {
     const batch = writeBatch(this.db);
