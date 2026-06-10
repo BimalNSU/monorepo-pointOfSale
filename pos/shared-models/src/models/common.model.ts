@@ -73,6 +73,7 @@ export type ChartOfAccountId = string;
 export type AccountTypeId = string;
 export type AccountBalanceId = string;
 export type CustomerId = string;
+export type CustomerFeedbackId = string;
 export interface BaseModel {
   createdAt: Date | FieldValue;
   createdBy: UserId;

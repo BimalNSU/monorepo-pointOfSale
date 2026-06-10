@@ -15,6 +15,7 @@ export * from "./models/accountType.model";
 export * from "./models/accountBalance.model";
 
 export * from "./models/customer.model";
+export * from "./models/customerFeedback.model";
 
 //COLLECTIONS
 export * from "./constants/collections";
