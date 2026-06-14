@@ -1,20 +1,8 @@
-import { CustomerFeedback, WithId } from "@pos/shared-models";
-import {
-  Avatar,
-  Button,
-  Col,
-  Descriptions,
-  Divider,
-  Rate,
-  Row,
-  Space,
-  Tag,
-  Typography,
-} from "antd";
+import { Avatar, Button, Col, Divider, Rate, Row, Space, Tag, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { FeedbackRow } from "../feedback.type";
-import { StarOutlined, UserOutlined } from "@ant-design/icons";
+import { StarOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 
 export const feedbackColumns = (
@@ -24,7 +12,7 @@ export const feedbackColumns = (
     dataIndex: "mobileIndex",
     key: "mobileIndex",
     render: (_, record) => (
-      <>
+      <div onClick={() => onView(record)}>
         <Row justify="space-between" align="top">
           <Col>
             <Space>
@@ -56,19 +44,34 @@ export const feedbackColumns = (
 
         <Space orientation="vertical" size={12} style={{ width: "100%" }}>
           <div>
-            🛍️ Collection: <Rate disabled value={record.collection} />
+            🛍️ Collection: <Rate disabled size="small" value={record.collection} />
           </div>
           <div>
-            💰 Value for Money: <Rate disabled value={record.valueForMoney} />
+            💰 Value for Money: <Rate disabled size="small" value={record.valueForMoney} />
           </div>
           <div>
-            😊 Staff Service: <Rate disabled value={record.staffService} />
+            😊 Staff Service: <Rate disabled size="small" value={record.staffService} />
           </div>
           <div>
-            🏪 Store Ambience: <Rate disabled value={record.storeAmbience} />
+            🏪 Store Ambience: <Rate disabled size="small" value={record.storeAmbience} />
+          </div>
+          <div>
+            {`Average Rating: `}
+            {(() => {
+              const avg =
+                (record.collection +
+                  record.valueForMoney +
+                  record.staffService +
+                  record.storeAmbience) /
+                4;
+              let color = "red";
+              if (avg >= 4.5) color = "green";
+              else if (avg >= 3.5) color = "gold";
+              return <Tag color={color}>{avg.toFixed(1)}</Tag>;
+            })()}
           </div>
         </Space>
-      </>
+      </div>
     ),
     responsive: ["xs"],
   },
@@ -88,28 +91,28 @@ export const feedbackColumns = (
     title: "Collection",
     dataIndex: "collection",
     width: 120,
-    render: (value: number) => <Rate disabled value={value} />,
+    render: (value: number) => <Rate disabled size="small" value={value} />,
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
     title: "Value",
     dataIndex: "valueForMoney",
     width: 120,
-    render: (value: number) => <Rate disabled value={value} />,
+    render: (value: number) => <Rate disabled size="small" value={value} />,
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
     title: "Staff",
     dataIndex: "staffService",
     width: 120,
-    render: (value: number) => <Rate disabled value={value} />,
+    render: (value: number) => <Rate disabled size="small" value={value} />,
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
     title: "Ambience",
     dataIndex: "storeAmbience",
     width: 120,
-    render: (value: number) => <Rate disabled value={value} />,
+    render: (value: number) => <Rate disabled size="small" value={value} />,
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
@@ -123,9 +126,9 @@ export const feedbackColumns = (
 
       if (avg >= 4.5) color = "green";
       else if (avg >= 3.5) color = "gold";
-
       return <Tag color={color}>{avg.toFixed(1)}</Tag>;
     },
+    align: "center",
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {

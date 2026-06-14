@@ -20,19 +20,19 @@ export function FeedbackDrawer({ open, feedback, onClose }: Props) {
         <Descriptions.Item label="Mobile">{feedback.mobile}</Descriptions.Item>
 
         <Descriptions.Item label="Collection">
-          <Rate disabled value={feedback.collection} />
+          <Rate disabled size="small" value={feedback.collection} />
         </Descriptions.Item>
 
         <Descriptions.Item label="Value for Money">
-          <Rate disabled value={feedback.valueForMoney} />
+          <Rate disabled size="small" value={feedback.valueForMoney} />
         </Descriptions.Item>
 
         <Descriptions.Item label="Staff Service">
-          <Rate disabled value={feedback.staffService} />
+          <Rate disabled size="small" value={feedback.staffService} />
         </Descriptions.Item>
 
         <Descriptions.Item label="Store Ambience">
-          <Rate disabled value={feedback.storeAmbience} />
+          <Rate disabled size="small" value={feedback.storeAmbience} />
         </Descriptions.Item>
 
         <Descriptions.Item label="Why visit again?">
