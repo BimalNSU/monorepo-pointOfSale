@@ -77,29 +77,29 @@ const FeedbackSummaryBar = ({ data }: Props) => {
   ];
   return (
     <Row gutter={[8, 8]} style={{ margin: 8 }}>
-      <Col span={12} xs={12} sm={12} md={4} lg={4} xl={4}>
+      <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Card size="small" variant="borderless">
           <Statistic title="Total Feedback" value={summary?.totalFeedbacks} />
         </Card>
       </Col>
-      <Col span={12} xs={12} sm={12} md={4} lg={4} xl={4}>
+      <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Card size="small" variant="borderless">
           <Statistic title="Average Rating" value={summary?.avgRating} suffix="/ 5" precision={1} />
         </Card>
       </Col>
-      <Col span={10} xs={10} sm={10} md={4} lg={4} xl={4}>
+      <Col xs={10} sm={10} md={4} lg={4} xl={4}>
         <Card size="small" variant="borderless">
           <Statistic title="5-Star Reviews" value={summary?.fiveStarReviews} />
         </Card>
       </Col>
-      <Col span={14} xs={14} sm={14} md={4} lg={4} xl={4}>
+      <Col xs={14} sm={14} md={4} lg={4} xl={4}>
         <Card size="small" variant="borderless">
           <Statistic title="Improvement Suggestions" value={summary?.suggestions} />
         </Card>
       </Col>
-      <Col span={24} xs={24} sm={24} md={4} lg={4} xl={4}>
+      <Col xs={24} sm={24} md={8} lg={8} xl={8}>
         <Card size="small" variant="borderless">
-          <Descriptions size="small" column={1} title="Average Ratings" items={items} />
+          <Descriptions size="small" column={2} title="Average Ratings" items={items} />
         </Card>
       </Col>
     </Row>
