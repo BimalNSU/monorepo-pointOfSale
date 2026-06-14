@@ -7,10 +7,10 @@ const { Text } = Typography;
 
 export const feedbackColumns = (
   onView: (feedback: FeedbackRow) => void,
+  highlightText: (text: string) => React.ReactNode,
 ): ColumnsType<FeedbackRow> => [
   {
     dataIndex: "mobileIndex",
-    key: "mobileIndex",
     render: (_, record) => (
       <div onClick={() => onView(record)}>
         <Row justify="space-between" align="top">
@@ -23,7 +23,7 @@ export const feedbackColumns = (
                 }}
               />
               <div>
-                <div style={{ fontWeight: 500 }}>{record.customerName}</div>
+                <div style={{ fontWeight: 500 }}>{highlightText(record.customerName)}</div>
                 <div style={{ fontSize: 12, color: "#888" }}>
                   #{record.id} · {record.createdAt}
                 </div>
@@ -36,7 +36,7 @@ export const feedbackColumns = (
             Mobile:
           </Text>
           <a href={`tel:${record.mobile}`} style={{ color: "#1677ff" }}>
-            {record.mobile}
+            {highlightText(record.mobile)}
           </a>
         </div>
 
@@ -79,12 +79,14 @@ export const feedbackColumns = (
     title: "Customer",
     dataIndex: "customerName",
     width: 180,
+    render: (text) => highlightText(text),
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
     title: "Mobile",
     dataIndex: "mobile",
     width: 140,
+    render: (text) => highlightText(text),
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
@@ -135,7 +137,6 @@ export const feedbackColumns = (
     title: "Submitted",
     dataIndex: "createdAt",
     width: 140,
-    render: (value: string) => dayjs(value).format("DD MMM YYYY"),
     responsive: ["md", "lg", "xl", "xxl"],
   },
   {
