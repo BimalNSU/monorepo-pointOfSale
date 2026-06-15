@@ -50,7 +50,7 @@ const CustomerFeedbackForm = () => {
   }
   return (
     <div className={styles.container}>
-      <Card className={styles.card}>
+      <Card className={styles.card} size="small">
         <div className={styles.header}>
           <Title level={2} className={styles.title}>
             🎁 Help Us Improve & Win a Surprise Gift!
@@ -59,7 +59,16 @@ const CustomerFeedbackForm = () => {
           <Text className={styles.subtitle}>Your feedback helps us serve you better.</Text>
         </div>
 
-        <Form form={form} layout="vertical" onFinish={onFinish} className={styles.form}>
+        <Form
+          form={form}
+          layout="horizontal"
+          onFinish={onFinish}
+          // className={styles.form}
+          labelCol={{ flex: "130px" }}
+          labelAlign="left"
+          labelWrap
+          // wrapperCol={{ flex: 1 }}
+        >
           <div className={styles.section}>
             <Title level={5}>Customer Information</Title>
 
@@ -103,19 +112,39 @@ const CustomerFeedbackForm = () => {
           <div className={styles.section}>
             <Title level={5}>Rate Your Experience</Title>
 
-            <Form.Item label="🛍️ Collection" name="collection" rules={[{ required: true }]}>
+            <Form.Item
+              label="🛍️ Collection"
+              name="collection"
+              rules={[{ required: true }]}
+              labelCol={{ span: 6 }}
+            >
               <Rate className={styles.rate} />
             </Form.Item>
 
-            <Form.Item label="💰 Value for Money" name="valueForMoney" rules={[{ required: true }]}>
+            <Form.Item
+              label="💰 Value for Money"
+              name="valueForMoney"
+              rules={[{ required: true }]}
+              labelCol={{ span: 6 }}
+            >
               <Rate className={styles.rate} />
             </Form.Item>
 
-            <Form.Item label="😊 Staff Service" name="staffService" rules={[{ required: true }]}>
+            <Form.Item
+              label="😊 Staff Service"
+              name="staffService"
+              rules={[{ required: true }]}
+              labelCol={{ span: 6 }}
+            >
               <Rate className={styles.rate} />
             </Form.Item>
 
-            <Form.Item label="🏪 Store Ambience" name="storeAmbience" rules={[{ required: true }]}>
+            <Form.Item
+              label="🏪 Store Ambience"
+              name="storeAmbience"
+              rules={[{ required: true }]}
+              labelCol={{ span: 6 }}
+            >
               <Rate className={styles.rate} />
             </Form.Item>
           </div>
@@ -126,6 +155,8 @@ const CustomerFeedbackForm = () => {
             <Form.Item
               label='Complete the sentence: "I would visit Organic Design again because..."'
               name="revisitReason"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
               rules={[
                 {
                   required: true,
@@ -136,7 +167,12 @@ const CustomerFeedbackForm = () => {
               <TextArea rows={4} maxLength={500} showCount placeholder="Share your experience..." />
             </Form.Item>
 
-            <Form.Item label="One thing we should improve" name="improvement">
+            <Form.Item
+              label="One thing we should improve"
+              name="improvement"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+            >
               <TextArea rows={4} maxLength={500} showCount placeholder="Your suggestion..." />
             </Form.Item>
           </div>
