@@ -21,7 +21,7 @@ const FeedbackSummaryBar = ({ data }: Props) => {
         if (curr.improvement?.length) {
           pre.suggestions++;
         }
-        if (currRating === 25) {
+        if (currRating === 20) {
           pre.fiveStarReviews++;
         }
         return pre;
