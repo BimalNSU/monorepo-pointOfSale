@@ -16,8 +16,8 @@ const CustomerFeedbackList = () => {
   const navigate = useNavigate();
   const [searchForm] = Form.useForm();
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = Number(searchParams.get("page"));
-  const pageSize = Number(searchParams.get("pageSize"));
+  const currentPage = Number(searchParams.get("page") || 1);
+  const pageSize = Number(searchParams.get("pageSize") || 10);
   const startDateStr = searchParams.get("startDate");
   const startDate = startDateStr ? dayjs(startDateStr, "YYYY-MM-DD") : null;
   const endDateStr = searchParams.get("endDate");
@@ -76,8 +76,8 @@ const CustomerFeedbackList = () => {
     [feedbacks, startDate, endDate, searchTerm],
   );
   const paginatedFeedbacks = useMemo(() => {
-    const start = ((currentPage || 1) - 1) * (pageSize || 10);
-    return filteredFeedbacks?.slice(start, start + (pageSize || 10)) || [];
+    const start = (currentPage - 1) * pageSize;
+    return filteredFeedbacks?.slice(start, start + pageSize) || [];
   }, [filteredFeedbacks, currentPage, pageSize]);
 
   const highlightText = useCallback(
@@ -138,6 +138,15 @@ const CustomerFeedbackList = () => {
       endDate: values.endDate?.format("YYYY-MM-DD"),
     });
   };
+  const handlePagination = (page: number, pageSize: number) => {
+    updateParams({
+      page,
+      pageSize,
+      searchTerm,
+      startDate: startDateStr,
+      endDate: endDateStr,
+    });
+  };
   return (
     <>
       <div style={{ margin: "8px 8px  8px 0" }}>
@@ -176,35 +185,20 @@ const CustomerFeedbackList = () => {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "end",
           alignItems: "center",
           gap: 12,
           flexWrap: "wrap",
           margin: "8px 8px 0 8px",
         }}
       >
-        {/* Page Size */}
-        <Select
-          size="small"
-          value={pageSize ? pageSize : 10}
-          onChange={(value) => updateParams({ page: 1, pageSize: value })}
-          // style={{
-          //   width: isMobile ? "45%" : 140,
-          //   minWidth: 120,
-          // }}
-          options={[
-            { value: 10, label: "10 / page" },
-            { value: 20, label: "20 / page" },
-            { value: 50, label: "50 / page" },
-          ]}
-        />
         <Pagination
-          current={currentPage ? 1 : currentPage}
-          pageSize={pageSize ? pageSize : 10}
+          current={currentPage}
+          pageSize={pageSize}
           total={filteredFeedbacks?.length}
-          onChange={(p) => updateParams({ page: p })}
+          onChange={handlePagination}
           size="small"
-          showSizeChanger={false}
+          showSizeChanger
           // simple={isMobile}
           // style={{
           //   width: isMobile ? "50%" : "auto",
