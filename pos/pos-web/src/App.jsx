@@ -16,10 +16,10 @@ import RequireAuth from "./pages/Layout/requireAuth";
 
 const CustomerLayout = lazy(() => import("./pages/Layout/Customer-layout/customerLayout"));
 
-const CustomerAdd = lazy(() => import("./pages/Customer/CustomerAdd"));
-const CustomerProfile = lazy(() => import("./pages/Customer/customerProfile"));
-const Customers = lazy(() => import("./pages/Customer/customers"));
-const DeletedCustomers = lazy(() => import("./pages/Customer/deletedCustomers"));
+const CustomerAdd = lazy(() => import("./Modules/Customer/pages/CustomerAdd"));
+const CustomerProfile = lazy(() => import("./Modules/Customer/pages/customerProfile"));
+const CustomerList = lazy(() => import("./Modules/Customer/pages/CustomerList"));
+const DeletedCustomers = lazy(() => import("./Modules/Customer/pages/deletedCustomers"));
 
 const PublishedProducts = lazy(() => import("./pages/Layout/Customer-layout/publishedProducts"));
 const OfficeAddress = lazy(() => import("./pages/Layout/Customer-layout/addressSection"));
@@ -53,6 +53,9 @@ const BkashTransactions = lazy(() => import("./pages/common/bkashTransactions"))
 
 const TestBarcode = lazy(() => import("./pages/ManagerView/testBarcode"));
 const PrintBarcode = lazy(() => import("./pages/ManagerView/printBarcode"));
+
+const CustomerFeedbackForm = lazy(() => import("./pages/CustomerFeedbackForm"));
+const CustomerFeedbackList = lazy(() => import("./pages/customerFeedback/customerFeedbackList"));
 
 const NotFound = lazy(() => import("./pages/notFound"));
 
@@ -109,6 +112,7 @@ const App = () => {
             path="/login"
             element={!session?.id ? <Login /> : <Navigate to="/dashboard" replace />}
           />
+          <Route path="/feedback" element={<CustomerFeedbackForm />} />
 
           {/* ---------------- EMPLOYEE/ADMIN PORTAL ---------------- */}
           <Route element={<RequireAuth />}>
@@ -170,7 +174,7 @@ const App = () => {
                     </RequireRole>
                   }
                 >
-                  <Route index element={<Customers />} />
+                  <Route index element={<CustomerList />} />
                   <Route path="add" element={<CustomerAdd />} />
                   <Route path=":id" element={<CustomerProfile />} />
 
@@ -245,6 +249,21 @@ const App = () => {
                       ]}
                     >
                       <InvoiceReport />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="customer-feedbacks"
+                  element={
+                    <RequireRole
+                      allowedRoles={[USER_ROLE.VALUES.Admin, USER_ROLE.VALUES.Employee]}
+                      allowedShopRoles={[
+                        SHOP_ROLE.VALUES.Manager,
+                        SHOP_ROLE.VALUES.Salesman,
+                        SHOP_ROLE.VALUES.Cashier,
+                      ]}
+                    >
+                      <CustomerFeedbackList />
                     </RequireRole>
                   }
                 />

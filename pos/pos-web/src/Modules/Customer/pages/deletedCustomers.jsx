@@ -28,7 +28,7 @@ import { useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
-import { useCustomers } from "@/api/useCustomers";
+import { useCustomers } from "@/Modules/Customer/hooks/useCustomers";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const { Text } = Typography;

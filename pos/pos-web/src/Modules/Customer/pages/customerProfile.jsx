@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Card, Descriptions, Divider, Space, Row, Col, Result, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCustomer } from "@/api/useCustomer";
-import CustomerForm from "./CustomerForm";
+import CustomerForm from "./components/CustomerForm";
 import Loading from "@/components/loading";
 import { ClothType, PantFitType } from "@/constants/customer_cloth";
 const { Paragraph } = Typography;

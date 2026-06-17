@@ -3,9 +3,6 @@ import { WithId, Customer } from "@pos/shared-models";
 import { firestoreConverter } from "@/utils/converter";
 import { collection, query, where } from "firebase/firestore";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
-import { useMemo } from "react";
-import dayjs from "dayjs";
-import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const customerFirestoreConverter = firestoreConverter<WithId<Customer>>();
 type Filter = {
   role?: 1 | 2 | 3;

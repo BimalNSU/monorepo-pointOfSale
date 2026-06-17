@@ -17,7 +17,7 @@ import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
 import { Customer, WithId } from "@pos/shared-models";
-import * as validator from "../../utils/Validation/Validation";
+import * as validator from "../../../../utils/Validation/Validation";
 import { MobileNumberInputAntd, validatePhoneNumber } from "./MobileInputNumber";
 const { Title, Text } = Typography;
 const { TextArea } = Input;

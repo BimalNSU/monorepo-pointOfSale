@@ -1,5 +1,5 @@
 import { useDocumentFormat } from "@/api/useDocumentFormat";
-import CustomerForm from "./CustomerForm";
+import CustomerForm from "./components/CustomerForm";
 import { useNavigate } from "react-router-dom";
 import { DOCUMENT_FORMAT } from "@/constants/document-format";
 import Loading from "@/components/loading";
