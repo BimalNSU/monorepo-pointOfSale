@@ -13,22 +13,13 @@ import {
   Typography,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  DeleteOutlined,
-  DownOutlined,
-  MoreOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-  ExportOutlined,
-  RedoOutlined,
-} from "@ant-design/icons";
+import { MoreOutlined, UserOutlined, RedoOutlined } from "@ant-design/icons";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
 import { useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useDebounce } from "react-use";
-import { USER_ROLE } from "@pos/shared-models";
-import { useCustomers } from "@/Modules/Customer/hooks/useCustomers";
+import { useCustomers } from "../hooks/useCustomers";
 import dayjs from "dayjs";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 const { Text } = Typography;
@@ -55,22 +46,15 @@ const DeletedCustomers = () => {
         setCustomers([]);
         return;
       }
-      if (!search) {
-        setCustomers(
-          data.map((u) => {
-            const { createdAt, ...rest } = u;
-            return { ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: u.id };
-          }),
-        );
-        return;
-      }
-      const lowerSearch = search.toLowerCase();
+      const lowerSearch = search?.toLowerCase();
       const result = [];
       for (const c of data) {
         if (
-          c.firstName.toLowerCase().includes(lowerSearch) ||
-          c.mobile.includes(lowerSearch) ||
-          c.email?.toLowerCase().includes(lowerSearch)
+          !lowerSearch ||
+          (lowerSearch &&
+            (c.firstName.toLowerCase().includes(lowerSearch) ||
+              c.mobile.includes(lowerSearch) ||
+              c.email?.toLowerCase().includes(lowerSearch)))
         ) {
           const { createdAt, ...rest } = c;
           result.push({ ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: c.id });

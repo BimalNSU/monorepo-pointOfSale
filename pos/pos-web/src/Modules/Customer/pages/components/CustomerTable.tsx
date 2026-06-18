@@ -1,15 +1,4 @@
-import {
-  Avatar,
-  Col,
-  Dropdown,
-  Modal,
-  notification,
-  Row,
-  Space,
-  Table,
-  TableProps,
-  Typography,
-} from "antd";
+import { Avatar, Col, Dropdown, Row, Space, Table, TableProps, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DeleteOutlined,
@@ -18,17 +7,10 @@ import {
   UserOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
-import CustomerService from "@/service/customer.service";
-import { useFirestore } from "reactfire";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-import { Customer, FetchStatus, USER_ROLE, WithId } from "@pos/shared-models";
-import dayjs from "dayjs";
-import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
-import { TableRowSelection } from "antd/es/table/interface";
+import { useCallback, useMemo } from "react";
+import { Customer, FetchStatus, WithId } from "@pos/shared-models";
+
 const { Text } = Typography;
-const { confirm } = Modal;
-const DEFAULT_PAGE_SIZE = 10;
 interface CustomerRow extends Omit<WithId<Customer>, "createdAt"> {
   createdAt: string;
 }
@@ -56,9 +38,6 @@ const CustomerTable = ({
   onRestore,
 }: CustomerTableProps) => {
   const navigate = useNavigate();
-
-  //   const db = useFirestore();
-  //   const customerService = useMemo(() => new CustomerService(db), [db]);
 
   const searchRegex = useMemo(() => {
     if (!searchTerm) return null;
@@ -129,7 +108,7 @@ const CustomerTable = ({
         label: <span style={{ fontSize: 14 }}>{"Restore"}</span>,
         icon: <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 20 }} />,
         // onClick: (e: any) => handleRestoreCustomer(e, record),
-        onClick: (e: any) => onRestore(record),
+        onClick: () => onRestore(record),
       });
     } else {
       arr.push({
@@ -251,7 +230,7 @@ const CustomerTable = ({
     {
       title: "Email",
       dataIndex: "email",
-      render: (text, record) => renderValueCell(highlightText(text), record),
+      render: (text, record) => (text ? renderValueCell(highlightText(text), record) : "N/A"),
       responsive: ["md", "lg", "xl", "xxl"],
     },
   ];

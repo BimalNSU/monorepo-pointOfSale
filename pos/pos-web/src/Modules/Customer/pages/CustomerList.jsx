@@ -1,4 +1,4 @@
-import { Button, Card, Col, Modal, notification, Row, Typography } from "antd";
+import { Button, Card, Col, Modal, notification, Row } from "antd";
 import { Link, useSearchParams } from "react-router-dom";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
@@ -10,20 +10,19 @@ import dayjs from "dayjs";
 import styles from "../../../posButton.module.css";
 import customAntdStyles from "../../../customAntd.module.css";
 import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
-import CustomerToolbar from "@/Modules/Customer/pages/components/CustomerToolbar";
+import CustomerToolbar from "./components/CustomerToolbar";
 import TablePagination from "@/components/TablePagination/TablePagination";
 import CustomerTable from "./components/CustomerTable";
 import { useCustomers } from "../hooks/useCustomers";
 import { PlusOutlined } from "@ant-design/icons";
 
-const { Text } = Typography;
 const { confirm } = Modal;
 const DEFAULT_PAGE_SIZE = 10;
 
 const CustomerList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = Number(searchParams.get("page") || 1);
-  const pageSize = Number(searchParams.get("limit") || 10);
+  const pageSize = Number(searchParams.get("limit") || DEFAULT_PAGE_SIZE);
   const searchTerm = searchParams.get("q");
   const { status, data } = useCustomers({ isDeleted: false });
 
@@ -45,10 +44,11 @@ const CustomerList = () => {
       for (const c of data) {
         if (
           !lowerSearch ||
-          (lowerSearch && c.id.includes(lowerSearch)) ||
-          c.firstName.toLowerCase().includes(lowerSearch) ||
-          c.mobile.includes(lowerSearch) ||
-          c.email?.toLowerCase().includes(lowerSearch)
+          (lowerSearch &&
+            (c.id.includes(lowerSearch) ||
+              c.firstName.toLowerCase().includes(lowerSearch) ||
+              c.mobile.includes(lowerSearch) ||
+              c.email?.toLowerCase().includes(lowerSearch)))
         ) {
           const { createdAt, ...rest } = c;
           result.push({ ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: c.id });
