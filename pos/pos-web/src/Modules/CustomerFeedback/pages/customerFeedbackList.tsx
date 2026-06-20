@@ -17,7 +17,7 @@ const CustomerFeedbackList = () => {
   const [searchForm] = Form.useForm();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get("page") || 1);
-  const pageSize = Number(searchParams.get("pageSize") || 10);
+  const pageSize = Number(searchParams.get("limit") || 10);
   const startDateStr = searchParams.get("startDate");
   const startDate = startDateStr ? dayjs(startDateStr, "YYYY-MM-DD") : null;
   const endDateStr = searchParams.get("endDate");
@@ -124,8 +124,8 @@ const CustomerFeedbackList = () => {
     queryFilters.page ? queryParams.set("page", queryFilters.page) : queryParams.delete("page");
 
     queryFilters.pageSize
-      ? queryParams.set("pageSize", queryFilters.pageSize)
-      : queryParams.delete("pageSize");
+      ? queryParams.set("limit", queryFilters.pageSize)
+      : queryParams.delete("limit");
 
     setSearchParams(queryParams);
   };

@@ -1,30 +1,22 @@
 import { Avatar, Col, Dropdown, Row, Space, Table, TableProps, Typography } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  DeleteOutlined,
-  DownOutlined,
-  MoreOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, DownOutlined, MoreOutlined, UserOutlined } from "@ant-design/icons";
 import { useCallback, useMemo } from "react";
-import { Customer, FetchStatus, WithId } from "@pos/shared-models";
+import { FetchStatus } from "@pos/shared-models";
+import { Key, TableRowSelection } from "antd/es/table/interface";
+import { CustomerRow } from "../../customer.type";
 
 const { Text } = Typography;
-interface CustomerRow extends Omit<WithId<Customer>, "createdAt"> {
-  createdAt: string;
-}
 type CustomerTableProps = {
   isAdmin: boolean;
   data: CustomerRow[];
   status: FetchStatus;
   searchTerm?: string | null;
 
-  selectedRowKeys: string[];
-  onSelectionChange: (keys: React.Key[]) => void;
+  selectedRowKeys: Key[];
+  onSelectionChange: (keys: React.Key[], selectedRows: CustomerRow[]) => void;
 
   onDelete: (customer: CustomerRow) => void;
-  onRestore: (customer: CustomerRow) => void;
 };
 
 const CustomerTable = ({
@@ -35,7 +27,6 @@ const CustomerTable = ({
   selectedRowKeys,
   onSelectionChange,
   onDelete,
-  onRestore,
 }: CustomerTableProps) => {
   const navigate = useNavigate();
 
@@ -101,25 +92,16 @@ const CustomerTable = ({
   );
 
   const renderActionItems = (record: CustomerRow) => {
-    const arr = [];
-    if (record.isDeleted) {
-      arr.push({
-        key: "1",
-        label: <span style={{ fontSize: 14 }}>{"Restore"}</span>,
-        icon: <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 20 }} />,
-        // onClick: (e: any) => handleRestoreCustomer(e, record),
-        onClick: () => onRestore(record),
-      });
-    } else {
-      arr.push({
+    const arr = [
+      {
         key: "1",
         label: <span style={{ fontSize: 14 }}>{"Delete"}</span>,
         icon: <DeleteOutlined />,
         // onClick: (e: any) => handleRemoveCustomer(e, record),
         onClick: () => onDelete(record),
         danger: true,
-      });
-    }
+      },
+    ];
     return arr;
   };
   const columns: TableProps<CustomerRow>["columns"] = [
@@ -184,7 +166,6 @@ const CustomerTable = ({
               </Col>
             )}
           </Row>
-
           <div style={{ marginTop: 10 }} onClick={(e) => e.stopPropagation()}>
             <Text strong style={{ marginRight: "3px" }}>
               Mobile:
@@ -265,7 +246,7 @@ const CustomerTable = ({
       responsive: ["md", "lg", "xl", "xxl"],
     });
   }
-  const rowSelection = {
+  const rowSelection: TableRowSelection<CustomerRow> = {
     selectedRowKeys,
     preserveSelectedRowKeys: true,
     onChange: onSelectionChange,

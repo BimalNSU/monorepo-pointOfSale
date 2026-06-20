@@ -1,44 +1,45 @@
-import { DeleteOutlined, ExportOutlined, MoreOutlined } from "@ant-design/icons";
-import { Button, Col, Dropdown, Grid, Input, Row, Space } from "antd";
+import { Button, Col, Input, Row } from "antd";
 type TableFilterBarProps = {
-  isAdmin: boolean;
   searchTerm?: string | null;
-  selectedRow?: number;
+  selectedNumbers?: number;
+  onSelectPreview?: (showDrawer: boolean) => void;
   onSearch: (searchTerm?: string) => void;
-  onDelete?: () => void;
-  onExport?: () => void;
 };
 
 const CustomerToolbar = ({
-  isAdmin = false,
   searchTerm,
-  selectedRow = 0,
+  selectedNumbers = 0,
+  onSelectPreview,
   onSearch,
-  onDelete,
-  onExport,
 }: TableFilterBarProps) => {
-  const { useBreakpoint } = Grid;
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
+  // const { useBreakpoint } = Grid;
+  // const screens = useBreakpoint();
+  // const isMobile = !screens.md;
 
   return (
-    <Row gutter={[16, 10]} justify="space-between">
+    <Row gutter={[16, 10]} justify="space-between" style={{ margin: "5px" }}>
       <Col>
         <Input
           placeholder="Search by name, mobile or email"
           value={searchTerm || ""}
-          // onChange={(e) => setSearch(e.target.value)}
           onChange={(e) => onSearch?.(e.target.value)}
           allowClear
         />
         {/* <Search
-                    placeholder="Search customer"
-                    defaultValue={search}
-                    onSearch={(value) => updateParams({ page: 1, search: value })}
-                    style={{ width: 250, marginBottom: 16 }}
-                  /> */}
+          placeholder="Search customer"
+          defaultValue={search}
+          onSearch={(value) => updateParams({ page: 1, search: value })}
+          style={{ width: 250, marginBottom: 16 }}
+        /> */}
       </Col>
       <Col>
+        {selectedNumbers > 0 && onSelectPreview && (
+          <Button color="volcano" variant="filled" onClick={() => onSelectPreview(true)}>
+            Selected ({selectedNumbers})
+          </Button>
+        )}
+      </Col>
+      {/* <Col>
         {selectedRow > 0 &&
           (isMobile ? (
             <Dropdown
@@ -78,7 +79,7 @@ const CustomerToolbar = ({
               </Button>
             </Space>
           ))}
-      </Col>
+      </Col> */}
     </Row>
   );
 };

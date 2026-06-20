@@ -2,20 +2,17 @@ import { Button, Card, Col, Modal, notification, Row } from "antd";
 import { Link, useSearchParams } from "react-router-dom";
 import CustomerService from "@/service/customer.service";
 import { useFirestore } from "reactfire";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
-import { useDebounce } from "react-use";
 import { USER_ROLE } from "@pos/shared-models";
-import dayjs from "dayjs";
 import styles from "../../../posButton.module.css";
 import customAntdStyles from "../../../customAntd.module.css";
-import { DATE_TIME_FORMAT } from "@/constants/dateFormat";
 import CustomerToolbar from "./components/CustomerToolbar";
 import TablePagination from "@/components/TablePagination/TablePagination";
 import CustomerTable from "./components/CustomerTable";
-import { useCustomers } from "../hooks/useCustomers";
 import { PlusOutlined } from "@ant-design/icons";
-
+import { useCustomersPaginated } from "../hooks/useCustomersPaginated";
+import CustomerSelectionDrawer from "./components/CustomerSelectionDrawer";
 const { confirm } = Modal;
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -24,50 +21,22 @@ const CustomerList = () => {
   const page = Number(searchParams.get("page") || 1);
   const pageSize = Number(searchParams.get("limit") || DEFAULT_PAGE_SIZE);
   const searchTerm = searchParams.get("q");
-  const { status, data } = useCustomers({ isDeleted: false });
+  const {
+    status,
+    data: customers,
+    itemCount,
+  } = useCustomersPaginated({ page, pageSize, searchTerm });
 
   const { userId: authUserId, session } = useFirebaseAuth();
   const db = useFirestore();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-  const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const customerService = useMemo(() => new CustomerService(db), [db]);
-  useDebounce(
-    () => {
-      if (!data?.length) {
-        setFilteredCustomers([]);
-        return;
-      }
-      const lowerSearch = searchTerm?.toLowerCase();
-      const result = [];
-      for (const c of data) {
-        if (
-          !lowerSearch ||
-          (lowerSearch &&
-            (c.id.includes(lowerSearch) ||
-              c.firstName.toLowerCase().includes(lowerSearch) ||
-              c.mobile.includes(lowerSearch) ||
-              c.email?.toLowerCase().includes(lowerSearch)))
-        ) {
-          const { createdAt, ...rest } = c;
-          result.push({ ...rest, createdAt: dayjs(createdAt).format(DATE_TIME_FORMAT), key: c.id });
-        }
-      }
-      setFilteredCustomers(result);
-    },
-    500,
-    [data, searchTerm],
-  );
-  useEffect(() => {
-    setSelectedRowKeys([]);
-  }, [filteredCustomers]);
-  const paginatedCustomers = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredCustomers.slice(start, start + pageSize);
-  }, [filteredCustomers, page, pageSize]);
 
-  const handleRemoveCustomer = async (record) => {
+  const selectedRowKeys = useMemo(() => selectedCustomers.map((r) => r.id), [selectedCustomers]);
+
+  const handleSoftDeleteCustomer = async (record) => {
     confirm({
       title: `Are you sure you want to delete this customer?`,
       async onOk() {
@@ -75,18 +44,6 @@ const CustomerList = () => {
           await customerService.softDelete(record.id, authUserId);
         } catch (err) {
           notification.error({ title: "Delete failed" });
-        }
-      },
-    });
-  };
-  const handleRestoreCustomer = async (record) => {
-    confirm({
-      title: `Are you sure, want to restore this customer?`,
-      async onOk() {
-        try {
-          await customerService.restore(record.id, authUserId);
-        } catch (err) {
-          notification.error({ title: "Restore failed" });
         }
       },
     });
@@ -99,7 +56,8 @@ const CustomerList = () => {
         try {
           await customerService.softDeletes(selectedRowKeys, authUserId);
           notification.success({ title: "Selected customers deleted successfully", duration: 2 });
-          setSelectedRowKeys([]);
+          setSelectedCustomers([]);
+          setDrawerOpen(false);
         } catch (err) {
           notification.error({ title: "Fail to delete", duration: 2 });
         }
@@ -108,8 +66,6 @@ const CustomerList = () => {
   };
 
   const handleBulkExport = () => {
-    const selectedCustomers = filteredCustomers.filter((c) => selectedRowKeys.includes(c.id));
-
     const csvContent =
       "data:text/csv;charset=utf-8," +
       [
@@ -144,6 +100,16 @@ const CustomerList = () => {
       searchTerm,
     });
   };
+  const handleSelectRow = (_, nSelectedCustomers) => {
+    setSelectedCustomers(nSelectedCustomers);
+  };
+  const handleAllSelectedRowsClear = () => {
+    setSelectedCustomers([]);
+    setDrawerOpen(false);
+  };
+  const handleRemoveSelectedCustomers = (removeCustomerId) => {
+    setSelectedCustomers((prev) => prev.filter((u) => u.id !== removeCustomerId));
+  };
   return (
     <Card
       title={
@@ -175,7 +141,7 @@ const CustomerList = () => {
         <Pagination
           current={page}
           pageSize={pageSize}
-          total={filteredCustomers.length}
+          total={itemCount}
           onChange={(p) => updateParams({ page: p, pageSize, searchTerm })}
           size="small"
           showSizeChanger={false}
@@ -184,28 +150,37 @@ const CustomerList = () => {
       <CustomerToolbar
         isAdmin={session?.role === USER_ROLE.VALUES.Admin}
         searchTerm={searchTerm}
-        selectedRow={selectedRowKeys.length}
+        selectedNumbers={selectedRowKeys.length}
         onSearch={(value) =>
           updateParams({ page: 1, pageSize: DEFAULT_PAGE_SIZE, searchTerm: value })
         }
-        onDelete={handleBulkDelete}
-        onExport={handleBulkExport}
+        onSelectPreview={(value) => setDrawerOpen(value)}
       />
+
       <CustomerTable
         isAdmin={session?.role === USER_ROLE.VALUES.Admin}
-        data={paginatedCustomers}
+        data={customers}
         status={status}
         searchTerm={searchTerm}
         selectedRowKeys={selectedRowKeys}
-        onSelectionChange={setSelectedRowKeys}
-        onDelete={handleRemoveCustomer}
-        onRestore={handleRestoreCustomer}
+        onSelectionChange={handleSelectRow}
+        onDelete={handleSoftDeleteCustomer}
       />
 
       <TablePagination
-        meta={{ page, pageSize, itemCount: filteredCustomers.length }}
+        meta={{ page, pageSize, itemCount }}
         label="customers"
         onChange={handleChangePagination}
+      />
+
+      <CustomerSelectionDrawer
+        open={drawerOpen}
+        customers={selectedCustomers}
+        onClose={() => setDrawerOpen(false)}
+        onRemove={handleRemoveSelectedCustomers}
+        onClearAll={handleAllSelectedRowsClear}
+        onExport={handleBulkExport}
+        onDelete={handleBulkDelete}
       />
     </Card>
   );
