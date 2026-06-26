@@ -174,6 +174,7 @@ const CustomerList = () => {
       />
 
       <CustomerSelectionDrawer
+        isAdmin={session?.role === USER_ROLE.VALUES.Admin}
         open={drawerOpen}
         customers={selectedCustomers}
         onClose={() => setDrawerOpen(false)}

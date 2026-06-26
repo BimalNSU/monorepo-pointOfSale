@@ -4,6 +4,7 @@ import { Avatar, Button, Col, Drawer, Row, Space, Table, Typography } from "antd
 import { DeleteOutlined, DownloadOutlined, UserOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 interface CustomerSelectionDrawerProps {
+  isAdmin: boolean;
   open: boolean;
   customers: CustomerRow[];
   onClose: () => void;
@@ -14,6 +15,7 @@ interface CustomerSelectionDrawerProps {
 }
 
 const CustomerSelectionDrawer = ({
+  isAdmin = false,
   open,
   customers,
   onClose,
@@ -110,9 +112,11 @@ const CustomerSelectionDrawer = ({
               Export
             </Button>
 
-            <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={onDelete}>
-              Delete
-            </Button>
+            {isAdmin && (
+              <Button color="danger" variant="solid" icon={<DeleteOutlined />} onClick={onDelete}>
+                Delete
+              </Button>
+            )}
           </Space>
         </Col>
       </Row>
