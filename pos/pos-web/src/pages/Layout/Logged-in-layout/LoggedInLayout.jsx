@@ -8,6 +8,7 @@ import CustomSidebar from "./custom-sider";
 import PopHoverProfile from "./pop-hover-profile";
 import { SHOP_ROLE, USER_ROLE } from "@pos/shared-models";
 import DisplayShop from "@/components/shop/displayShop";
+import LanguageButton from "@/settings/components/LanguageSwitcher";
 // import Notificationlist from "@/components/Notification/NotificationList";
 // import OwnerApp from "../../SalesmanView/OwnerApp/OwnerApp";
 // import TenantApp from "../../TenantView/TenantApp/TenantApp";
@@ -129,6 +130,7 @@ const LoggedInLayout = () => {
             </span> */}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <LanguageButton />
             <Popover
               content={notificationContent}
               title="Notifications"
@@ -182,7 +184,13 @@ const LoggedInLayout = () => {
           </div>
         </Header>
 
-        <Content style={{ margin: "10px", padding: "2px", background: "#fff" }}>
+        <Content
+          style={{
+            margin: "10px",
+            padding: "2px",
+            // background: "#fff"
+          }}
+        >
           <div
           // className="site-layout-background" style={{ paddingBottom: "70px" }}
           >
