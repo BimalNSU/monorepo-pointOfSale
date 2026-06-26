@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useFirebaseAuth } from "@/utils/hooks/useFirebaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useFirestore } from "reactfire";
-import { Button, Card, Form, Row, Tag } from "antd";
+import { Button, Card, Form, message, Row, Tag } from "antd";
 import ProductService from "@/service/product.service";
 import { useDocumentFormat } from "@/api/useDocumentFormat";
 import ProductForm from "./subComponent/productForm";
 import useFirebaseMultiUpload from "@/api/useFirebaseMultiUpload";
 import ProductImagesSection from "./subComponent/productImageSection";
+import { USER_ROLE } from "@pos/shared-models";
+import { FOLDERS } from "@/constants/folders";
 
 const ProductAdd = () => {
   const { uploadFiles, progress, uploading, uploadedCount, totalCount } = useFirebaseMultiUpload();
@@ -27,54 +29,61 @@ const ProductAdd = () => {
     fileList.forEach((f) => f.preview && f.file && URL.revokeObjectURL(f.preview));
     setFileList([]);
   };
+
   const handleFormSubmit = async (values) => {
-    if (!fileList.length) {
-      message.warning("Please select images");
-      return;
-    }
-
+    // if (!fileList.length) {
+    //   message.warning("Please select images");
+    //   return;
+    // }
     const imagesArray = [];
-    const folderPath = `${FOLDERS.products}/${newProductId}`;
-    const now = new Date();
+    const createProduct = async () => {
+      // const { qty, ...rest } = values;
+      const newProduct = {
+        ...values,
+        id: newProductId,
+        media: { images: imagesArray || [], videos: [] },
+        // ...(role === USER_ROLE.VALUES.Admin && { qty: values.qty }),
+      };
 
-    const filesToUpload = fileList.map((f, index) => ({
-      file: f.file,
-      folderPath,
-      metadata: {},
-      onSuccess: (fileData) => {
-        imagesArray.push({
-          path: fileData.path,
-          filename: fileData.filename,
-          isPrimary: f.isPrimary,
-          order: index + 1,
-          metadata: { createdAt: now, contentType: f.file.type },
-        });
-      },
-      onError: (err) => {
-        console.error("Upload failed:", err);
-        message.error(`Failed to upload ${f.name}`);
-      },
-    }));
-    try {
-      await uploadFiles({
-        files: filesToUpload,
-        concurrency: 3,
-        onAllSuccess: async () => {
-          const { qty, ...rest } = values;
-          const newProduct = {
-            ...rest,
-            id: newProductId,
-            media: { images: imagesArray, videos: [] },
-            ...(role === USER_ROLE.VALUES.Admin && { qty: values.qty }),
-          };
-          await productService.create(newProduct, {
-            userId,
-            role: session.role,
-            shopId: session.shopId,
-            shopRole: session.shopRole,
-          });
-        },
+      await productService.create(newProduct, {
+        userId,
+        role: session.role,
+        shopId: session.shopId,
+        shopRole: session.shopRole,
       });
+    };
+    try {
+      // Upload images only if any were selected
+      if (fileList.length) {
+        const folderPath = `${FOLDERS.products}/${newProductId}`;
+        const now = new Date();
+
+        const filesToUpload = fileList.map((f, index) => ({
+          file: f.file,
+          folderPath,
+          metadata: {},
+          onSuccess: (fileData) => {
+            imagesArray.push({
+              path: fileData.path,
+              filename: fileData.filename,
+              isPrimary: f.isPrimary,
+              order: index + 1,
+              metadata: { createdAt: now, contentType: f.file.type },
+            });
+          },
+          onError: (err) => {
+            console.error("Upload failed:", err);
+            message.error(`Failed to upload ${f.name}`);
+          },
+        }));
+        await uploadFiles({
+          files: filesToUpload,
+          concurrency: 3,
+          onAllSuccess: createProduct,
+        });
+      } else {
+        await createProduct();
+      }
       resetForm();
       setResponseMessage("success");
       message.success("Product created successfully!");
@@ -165,7 +174,7 @@ const ProductAdd = () => {
             size="large"
             htmlType="submit"
             loading={uploading}
-            disabled={!fileList.length}
+            // disabled={!fileList.length}
           >
             {uploading ? "Creating Product..." : "Create Product"}
           </Button>

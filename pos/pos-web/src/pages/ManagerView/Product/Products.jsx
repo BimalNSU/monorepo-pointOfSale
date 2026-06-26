@@ -59,6 +59,12 @@ const Products = () => {
           >
             <Text strong>No#:</Text> {record.id}
             <br />
+            {record.barcode && (
+              <>
+                <Text strong>Code:</Text> {record.barcode}
+                <br />
+              </>
+            )}
             <Text strong>Name:</Text> {record.name}
             <br />
             <Text strong>Description:</Text> {record.description ?? "N/A"}
@@ -101,6 +107,12 @@ const Products = () => {
       title: "#",
       dataIndex: "id",
       render: renderValueCell,
+      responsive: ["md", "lg", "xl", "xxl"],
+    },
+    {
+      title: "Code",
+      dataIndex: "barcode",
+      render: (text, record) => text && renderValueCell(text, record),
       responsive: ["md", "lg", "xl", "xxl"],
     },
     {
